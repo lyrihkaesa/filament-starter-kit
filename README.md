@@ -98,6 +98,33 @@ composer lint
 
 > Tips: Untuk pengguna Visual Studio Code, gunakan ekstensi [Laravel Pint](https://marketplace.visualstudio.com/items?itemName=open-southeners.laravel-pint) sebagai default formatter.
 
+Oke Kaesa, kita buat versi **ringkas di README.md** yang hanya menyinggung Rector dan link ke `docs/rector.md` supaya contributor tahu di mana melihat panduan lengkap. Contohnya:
+
+## 🛠 Code Refactoring with Rector
+
+Project ini menggunakan [Rector](https://github.com/rectorphp/rector) untuk otomatis melakukan refactoring, meningkatkan kualitas kode, dan menambahkan type declarations.  
+Kami juga menggunakan package [driftingly/rector-laravel](https://github.com/driftingly/rector-laravel) untuk aturan khusus Laravel.
+
+### Menjalankan Rector
+
+-   **Dry-run (cek tanpa perubahan)**:
+
+```bash
+composer test:refactor
+```
+
+-   **Apply fixes**:
+
+```bash
+composer refactor
+```
+
+> ⚠ Selalu commit perubahan sebelum menjalankan Rector untuk memudahkan rollback.
+
+### Dokumentasi Lengkap
+
+Lihat panduan lengkap konfigurasi, preset, rules, dan cara remove driftingly/rector-laravel di: [docs/rector.md](docs/rector.md)
+
 ## 📖 Dokumentasi Lanjutan
 
 [TODO]
