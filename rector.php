@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use RectorLaravel\Set\LaravelLevelSetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -23,4 +24,7 @@ return RectorConfig::configure()
         earlyReturn: true,
         strictBooleans: true,
     )
+    ->withSets([
+        LaravelLevelSetList::UP_TO_LARAVEL_120,
+    ])
     ->withPhpSets();
