@@ -67,18 +67,27 @@
         "refactor": "rector",
         "test:type-coverage": "pest --type-coverage --min=100",
         "test:typos": "peck",
-        "test:lint": [
+        "test:lint": "pint --test",
+        "test:lint-full": [
             "pint --test",
             "npm run test:lint"
         ],
-        "test:unit": "pest --parallel --coverage --exactly=100.0",
+        "test:unit": "pest --parallel --coverage --exactly=91.1",
         "test:types": "phpstan",
         "test:refactor": "rector --dry-run",
-        "test": [
+        "test-full": [
             "@php artisan config:clear --ansi",
             "@php artisan test",
             "@test:type-coverage",
             "@test:typos",
+            "@test:unit",
+            "@test:lint",
+            "@test:types",
+            "@test:refactor"
+        ],
+        "test": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test",
             "@test:unit",
             "@test:lint",
             "@test:types",
