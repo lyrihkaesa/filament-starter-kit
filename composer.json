@@ -1,11 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "lyrihkaesa/filament-starter-kit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Filament Starter Kit for Laravel with best practices",
     "keywords": [
         "laravel",
-        "framework"
+        "framework",
+        "filament",
+        "starter kit"
     ],
     "license": "MIT",
     "require": {
