@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+// use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use RectorLaravel\Set\LaravelLevelSetList;
 
 return RectorConfig::configure()
@@ -13,9 +13,9 @@ return RectorConfig::configure()
         __DIR__.'/database',
         __DIR__.'/public',
     ])
-    ->withSkip([
-        AddOverrideAttributeToOverriddenMethodsRector::class,
-    ])
+    // ->withSkip([
+    //     AddOverrideAttributeToOverriddenMethodsRector::class,
+    // ])
     ->withPreparedSets(
         deadCode: true,
         codeQuality: true,
