@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ modelNamespace }};
+use Illuminate\Support\Facades\DB;
+
+final readonly class {{ class }}
+{
+    public function __construct(
+        // Inject dependencies here
+    ) {}
+
+    public function handle({{ model }} ${{ modelVariable }}): void
+    {
+        DB::transaction(function () use (${{ modelVariable }}): void {
+            ${{ modelVariable }}->delete();
+        });
+    }
+}

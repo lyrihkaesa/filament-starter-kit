@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use Illuminate\Support\Facades\DB;
+
+final readonly class {{ class }}
+{
+    public function __construct(
+        // Inject dependencies here
+    ) {}
+
+    /**
+     * @param array{
+     *     // Define your data structure here
+     * } $data
+     */
+    public function handle(array $data): array
+    {
+
+        /** @var array $result */
+        $result = DB::transaction(function () use ($data): array {
+            return $data;
+        });
+
+        return $result;
+    }
+}

@@ -75,7 +75,8 @@
             "pint --test",
             "npm run test:lint"
         ],
-        "test:unit": "pest --parallel --coverage --exactly=91.1",
+        "test:unit": "pest --parallel --coverage",
+        "test:unit100": "pest --parallel --coverage --exactly=100",
         "test:types": "phpstan",
         "test:refactor": "rector --dry-run",
         "test-full": [

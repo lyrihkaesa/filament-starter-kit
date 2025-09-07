@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ modelNamespace }};
+use Illuminate\Support\Facades\DB;
+
+final readonly class {{ class }}
+{
+
+    public function __construct(
+        // Inject dependencies here
+    ) {}
+
+    /**
+     * @param array{
+     *     // Define your data structure here
+     * } $data
+     */
+    public function handle(array $data): {{ model }}
+    {
+        /** @var {{ model }} $created{{ model }} */
+        $created{{ model }} = DB::transaction(function () use ($data): {{ model }} {
+            return {{ model }}::create($data);
+        });
+
+        return $created{{ model }};
+    }
+}

@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ modelNamespace }};
+use Illuminate\Support\Facades\DB;
+
+final readonly class {{ class }}
+{
+    public function __construct(
+        // Inject dependencies here
+    ) {}
+
+    /**
+     * @param {{ model }} ${{ modelVariable }}
+     * @param array{
+     *     // Define your data structure here
+     * } $data
+     */
+    public function handle({{ model }} ${{ modelVariable }}, array $data): {{ model }}
+    {
+
+        /** @var {{ model }} $updated{{ model }} */
+        $updated{{ model }} = DB::transaction(function () use (${{ modelVariable }}, $data): {{ model }} {
+            ${{ modelVariable }}->update($data);
+            return ${{ modelVariable }}->fresh();
+        });
+
+        return $updated{{ model }};
+    }
+}
