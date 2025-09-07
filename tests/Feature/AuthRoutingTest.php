@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 it('the root url redirects to login', function () {
     $response = $this->get('/');
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Filament\Pages\Auth\Login;
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
