@@ -85,6 +85,19 @@ php artisan test
 -   `tests/Feature` → untuk menguji route, response, dan integrasi antar komponen.
 -   `tests/Unit` → untuk menguji business logic kecil (misalnya `Action`).
 
+## 🎨 Code Style
+
+Project ini menggunakan [Laravel Pint](https://laravel.com/docs/pint) untuk menjaga konsistensi kode PHP.  
+Semua aturan custom Pint dan panduan format dapat dilihat di [docs/code-style.md](docs/code-style.md).
+
+Linting dapat dijalankan dengan:
+
+```bash
+composer lint
+```
+
+> Tips: Untuk pengguna Visual Studio Code, gunakan ekstensi [Laravel Pint](https://marketplace.visualstudio.com/items?itemName=open-southeners.laravel-pint) sebagai default formatter.
+
 ## 📖 Dokumentasi Lanjutan
 
 [TODO]

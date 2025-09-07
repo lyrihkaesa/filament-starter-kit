@@ -5,6 +5,22 @@ Tujuannya untuk menjaga konsistensi dan kualitas kode di seluruh project.
 
 ---
 
+## Visual Studio Code
+
+Jika anda menggunakan visual studio code gunakanlah ekstensi [Laravel Pint](https://marketplace.visualstudio.com/items?itemName=open-southeners.laravel-pint) untuk formating dengan Pint, Biasanya anda melakukan formating php menggunakan Ekstensi [PHP Intelephense](https://marketplace.visualstudio.com/.items?itemName=bmewburn.vscode-intelephense-client).
+
+Saya merekomendasikan Laravel Pint untuk best partice linter.
+Buka file `.php` > click kanan mouse pada editor > `Format Document With` > `Laravel Pint`. Atau bisa diconfigurasi secara default lewat `settings.json` vscode:
+
+```json
+"editor.formatOnSave": true,
+"[php]": {
+    "editor.defaultFormatter": "open-southeners.laravel-pint"
+},
+```
+
+---
+
 ## 📂 File yang Dikecualikan
 
 Rule Pint **tidak dijalankan** pada file berikut:
