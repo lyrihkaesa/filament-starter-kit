@@ -3,7 +3,10 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
@@ -53,9 +56,29 @@
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
         ],
+        "lint": [
+            "pint",
+            "npm run lint"
+        ],
+        "refactor": "rector",
+        "test:type-coverage": "pest --type-coverage --min=100",
+        "test:typos": "peck",
+        "test:lint": [
+            "pint --test",
+            "npm run test:lint"
+        ],
+        "test:unit": "pest --parallel --coverage --exactly=100.0",
+        "test:types": "phpstan",
+        "test:refactor": "rector --dry-run",
         "test": [
             "@php artisan config:clear --ansi",
-            "@php artisan test"
+            "@php artisan test",
+            "@test:type-coverage",
+            "@test:typos",
+            "@test:unit",
+            "@test:lint",
+            "@test:types",
+            "@test:refactor"
         ]
     },
     "extra": {
