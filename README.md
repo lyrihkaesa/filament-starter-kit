@@ -7,7 +7,9 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 
 ## 🚀 Quick Start
 
-1. Clone repository ini:
+### **Opsi 1: Manual (Clone Repository)**
+
+1. Clone repository:
 
     ```bash
     git clone https://github.com/username/filament-starter-kit.git
@@ -18,7 +20,8 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 
     ```bash
     composer install
-    npm install && npm run build
+    npm install
+    npm run build
     ```
 
 3. Salin file `.env`:
@@ -45,13 +48,47 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
     php artisan serve
     ```
 
-> Buka [http://localhost:8000/app](http://localhost:8000/app) untuk mengakses admin panel.  
-> Karena saya pakai **Laravel Herd**, maka pada `.env` saya buat `APP_URL=https://filament-starter-kit.test` anda bisa mengubahnya ke `APP_URL=https://localhost:8000` jika anda menjalankan dengan `php artisan serve`.
+7. Login default:
 
-7. Login dengan
+    - Email: `admin@example.com`
+    - Password: `password`
 
--   Email: `admin@example.com`
--   Password: `password`
+> Jika menggunakan **Laravel Herd**, atur `APP_URL=https://filament-starter-kit.test`.
+> Jika pakai `php artisan serve`, gunakan `APP_URL=https://localhost:8000`.
+
+---
+
+### **Opsi 2: Install Baru dengan Laravel Installer**
+
+1. Pastikan **Laravel Installer** sudah ada (Apps ini include di Apps Laravel Herd):
+
+    ```bash
+    laravel --version
+    ```
+
+2. Buat project baru langsung dari starter kit:
+
+    ```bash
+    laravel new my-app --using=lyrihkaesa/filament-starter-kit
+    cd my-app
+    ```
+
+3. Jalankan migrasi & seeder:
+
+    ```bash
+    php artisan migrate --seed
+    ```
+
+4. Jalankan server:
+
+    ```bash
+    php artisan serve
+    ```
+
+5. Login default sama seperti cara manual:
+
+    - Email: `admin@example.com`
+    - Password: `password`
 
 ---
 
