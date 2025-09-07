@@ -125,6 +125,34 @@ composer refactor
 
 Lihat panduan lengkap konfigurasi, preset, rules, dan cara remove driftingly/rector-laravel di: [docs/rector.md](docs/rector.md)
 
+---
+
+## 🔍 Static Analysis with Larastan
+
+Project ini menggunakan [Larastan](https://github.com/nunomaduro/larastan) untuk melakukan **static analysis** dan **type checking** di Laravel.
+
+-   **Run Larastan**:
+
+```bash
+composer test:types
+```
+
+-   **Configuration file**: `phpstan.neon`
+-   **Documentation**: lihat [docs/larastan.md](docs/larastan.md)
+
+`phpstan.neon`
+
+```neon
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+
+parameters:
+    paths:
+        - app/
+    level: max
+```
+
 ## 📖 Dokumentasi Lanjutan
 
 [TODO]
