@@ -77,9 +77,11 @@ final class AppServiceProvider extends ServiceProvider
         );
 
         /**
+         * ✅ Eager Load Relationships Automatically
+         * Release: Laravel v12.8
          * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/AutomaticallyEagerLoadRelationships.php
          */
-        // $this->automaticallyEagerLoadRelationships();
+        // Model::automaticallyEagerLoadRelationships();
 
         /**
          * ✅ Immutable DateTime
@@ -91,14 +93,5 @@ final class AppServiceProvider extends ServiceProvider
         // Todo: Testing
         // https://github.com/nunomaduro/essentials/blob/main/src/Configurables/FakeSleep.php
         // https://github.com/nunomaduro/essentials/blob/main/src/Configurables/PreventStrayRequests.php
-    }
-
-    public function automaticallyEagerLoadRelationships(): void
-    {
-        if (! method_exists(Model::class, 'automaticallyEagerLoadRelationships')) {
-            return;
-        }
-
-        Model::automaticallyEagerLoadRelationships();
     }
 }
