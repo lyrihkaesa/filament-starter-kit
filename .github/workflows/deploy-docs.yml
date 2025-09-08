@@ -1,0 +1,47 @@
+name: Deploy Docs to Lyrihkaesa.github.io
+
+on:
+  push:
+    branches:
+      - main
+      - "v*" # semua branch versi, misal v1, v2, v3
+    paths:
+      - "docs/**" # hanya trigger jika ada perubahan di folder docs
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Filament Starter Kit
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+      - name: Checkout Docusaurus Repo (main branch)
+        uses: actions/checkout@v3
+        with:
+          repository: lyrihkaesa/lyrihkaesa.github.io
+          token: ${{ secrets.DOCO_GH_TOKEN }}
+          path: docusaurus
+          ref: main
+
+      - name: Copy Docs to version folder
+        run: |
+          BRANCH_DIR="${GITHUB_REF##*/}"
+          TARGET_DIR="docusaurus/articles/filament-starter-kit/$BRANCH_DIR"
+          mkdir -p "$TARGET_DIR"
+          rsync -av --delete docs/ "$TARGET_DIR/"
+
+      - name: Commit & Push only if changes
+        run: |
+          cd docusaurus
+          BRANCH_DIR="${GITHUB_REF##*/}"  # Ambil nama branch
+          git add articles/filament-starter-kit/$BRANCH_DIR
+          git commit -m "Update docs from filament-starter-kit ($BRANCH_DIR)"
+          git push origin main
