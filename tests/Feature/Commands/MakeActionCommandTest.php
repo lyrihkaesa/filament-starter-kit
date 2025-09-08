@@ -114,3 +114,73 @@ it('honors --force to overwrite existing files', function () {
     expect($content)->not->toBe('old content');
     $filesystem->delete($file);
 });
+
+it('prompts for name when not provided and creates the file', function () {
+    $filesystem = new Filesystem();
+    $file = app_path('Actions/Posts/PublishPostAction.php');
+
+    try {
+        $this->artisan('make:action')
+            ->expectsQuestion('What is the class name? (e.g., Posts/PublishPostAction)', 'Posts/PublishPostAction')
+            ->assertExitCode(0);
+
+        expect($filesystem->exists($file))->toBeTrue();
+    } finally {
+        if ($filesystem->exists($file)) {
+            $filesystem->delete($file);
+        }
+    }
+});
+
+it('returns early when empty name is provided after prompt', function () {
+    $this->artisan('make:action')
+        ->expectsQuestion('What is the class name? (e.g., Posts/PublishPostAction)', '')
+        ->assertExitCode(0);
+});
+
+it('asks to overwrite existing file and skips when answered No', function () {
+    $filesystem = new Filesystem();
+    $file = app_path('Actions/SkipAction.php');
+
+    try {
+        $filesystem->ensureDirectoryExists(dirname($file));
+        $filesystem->put($file, 'old content');
+
+        $command = new App\Console\Commands\MakeActionCommand(app(\Illuminate\Filesystem\Filesystem::class));
+        $command->setLaravel(app());
+        $tester = new Symfony\Component\Console\Tester\CommandTester($command);
+        $tester->setInputs(['no']);
+        $exitCode = $tester->execute(['name' => 'SkipAction']);
+
+        expect($exitCode)->toBe(0)
+            ->and($tester->getDisplay())->toContain('Skipped')
+            ->and($tester->getDisplay())->toContain('SkipAction.php');
+    } finally {
+        if ($filesystem->exists($file)) {
+            $filesystem->delete($file);
+        }
+    }
+});
+
+it('asks to overwrite existing file and overwrites when answered Yes', function () {
+    $filesystem = new Filesystem();
+    $file = app_path('Actions/OverwriteAction.php');
+
+    try {
+        $filesystem->ensureDirectoryExists(dirname($file));
+        $filesystem->put($file, 'old content');
+
+        $command = new App\Console\Commands\MakeActionCommand(app(\Illuminate\Filesystem\Filesystem::class));
+        $command->setLaravel(app());
+        $tester = new Symfony\Component\Console\Tester\CommandTester($command);
+        $tester->setInputs(['yes']);
+        $exitCode = $tester->execute(['name' => 'OverwriteAction']);
+
+        expect($exitCode)->toBe(0)
+            ->and($filesystem->get($file))->not()->toBe('old content');
+    } finally {
+        if ($filesystem->exists($file)) {
+            $filesystem->delete($file);
+        }
+    }
+});
