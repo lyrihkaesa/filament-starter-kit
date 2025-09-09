@@ -3,8 +3,7 @@ name: Deploy Docs to Lyrihkaesa.github.io
 on:
   push:
     branches:
-      - main
-      - "v*" # semua branch versi, misal v1, v2, v3
+      - 1.x
     paths:
       - "docs/**" # hanya trigger jika ada perubahan di folder docs
 
