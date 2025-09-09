@@ -31,9 +31,10 @@ final class AppPanelProvider extends PanelProvider
             ->default()
             ->id('app')
             ->path('app')
+            ->favicon(asset('images/logo-128x128.png'))
             ->login(Login::class)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Fuchsia,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -61,6 +62,7 @@ final class AppPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/app/theme.css');
     }
 }
