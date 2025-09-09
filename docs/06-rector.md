@@ -1,4 +1,4 @@
-# 🛠 Rector Guide for Filament Starter Kit
+# Rector - Automated Refactoring
 
 Project ini menggunakan [Rector](https://github.com/rectorphp/rector) untuk **automated refactoring** dan **code quality/type checking**.  
 Selain Rector official, kita menggunakan package `driftingly/rector-laravel` untuk rule khusus Laravel.

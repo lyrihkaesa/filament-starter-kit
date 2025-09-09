@@ -1,4 +1,4 @@
-# AppServiceProvider Essentials Configuration
+# `AppServiceProvider` Essentials Configuration
 
 Project ini menggunakan beberapa konfigurasi dari [NunoMaduro Essentials](https://github.com/nunomaduro/essentials) untuk meningkatkan performa, keamanan, dan kualitas kode.
 

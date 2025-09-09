@@ -49,7 +49,9 @@ php --ini
 Kemudian tambahkan baris berikut:
 
 ```ini
-zend_extension=php_xdebug
+zend_extension=opcache # Ini sudah ada di php.ini, jadi jangan dihapus
+
+zend_extension=php_xdebug # Tambahkan ini dibawah opcache
 xdebug.mode=coverage
 ```
 

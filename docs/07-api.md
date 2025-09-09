@@ -1,7 +1,7 @@
-# API (Sanctum)
+# API Sanctum (Default)
 
 > **Catatan:** Starter kit ini menggunakan **Laravel Sanctum** untuk autentikasi API secara default.
-> Jika Anda ingin menggunakan **JWT** sebagai gantinya, silakan baca dokumentasi migrasi pada [`api-jwt.md`](./api-jwt.md).
+> Jika Anda ingin menggunakan **JWT** sebagai gantinya, silakan baca dokumentasi migrasi pada [`api-jwt.md`](api-jwt).
 
 ## 1. Autentikasi API dengan Sanctum
 
@@ -113,7 +113,7 @@ Token yang digunakan akan dicabut, dan client harus login ulang untuk mendapatka
 
 Jika ingin mengganti Sanctum dengan JWT:
 
-1. Baca dokumentasi migrasi pada [`api-jwt.md`](./api-jwt.md)
+1. Baca dokumentasi migrasi pada [`api-jwt`](api-jwt)
 2. Pilih library JWT yang sesuai:
 
     - [lcobucci/jwt](https://github.com/lcobucci/jwt)

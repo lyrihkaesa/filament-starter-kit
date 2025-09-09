@@ -1,4 +1,4 @@
-# 🎨 Code Style Rules (Laravel Pint)
+# Pint - Code Style or Linter
 
 Project ini menggunakan [Laravel Pint](https://laravel.com/docs/pint) dengan preset `laravel` dan beberapa aturan tambahan/kustom.  
 Tujuannya untuk menjaga konsistensi dan kualitas kode di seluruh project.

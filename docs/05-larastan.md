@@ -1,4 +1,4 @@
-# 📝 Larastan Guide
+# Larastan - Typescript for PHP
 
 Project ini menggunakan [Larastan](https://github.com/nunomaduro/larastan) untuk **static analysis** dan **type checking** di Laravel. Larastan adalah extension dari PHPStan khusus Laravel.
 

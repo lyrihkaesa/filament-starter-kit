@@ -1,4 +1,4 @@
-# 📦 Custom Artisan Command: `make:action`
+# Action Pattern `make:action` - CQRS
 
 Karena laravel belum ada artisan command untuk membuat action saya buat secara manual terlebih dahulu.
 Command `php artisan make:action` adalah perintah kustom untuk membantu developer membuat **Action Class** di folder `app/Actions`, baik untuk kebutuhan **CRUD berbasis model** maupun **custom action**.
