@@ -6,15 +6,17 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Filament\Panel;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 final class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -73,5 +75,21 @@ final class User extends Authenticatable
             'password' => 'hashed',
             'anonymized_at' => 'datetime',
         ];
+    }
+
+    public function canImpersonate(): bool
+    {
+        // Let's prevent impersonating other users at our own company
+        // example:
+        // return $this->email === 'superadmin@example.com';
+        return true;
+    }
+
+    public function canBeImpersonated(): bool
+    {
+        // Let's prevent being impersonated by other users at our own company
+        // example:
+        // return $this->email === 'member@example.com';
+        return true;
     }
 }
