@@ -3,8 +3,7 @@ name: Deploy Docs to Lyrihkaesa.github.io
 on:
   push:
     branches:
-      - main
-      - "v*" # semua branch versi, misal v1, v2, v3
+      - 1.x
     paths:
       - "docs/**" # hanya trigger jika ada perubahan di folder docs
 
@@ -33,15 +32,13 @@ jobs:
 
       - name: Copy Docs to version folder
         run: |
-          BRANCH_DIR="${GITHUB_REF##*/}"
-          TARGET_DIR="docusaurus/articles/filament-starter-kit/$BRANCH_DIR"
+          TARGET_DIR="docusaurus/articles/filament-starter-kit"
           mkdir -p "$TARGET_DIR"
           rsync -av --delete docs/ "$TARGET_DIR/"
 
       - name: Commit & Push only if changes
         run: |
           cd docusaurus
-          BRANCH_DIR="${GITHUB_REF##*/}"  # Ambil nama branch
-          git add articles/filament-starter-kit/$BRANCH_DIR
-          git commit -m "Update docs from filament-starter-kit ($BRANCH_DIR)"
+          git add articles/filament-starter-kit
+          git commit -m "Update docs from filament-starter-kit"
           git push origin main

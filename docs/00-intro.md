@@ -1,15 +1,16 @@
 ---
+slug: /
 sidebar_position: 0
 ---
 
-# Main
+# Introduction
 
 Starter Kit untuk membangun aplikasi berbasis [Laravel](https://laravel.com/) + [Filament](https://filamentphp.com/).  
 Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** dengan praktik terbaik (Action Pattern, custom resource, dsb).
 
 ## Install Baru dengan Laravel Installer
 
-1.  Pastikan [Laravel Installer](https://laravel.com/docs/12.x/installation#installing-php), Jika Anda menggunakan **Laravel Herd** otomatis Anda sudah install `Laravel Installer`:
+1. Pastikan [Laravel Installer](https://laravel.com/docs/12.x/installation#installing-php), Jika Anda menggunakan **Laravel Herd** otomatis Anda sudah install `Laravel Installer`:
 
     Check `Laravel Installer` terpasang:
 
@@ -27,14 +28,14 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 
     </details>
 
-2.  Buat project baru langsung dari starter kit:
+2. Buat project baru langsung dari starter kit:
 
     ```bash
     laravel new my-app --using=lyrihkaesa/filament-starter-kit
     cd my-app
     ```
 
-3.  Jalankan perintah dibawah ini jika ada script saat create project ada yang gagal dimuat:
+3. Jalankan perintah dibawah ini jika ada script saat create project ada yang gagal dimuat:
 
     ```bash
     composer install
@@ -45,7 +46,7 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
     php artisan key:generate
     ```
 
-4.  Jalankan server:
+4. Jalankan server:
 
     ```bash
     composer dev
@@ -53,9 +54,9 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 
     Jika menggunakan `Laravel Herd` langsung saja dibrowser [http://filament-starter-kit.test](http://filament-starter-kit.test)
 
-5.  Login default (automatis input jika `APP_DEBUG=true`):
-    -   Email: `admin@example.com`
-    -   Password: `password`
+5. Login default (automatis input jika `APP_DEBUG=true`):
+    - Email: `admin@example.com`
+    - Password: `password`
 
 > Jika menggunakan **Laravel Herd**, atur `APP_URL=http://filament-starter-kit.test`.  
 > Jika pakai `composer dev`, gunakan `APP_URL=http://localhost:8000`.
