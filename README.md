@@ -5,9 +5,73 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 
 ---
 
+## ✨ Fitur yang Tersedia
+
+-   Filament panel dengan ID `app` (bukan default `admin`)
+-   User Resource (CRUD user) with Action Pattern
+-   Action Pattern (`php artisan make:action`)
+-   User, Role & Permision Seeder (default admin user)
+-   Custom Locale (APP_LOCALE `id`, APP_FAKER_LOCALE `id_ID`)
+-   RBAC or ABAC (Role & Permission) using `bezhansalleh/filament-shield`
+-   Impersonating User using `stechstudio/filament-impersonate`
+-   API using `laravel/sanctum`
+
 ## 🚀 Quick Start
 
-### **Opsi 1: Manual (Clone Repository)**
+### **Opsi 1: Install Baru dengan Laravel Installer**
+
+1.  Pastikan [Laravel Installer](https://laravel.com/docs/12.x/installation#installing-php), Jika Anda menggunakan **Laravel Herd** otomatis Anda sudah install `Laravel Installer`:
+
+    Check `Laravel Installer` terpasang:
+
+    ```bash
+    laravel --version
+    ```
+
+    <details>
+      <summary><strong>Panduan menginstal Laravel Installer</strong></summary>
+      Jika Anda sudah menginstal `PHP` dan `Composer`, Anda dapat menginstal `Laravel Installer` melalui Composer:
+
+    ```bash
+    composer global require laravel/installer
+    ```
+
+    </details>
+
+2.  Buat project baru langsung dari starter kit:
+
+    ```bash
+    laravel new my-app --using=lyrihkaesa/filament-starter-kit
+    cd my-app
+    ```
+
+3.  Jalankan perintah dibawah ini jika ada script saat create project ada yang gagal dimuat:
+
+    ```bash
+    composer install
+    npm install
+    npm run build
+    cp .env.example .env
+    php artisan migrate --seed
+    php artisan key:generate
+    ```
+
+4.  Jalankan server:
+
+    ```bash
+    composer dev
+    ```
+
+    Jika menggunakan `Laravel Herd` langsung saja dibrowser [http://filament-starter-kit.test]([http://filament-starter-kit.test)
+
+5.  Login default (automatis input jika `APP_DEBUG=true`):
+    -   Email: `admin@example.com`
+    -   Password: `password`
+
+> Jika menggunakan **Laravel Herd**, atur `APP_URL=http://filament-starter-kit.test`.  
+> Jika pakai `composer dev`, gunakan `APP_URL=http://localhost:8000`.
+
+### **Opsi 2: Manual (Clone Repository)**
 
 1. Clone repository:
 
@@ -45,7 +109,7 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 6. Jalankan server:
 
     ```bash
-    php artisan serve
+    composer dev
     ```
 
 7. Login default:
@@ -53,53 +117,7 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
     - Email: `admin@example.com`
     - Password: `password`
 
-> Jika menggunakan **Laravel Herd**, atur `APP_URL=https://filament-starter-kit.test`.
-> Jika pakai `php artisan serve`, gunakan `APP_URL=https://localhost:8000`.
-
 ---
-
-### **Opsi 2: Install Baru dengan Laravel Installer**
-
-1. Pastikan **Laravel Installer** sudah ada (Apps ini include di Apps Laravel Herd):
-
-    ```bash
-    laravel --version
-    ```
-
-2. Buat project baru langsung dari starter kit:
-
-    ```bash
-    laravel new my-app --using=lyrihkaesa/filament-starter-kit
-    cd my-app
-    ```
-
-3. Jalankan migrasi & seeder:
-
-    ```bash
-    php artisan migrate --seed
-    ```
-
-4. Jalankan server:
-
-    ```bash
-    php artisan serve
-    ```
-
-5. Login default sama seperti cara manual:
-
-    - Email: `admin@example.com`
-    - Password: `password`
-
----
-
-## ✨ Fitur yang Tersedia
-
--   ✅ Filament panel dengan ID `app` (bukan `admin`)
--   ✅ User Resource (CRUD user)
--   ✅ Action Pattern (`php artisan make:action`)
--   ✅ User Seeder (default admin user)
--   ✅ Custom Locale (APP_LOCALE `id`, APP_FAKER_LOCALE `id_ID`)
--   ✅ Redirect `/` dan `/login` ke `/app`
 
 ## 🧪 Testing
 
@@ -204,4 +222,4 @@ parameters:
 
 ## 📜 Lisensi
 
-MIT License
+[MIT License](LICENSE)
