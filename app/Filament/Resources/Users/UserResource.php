@@ -56,6 +56,9 @@ class UserResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<User>
+     */
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
         return parent::getRecordRouteBindingEloquentQuery()

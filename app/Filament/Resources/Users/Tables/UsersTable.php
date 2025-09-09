@@ -8,9 +8,11 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\IconSize;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use STS\FilamentImpersonate\Actions\Impersonate;
 
 class UsersTable
 {
@@ -39,6 +41,10 @@ class UsersTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                Impersonate::make()
+                    ->link()
+                    ->color('warning')
+                    ->iconSize(IconSize::Small),
                 ViewAction::make(),
                 EditAction::make(),
             ])
