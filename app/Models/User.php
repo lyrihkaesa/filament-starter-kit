@@ -6,17 +6,19 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-final class User extends Authenticatable
+final class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes, HasRoles;
+    use HasFactory, HasPanelShield, HasRoles, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -52,6 +54,36 @@ final class User extends Authenticatable
         ]);
     }
 
+    /**
+     * Filament override implements FilamentUser
+     * And override trait HasPanelShield
+     * Jika user memiliki role 'super_admin' atau 'panel_user' maka bisa akses panel.
+     *
+     * @see FilamentUser
+     * @see HasPanelShield
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // return str_ends_with($this->email, '@example.com') && $this->hasVerifiedEmail();
+        return true;
+    }
+
+    public function canImpersonate(): bool
+    {
+        // Let's prevent impersonating other users at our own company
+        // example:
+        // return $this->email === 'superadmin@example.com';
+        return true;
+    }
+
+    public function canBeImpersonated(): bool
+    {
+        // Let's prevent being impersonated by other users at our own company
+        // example:
+        // return $this->email === 'member@example.com';
+        return true;
+    }
+
     protected static function booted(): void
     {
         self::deleting(function (self $user) {
@@ -75,21 +107,5 @@ final class User extends Authenticatable
             'password' => 'hashed',
             'anonymized_at' => 'datetime',
         ];
-    }
-
-    public function canImpersonate(): bool
-    {
-        // Let's prevent impersonating other users at our own company
-        // example:
-        // return $this->email === 'superadmin@example.com';
-        return true;
-    }
-
-    public function canBeImpersonated(): bool
-    {
-        // Let's prevent being impersonated by other users at our own company
-        // example:
-        // return $this->email === 'member@example.com';
-        return true;
     }
 }

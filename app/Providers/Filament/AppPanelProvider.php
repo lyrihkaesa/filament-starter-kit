@@ -32,7 +32,6 @@ final class AppPanelProvider extends PanelProvider
             ->id('app')
             ->path('app')
             ->login(Login::class)
-            ->plugin(FilamentShieldPlugin::make())
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -59,6 +58,9 @@ final class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->plugins([
+                FilamentShieldPlugin::make(),
             ]);
     }
 }

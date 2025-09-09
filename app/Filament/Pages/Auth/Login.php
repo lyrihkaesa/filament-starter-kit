@@ -13,7 +13,7 @@ final class Login extends \Filament\Auth\Pages\Login
         // Fill the form with the admin credentials
         if (app()->hasDebugModeEnabled()) {
             $this->form->fill([
-                'email' => 'admin@example.com',
+                'email' => 'superadmin@example.com',
                 'password' => 'password',
                 'remember' => true,
             ]);

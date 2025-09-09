@@ -146,7 +146,7 @@ it('asks to overwrite existing file and skips when answered No', function () {
         $filesystem->ensureDirectoryExists(dirname($file));
         $filesystem->put($file, 'old content');
 
-        $command = new App\Console\Commands\MakeActionCommand(app(\Illuminate\Filesystem\Filesystem::class));
+        $command = new App\Console\Commands\MakeActionCommand(app(Filesystem::class));
         $command->setLaravel(app());
         $tester = new Symfony\Component\Console\Tester\CommandTester($command);
         $tester->setInputs(['no']);
@@ -170,7 +170,7 @@ it('asks to overwrite existing file and overwrites when answered Yes', function 
         $filesystem->ensureDirectoryExists(dirname($file));
         $filesystem->put($file, 'old content');
 
-        $command = new App\Console\Commands\MakeActionCommand(app(\Illuminate\Filesystem\Filesystem::class));
+        $command = new App\Console\Commands\MakeActionCommand(app(Filesystem::class));
         $command->setLaravel(app());
         $tester = new Symfony\Component\Console\Tester\CommandTester($command);
         $tester->setInputs(['yes']);

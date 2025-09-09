@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Users\Pages;
 
-use Filament\Actions\EditAction;
-use Filament\Support\Enums\IconSize;
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\Users\UserResource;
+use Filament\Actions\EditAction;
+use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Enums\IconSize;
 use STS\FilamentImpersonate\Actions\Impersonate;
 
-class ViewUser extends ViewRecord
+final class ViewUser extends ViewRecord
 {
     protected static string $resource = UserResource::class;
 
