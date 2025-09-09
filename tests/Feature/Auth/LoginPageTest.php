@@ -18,7 +18,7 @@ it('autofills login form when debug mode enabled', function () {
     // Pastikan autofill email/password
     Livewire::test(Login::class)
         ->assertOk()
-        ->assertSet('data.email', 'admin@example.com')
+        ->assertSet('data.email', 'superadmin@example.com')
         ->assertSet('data.password', 'password')
         ->assertSet('data.remember', true);
 });
@@ -30,7 +30,7 @@ it('does not autofill login form when debug mode disabled', function () {
     // Pastikan autofill email/password
     Livewire::test(Login::class)
         ->assertOk()
-        ->assertNotSet('data.email', 'admin@example.com')
+        ->assertNotSet('data.email', 'superadmin@example.com')
         ->assertNotSet('data.password', 'password')
         ->assertSet('data.remember', false);
 });
