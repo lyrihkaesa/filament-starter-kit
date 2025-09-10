@@ -16,18 +16,22 @@ final class UserForm
         return $schema
             ->components([
                 FileUpload::make('avatar')
+                    ->label(__('Avatar'))
                     ->image()
                     ->avatar()
                     ->imageEditor()
                     ->circleCropper(),
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required(),
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label(__('Email'))
                     ->email()
                     ->required(),
-                DateTimePicker::make('email_verified_at'),
+                DateTimePicker::make('email_verified_at')
+                    ->label(__('Email verified at')),
                 TextInput::make('password')
+                    ->label(__('Password'))
                     ->password()
                     ->required(),
             ]);

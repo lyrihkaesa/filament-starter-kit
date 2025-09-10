@@ -24,23 +24,28 @@ final class UsersTable
         return $table
             ->columns([
                 ImageColumn::make('avatar')
+                    ->label(__('Avatar'))
                     ->circular()
                     ->defaultImageUrl(asset('images/thumbnails/images-dark-500x500.jpg')),
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable(),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label(__('Email'))
                     ->searchable(),
                 TextColumn::make('email_verified_at')
-                    ->dateTime()
+                    ->label(__('Email verified at'))
+                    ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label(__('Created at'))
+                    ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label(__('Updated at'))
+                    ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

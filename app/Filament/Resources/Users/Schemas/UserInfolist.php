@@ -15,15 +15,20 @@ final class UserInfolist
         return $schema
             ->components([
                 ImageEntry::make('avatar')
+                    ->label(__('Avatar'))
                     ->circular(),
-                TextEntry::make('name'),
+                TextEntry::make('name')
+                    ->label(__('Name')),
                 TextEntry::make('email')
-                    ->label('Email address'),
+                    ->label(__('Email')),
                 TextEntry::make('email_verified_at')
+                    ->label(__('Email verified at'))
                     ->dateTime(),
                 TextEntry::make('created_at')
+                    ->label(__('Created at'))
                     ->dateTime(),
                 TextEntry::make('updated_at')
+                    ->label(__('Updated at'))
                     ->dateTime(),
             ]);
     }
