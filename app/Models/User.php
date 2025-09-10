@@ -8,6 +8,7 @@ namespace App\Models;
 
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-final class User extends Authenticatable implements FilamentUser
+final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasPanelShield, HasRoles, Notifiable, SoftDeletes;
@@ -82,6 +83,28 @@ final class User extends Authenticatable implements FilamentUser
         // example:
         // return $this->email === 'member@example.com';
         return true;
+    }
+
+    /**
+     * Filament override implements HasAvatar
+     *
+     * @see HasAvatar
+     */
+    public function getFilamentAvatarUrl(): ?string
+    {
+        if ($this->avatar === null) {
+            // return asset('images/thumbnails/images-dark-500x500.jpg');
+            return null;
+        }
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = \Illuminate\Support\Facades\Storage::disk(config('filament.default_filesystem_disk'));
+
+        if (config('filament.default_filesystem_disk') === 'local') {
+            return $disk->temporaryUrl($this->avatar, now()->addMinutes(5));
+        }
+
+        return $disk->url($this->avatar);
     }
 
     protected static function booted(): void

@@ -11,6 +11,7 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Enums\IconSize;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -22,6 +23,9 @@ final class UsersTable
     {
         return $table
             ->columns([
+                ImageColumn::make('avatar')
+                    ->circular()
+                    ->defaultImageUrl(asset('images/thumbnails/images-dark-500x500.jpg')),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('email')
@@ -29,7 +33,8 @@ final class UsersTable
                     ->searchable(),
                 TextColumn::make('email_verified_at')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
