@@ -119,98 +119,14 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 
 ---
 
-## 🧪 Testing
+## ⚙️ Development Tools
 
-Project ini menggunakan [Pest v4](https://pestphp.com/) sebagai testing framework.
-
-**Menjalankan Seluruh Test**
-
-```bash
-php artisan test
-```
-
-**atau langsung dengan binary Pest:**
-
-```bash
-./vendor/bin/pest
-```
-
-**Struktur Test**
-
--   `tests/Feature` → untuk menguji route, response, dan integrasi antar komponen.
--   `tests/Unit` → untuk menguji business logic kecil (misalnya `Action`).
-
-## 🎨 Code Style
-
-Project ini menggunakan [Laravel Pint](https://laravel.com/docs/pint) untuk menjaga konsistensi kode PHP.  
-Semua aturan custom Pint dan panduan format dapat dilihat di [docs/code-style.md](docs/code-style.md).
-
-Linting dapat dijalankan dengan:
-
-```bash
-composer lint
-```
-
-> Tips: Untuk pengguna Visual Studio Code, gunakan ekstensi [Laravel Pint](https://marketplace.visualstudio.com/items?itemName=open-southeners.laravel-pint) sebagai default formatter.
-
-Oke Kaesa, kita buat versi **ringkas di README.md** yang hanya menyinggung Rector dan link ke `docs/rector.md` supaya contributor tahu di mana melihat panduan lengkap. Contohnya:
-
-## 🛠 Code Refactoring with Rector
-
-Project ini menggunakan [Rector](https://github.com/rectorphp/rector) untuk otomatis melakukan refactoring, meningkatkan kualitas kode, dan menambahkan type declarations.  
-Kami juga menggunakan package [driftingly/rector-laravel](https://github.com/driftingly/rector-laravel) untuk aturan khusus Laravel.
-
-### Menjalankan Rector
-
--   **Dry-run (cek tanpa perubahan)**:
-
-```bash
-composer test:refactor
-```
-
--   **Apply fixes**:
-
-```bash
-composer refactor
-```
-
-> ⚠ Selalu commit perubahan sebelum menjalankan Rector untuk memudahkan rollback.
-
-### Dokumentasi Lengkap
-
-Lihat panduan lengkap konfigurasi, preset, rules, dan cara remove driftingly/rector-laravel di: [docs/rector.md](docs/rector.md)
-
----
-
-## 🔍 Static Analysis with Larastan
-
-Project ini menggunakan [Larastan](https://github.com/nunomaduro/larastan) untuk melakukan **static analysis** dan **type checking** di Laravel.
-
--   **Run Larastan**:
-
-```bash
-composer test:types
-```
-
--   **Configuration file**: `phpstan.neon`
--   **Documentation**: lihat [docs/larastan.md](docs/larastan.md)
-
-`phpstan.neon`
-
-```neon
-includes:
-    - vendor/larastan/larastan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
-
-parameters:
-    paths:
-        - app/
-    level: max
-```
-
-## 📖 Dokumentasi Lanjutan
-
-[TODO]
+| Keterangan                                      | Package                                                                                                                   | Command                                                                          |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [🧪 **Testing**](docs/03-test-pest-coverage.md) | [Pest v4](https://pestphp.com/)                                                                                           | `php artisan test` / `./vendor/bin/pest`                                         |
+| [🎨 **Code Style**](docs/04-pint-code-style.md) | [Laravel Pint](https://laravel.com/docs/pint)                                                                             | `composer lint` / `./vendor/bin/pint`                                            |
+| [🛠 **Refactoring**](docs/06-rector.md)          | [Rector](https://github.com/rectorphp/rector) + [driftingly/rector-laravel](https://github.com/driftingly/rector-laravel) | `composer test:refactor` (dry-run) / `composer refactor` / `./vendor/bin/rector` |
+| [🔍 **Static Analysis**](docs/05-larastan.md)   | [Larastan](https://github.com/nunomaduro/larastan)                                                                        | `composer test:types` / `./vendor/bin/phpstan`                                   |
 
 ---
 
