@@ -1,7 +1,7 @@
 # API Sanctum (Default)
 
 > **Catatan:** Starter kit ini menggunakan **Laravel Sanctum** untuk autentikasi API secara default.
-> Jika Anda ingin menggunakan **JWT** sebagai gantinya, silakan baca dokumentasi migrasi pada [`api-jwt.md`](api-jwt).
+> Jika Anda ingin menggunakan **JWT** silahkan cari tahu sendiri, atau tunggu saya buat dokumentasi migrasi.
 
 ## 1. Autentikasi API dengan Sanctum
 
@@ -18,10 +18,6 @@ Authorization: Bearer {token}
 ### Instalasi dan Referensi
 
 -   Dokumentasi Laravel Sanctum: [https://laravel.com/docs/12.x/sanctum](https://laravel.com/docs/12.x/sanctum)
--   JWT sebagai alternatif:
-
-    -   PHP Libraries: [https://www.jwt.io/libraries?programming_language=php](https://www.jwt.io/libraries?programming_language=php)
-    -   Contoh Library Laravel: [https://github.com/lcobucci/jwt](https://github.com/lcobucci/jwt)
 
 ---
 
@@ -109,16 +105,9 @@ Token yang digunakan akan dicabut, dan client harus login ulang untuk mendapatka
 
 ---
 
-## 4. Migrasi ke JWT
+## Migrasi ke JWTs (Masih Perencanaan)
 
-Jika ingin mengganti Sanctum dengan JWT:
+Jika ingin mengganti Sanctum dengan JWT, nanti yaa saya buat dokumentasinya.
 
-1. Baca dokumentasi migrasi pada [`api-jwt`](api-jwt)
-2. Pilih library JWT yang sesuai:
-
-    - [lcobucci/jwt](https://github.com/lcobucci/jwt)
-    - [Alternatif lain](https://www.jwt.io/libraries?programming_language=php)
-
-3. Sesuaikan endpoint login, middleware, dan validasi token.
-
-Dokumentasi ini bersifat dasar untuk memulai penggunaan API di **filament-starter-kit**. Pastikan setiap request yang membutuhkan autentikasi selalu menyertakan token.
+-   PHP Libraries JWT: [https://www.jwt.io/libraries?programming_language=php](https://www.jwt.io/libraries?programming_language=php)
+-   [lcobucci/jwt](https://github.com/lcobucci/jwt)
