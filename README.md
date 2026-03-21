@@ -1,6 +1,6 @@
 # Filament Starter Kit
 
-Starter Kit untuk membangun aplikasi berbasis [Laravel](https://laravel.com/) + [Filament](https://filamentphp.com/).  
+Starter Kit untuk membangun aplikasi berbasis [Laravel 12](https://laravel.com/) + [Filament v5](https://filamentphp.com/).  
 Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** dengan praktik terbaik (Action Pattern, custom resource, dsb).
 
 ---
