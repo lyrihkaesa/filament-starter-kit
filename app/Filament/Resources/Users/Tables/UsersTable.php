@@ -61,7 +61,7 @@ final class UsersTable
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
-                    ->using(fn (\App\Models\User $record, \App\Actions\Users\DeleteUserAction $deletAction) => $deletAction->handle($record)),
+                    ->using(fn (\App\Models\User $record, \App\Actions\Users\DeleteUserAction $deleteAction) => $deleteAction->handle($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

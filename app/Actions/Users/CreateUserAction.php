@@ -11,13 +11,17 @@ final readonly class CreateUserAction
 {
     /**
      * @param array{
-     *     // Define your data structure here
+     *     name: string,
+     *     email: string,
+     *     password: string,
+     *     avatar?: string|null,
+     *     email_verified_at?: string|null,
      * } $data
      */
     public function handle(array $data): User
     {
         /** @var User $createdUser */
-        $createdUser = DB::transaction(fn (): User => User::create($data));
+        $createdUser = DB::transaction(fn (): User => User::query()->create($data));
 
         return $createdUser;
     }

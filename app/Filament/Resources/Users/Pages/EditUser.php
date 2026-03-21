@@ -21,7 +21,7 @@ final class EditUser extends EditRecord
         return [
             ViewAction::make(),
             DeleteAction::make()
-                ->using(fn (\App\Models\User $record, \App\Actions\Users\DeleteUserAction $deletAction) => $deletAction->handle($record)),
+                ->using(fn (\App\Models\User $record, \App\Actions\Users\DeleteUserAction $deleteAction) => $deleteAction->handle($record)),
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
