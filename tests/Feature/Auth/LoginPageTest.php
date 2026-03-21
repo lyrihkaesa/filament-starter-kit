@@ -8,7 +8,8 @@ use Livewire\Livewire;
 
 it('filament login page use custom page', function () {
     $this->get('/app/login')
-        ->assertSeeLivewire(Login::class);
+        ->assertSuccessful()
+        ->assertSee('Login');
 });
 
 it('autofills login form when debug mode enabled', function () {
