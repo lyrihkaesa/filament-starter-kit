@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ modelFqn }};
+use {{ namespace }}\Pages\Create{{ model }};
+use {{ namespace }}\Pages\Edit{{ model }};
+use {{ namespace }}\Pages\List{{ modelPlural }};
+use {{ namespace }}\Pages\View{{ model }};
+use {{ namespace }}\Schemas\{{ model }}Form;
+use {{ namespace }}\Schemas\{{ model }}Infolist;
+use {{ namespace }}\Tables\{{ modelPlural }}Table;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+{{ softDeletesImport }}
+
+final class {{ model }}Resource extends Resource
+{
+    protected static ?string $model = {{ model }}::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    public static function form(Schema $schema): Schema
+    {
+        return {{ model }}Form::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return {{ model }}Infolist::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return {{ modelPlural }}Table::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => List{{ modelPlural }}::route('/'),
+            'create' => Create{{ model }}::route('/create'),
+            'view' => View{{ model }}::route('/{record}'),
+            'edit' => Edit{{ model }}::route('/{record}/edit'),
+        ];
+    }
+    {{ softDeletesMethod }}
+}

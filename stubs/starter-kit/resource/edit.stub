@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }}\Pages;
+
+use {{ resourceFqn }};
+use App\Actions\{{ modelPlural }}\Update{{ model }}Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+
+final class Edit{{ model }} extends EditRecord
+{
+    protected static string $resource = {{ model }}Resource::class;
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        return app(Update{{ model }}Action::class)->handle($record, $data);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            ViewAction::make(),
+            DeleteAction::make(),
+        ];
+    }
+}
