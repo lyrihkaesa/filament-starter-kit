@@ -37,7 +37,7 @@ final class AppPanelProvider extends PanelProvider
             ->passwordReset()
             // ->emailVerification()
             // ->emailChangeVerification()
-            ->profile()
+            ->profile(\App\Filament\Pages\Auth\EditProfile::class)
             ->colors([
                 'primary' => Color::Fuchsia,
             ])
