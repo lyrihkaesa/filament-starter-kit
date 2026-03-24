@@ -16,17 +16,17 @@ beforeEach(function () {
     config(['session.driver' => 'database']);
 });
 
-it('can see the browser sessions component on the profile page', function () {
+it('can see the browser sessions on the consolidated profile page', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
     $this->get(EditProfile::getUrl())
         ->assertStatus(200)
-        ->assertSee('Browser Sessions');
+        ->assertSee(__('Browser Sessions'));
 });
 
-it('can logout other browser sessions from the profile page footer', function () {
+it('can logout other browser sessions from the consolidated profile page', function () {
     $user = User::factory()->create(['password' => bcrypt('password')]);
 
     $this->actingAs($user);

@@ -11,7 +11,7 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-it('can see the custom profile page', function () {
+it('can see the consolidated profile page', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user);
@@ -35,7 +35,7 @@ it('can update profile information', function () {
         ->fillForm([
             'name' => 'New Name',
             'email' => 'new@example.com',
-        ])
+        ], 'form')
         ->call('save')
         ->assertHasNoErrors();
 

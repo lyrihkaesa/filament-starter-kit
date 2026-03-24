@@ -4,49 +4,114 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use App\Livewire\Profile\BrowserSessions;
-use App\Livewire\Profile\UpdatePassword;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Livewire;
+use Filament\Schemas\Components\EmbeddedSchema;
+use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Throwable;
 
-final class EditProfile extends BaseEditProfile
+final class EditProfile extends BaseEditProfile implements HasForms
 {
+    use InteractsWithForms;
+
+    /**
+     * @var array<string, mixed> | null
+     */
+    public ?array $passwordData = [];
+
     public static function isSimple(): bool
     {
         return false;
     }
 
-    /**
-     * @return array<Action>
-     */
-    public function getFormActions(): array
+    public function mount(): void
     {
-        return [];
+        parent::mount();
+
+        $this->passwordForm->fill();
     }
 
-    public function form(Schema $schema): Schema
+    /**
+     * Override to render sections sequentially.
+     */
+    public function content(Schema $schema): Schema
     {
         return $schema
             ->components([
-                $this->getProfileInformationSection(),
-                $this->getUpdatePasswordSection(),
+                $this->getProfileSection(),
+                $this->getPasswordSection(),
                 $this->getBrowserSessionsSection(),
             ]);
     }
 
+    /**
+     * Override form to remove default actions and keep it focused on Name/Email.
+     */
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                $this->getNameFormComponent(),
+                $this->getEmailFormComponent(),
+            ])
+            ->statePath('data');
+    }
+
+    public function passwordForm(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('current_password')
+                    ->label(__('Current Password'))
+                    ->password()
+                    ->revealable()
+                    ->required()
+                    ->currentPassword(guard: Filament::getAuthGuard()),
+                TextInput::make('password')
+                    ->label(__('New Password'))
+                    ->password()
+                    ->revealable()
+                    ->required()
+                    ->rule(Password::default())
+                    ->same('password_confirmation'),
+                TextInput::make('password_confirmation')
+                    ->label(__('Confirm Password'))
+                    ->password()
+                    ->revealable()
+                    ->required(),
+            ])
+            ->statePath('passwordData');
+    }
+
     public function savePassword(): void
     {
-        $this->dispatch('update-password')->to(UpdatePassword::class);
+        $data = $this->passwordForm->getState();
+
+        Auth::user()->update([
+            'password' => Hash::make($data['password']),
+        ]);
+
+        $this->passwordForm->fill();
+
+        Notification::make()
+            ->title(__('Saved.'))
+            ->success()
+            ->send();
     }
 
     public function logoutOtherBrowserSessions(string $password): void
@@ -68,39 +133,87 @@ final class EditProfile extends BaseEditProfile
                 ->delete();
         }
 
-        $this->dispatch('refresh-sessions')->to(BrowserSessions::class);
-
         Notification::make()
             ->title(__('Done.'))
             ->success()
             ->send();
     }
 
-    protected function getProfileInformationSection(): Component
+    public function getBrowserSessionsList(): Collection
+    {
+        if (config('session.driver') !== 'database') {
+            return collect();
+        }
+
+        $currentSessionIdRaw = null;
+        try {
+            $currentSessionIdRaw = session()->getId();
+        } catch (Throwable $e) {
+            // No session
+        }
+
+        return DB::table('sessions')
+            ->where('user_id', Auth::id())
+            ->orderBy('last_activity', 'desc')
+            ->get()
+            ->map(function ($session) use ($currentSessionIdRaw): object {
+                $agent = $this->createAgent((string) ($session->user_agent ?? ''));
+
+                return (object) [
+                    'agent' => (object) [
+                        'is_desktop' => $agent['is_desktop'],
+                        'platform' => $agent['platform'],
+                        'browser' => $agent['browser'],
+                    ],
+                    'ip_address' => $session->ip_address,
+                    'is_current_device' => $currentSessionIdRaw && $session->id === $currentSessionIdRaw,
+                    'last_active' => Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
+                ];
+            });
+    }
+
+    protected function getForms(): array
+    {
+        return [
+            'form',
+            'passwordForm',
+        ];
+    }
+
+    protected function getProfileSection(): Component
     {
         return Section::make(__('Profile Information'))
             ->description(__('Update your account\'s profile information and email address.'))
             ->schema([
-                $this->getNameFormComponent(),
-                $this->getEmailFormComponent(),
+                Form::make([
+                    EmbeddedSchema::make('form'),
+                ])
+                    ->livewireSubmitHandler('save')
+                    ->footer([
+                        Action::make('saveProfile')
+                            ->label(__('Save'))
+                            ->submit('save'),
+                    ]),
             ])
-            ->aside()
-            ->footer([
-                $this->getSaveFormAction(),
-            ]);
+            ->aside();
     }
 
-    protected function getUpdatePasswordSection(): Component
+    protected function getPasswordSection(): Component
     {
         return Section::make(__('Update Password'))
             ->description(__('Ensure your account is using a long, random password to stay secure.'))
             ->schema([
-                Livewire::make(UpdatePassword::class)->key('update-password-component'),
+                Form::make([
+                    EmbeddedSchema::make('passwordForm'),
+                ])
+                    ->livewireSubmitHandler('savePassword')
+                    ->footer([
+                        Action::make('savePassword')
+                            ->label(__('Save'))
+                            ->submit('savePassword'),
+                    ]),
             ])
-            ->aside()
-            ->footer([
-                $this->getUpdatePasswordAction(),
-            ]);
+            ->aside();
     }
 
     protected function getBrowserSessionsSection(): Component
@@ -108,19 +221,13 @@ final class EditProfile extends BaseEditProfile
         return Section::make(__('Browser Sessions'))
             ->description(__('Manage and log out your active sessions on other browsers and devices.'))
             ->schema([
-                Livewire::make(BrowserSessions::class)->key('browser-sessions-component'),
+                View::make('livewire.profile.browser-sessions-list')
+                    ->viewData(['browser_sessions_data' => $this->getBrowserSessionsList()]),
             ])
             ->aside()
             ->footer([
                 $this->getLogoutOtherSessionsAction(),
             ]);
-    }
-
-    protected function getUpdatePasswordAction(): Action
-    {
-        return Action::make('savePassword')
-            ->label(__('Save'))
-            ->action(fn () => $this->savePassword());
     }
 
     protected function getLogoutOtherSessionsAction(): Action
@@ -141,5 +248,40 @@ final class EditProfile extends BaseEditProfile
                     ->currentPassword(guard: Filament::getAuthGuard()),
             ])
             ->action(fn (array $data) => $this->logoutOtherBrowserSessions($data['password']));
+    }
+
+    protected function createAgent(string $userAgent): array
+    {
+        $isMobile = (bool) preg_match('/Mobile|Android|iPhone|iPad|Phone/i', $userAgent);
+
+        $browser = 'Unknown Browser';
+        if (preg_match('/Chrome/i', $userAgent)) {
+            $browser = 'Chrome';
+        } elseif (preg_match('/Safari/i', $userAgent)) {
+            $browser = 'Safari';
+        } elseif (preg_match('/Firefox/i', $userAgent)) {
+            $browser = 'Firefox';
+        } elseif (preg_match('/Edge/i', $userAgent)) {
+            $browser = 'Edge';
+        }
+
+        $platform = 'Unknown OS';
+        if (preg_match('/Windows/i', $userAgent)) {
+            $platform = 'Windows';
+        } elseif (preg_match('/Mac/i', $userAgent)) {
+            $platform = 'macOS';
+        } elseif (preg_match('/Linux/i', $userAgent)) {
+            $platform = 'Linux';
+        } elseif (preg_match('/Android/i', $userAgent)) {
+            $platform = 'Android';
+        } elseif (preg_match('/iPhone|iPad/i', $userAgent)) {
+            $platform = 'iOS';
+        }
+
+        return [
+            'is_desktop' => ! $isMobile,
+            'browser' => $browser,
+            'platform' => $platform,
+        ];
     }
 }
