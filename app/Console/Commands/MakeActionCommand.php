@@ -25,7 +25,7 @@ final class MakeActionCommand extends GeneratorCommand
             $actions = $this->resolveActions();
 
             foreach ($actions as $action) {
-                $className = "{$action}{$model}Action";
+                $className = sprintf('%s%sAction', $action, $model);
 
                 $this->call(self::class, [
                     'name' => $className,
@@ -59,7 +59,7 @@ final class MakeActionCommand extends GeneratorCommand
 
         if (file_exists($path) && ! $this->option('force')) {
             $overwrite = $this->confirm(
-                "File '{$path}' already exists. Do you want to overwrite it?",
+                sprintf("File '%s' already exists. Do you want to overwrite it?", $path),
                 false // default jawaban NO
             );
 
@@ -81,9 +81,11 @@ final class MakeActionCommand extends GeneratorCommand
         if ($this->option('create')) {
             return $this->resolveStub('create-action');
         }
+
         if ($this->option('update')) {
             return $this->resolveStub('update-action');
         }
+
         if ($this->option('delete')) {
             return $this->resolveStub('delete-action');
         }
@@ -91,8 +93,12 @@ final class MakeActionCommand extends GeneratorCommand
         return $this->resolveStub('custom-action');
     }
 
-    protected function getDefaultNamespace($rootNamespace): string
+    /**
+     * @param  string  $rootNamespace
+     */
+    protected function getDefaultNamespace(mixed $rootNamespace): string
     {
+        $rootNamespace = (string) $rootNamespace;
         if ($this->option('model')) {
             return $rootNamespace.'\\Actions\\'.$this->getModelFolder();
         }
@@ -100,8 +106,12 @@ final class MakeActionCommand extends GeneratorCommand
         return $rootNamespace.'\\Actions';
     }
 
-    protected function buildClass($name): string
+    /**
+     * @param  string  $name
+     */
+    protected function buildClass(mixed $name): string
     {
+        $name = (string) $name;
         $replace = [];
 
         if ($model = $this->option('model')) {
@@ -159,9 +169,11 @@ final class MakeActionCommand extends GeneratorCommand
         if ($this->option('create')) {
             $actions[] = 'Create';
         }
+
         if ($this->option('update')) {
             $actions[] = 'Update';
         }
+
         if ($this->option('delete')) {
             $actions[] = 'Delete';
         }
@@ -180,10 +192,10 @@ final class MakeActionCommand extends GeneratorCommand
 
     private function resolveStub(string $stub): string
     {
-        $customStub = base_path("stubs/{$stub}.stub");
+        $customStub = base_path(sprintf('stubs/%s.stub', $stub));
 
         return file_exists($customStub)
             ? $customStub
-            : __DIR__."/../../../stubs/{$stub}.stub";
+            : __DIR__.sprintf('/../../../stubs/%s.stub', $stub);
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('can update a user', function () {
+it('can update a user', function (): void {
     // Arrange
     $user = User::factory()->create([
         'name' => 'Old Name',
@@ -20,7 +20,7 @@ it('can update a user', function () {
         'email' => 'new@example.com',
     ];
 
-    $action = app(UpdateUserAction::class);
+    $action = resolve(UpdateUserAction::class);
 
     // Act
     $updatedUser = $action->handle($user, $data);

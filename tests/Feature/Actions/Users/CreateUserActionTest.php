@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
-it('can create a user', function () {
+it('can create a user', function (): void {
     // Arrange: data untuk membuat user
     $data = [
         'name' => 'Kaesa',
@@ -17,7 +17,7 @@ it('can create a user', function () {
         'password' => bcrypt('secret123'),
     ];
 
-    $action = app(CreateUserAction::class);
+    $action = resolve(CreateUserAction::class);
 
     // Act: jalankan action
     $user = $action->handle($data);
@@ -32,14 +32,14 @@ it('can create a user', function () {
     ]);
 });
 
-it('runs inside a transaction', function () {
+it('runs inside a transaction', function (): void {
     $data = [
         'name' => 'Broken',
         'email' => 'broken@example.com',
         'password' => bcrypt('secret123'),
     ];
 
-    $action = app(CreateUserAction::class);
+    $action = resolve(CreateUserAction::class);
 
     // Simulasi error supaya transaction rollback
     $this->expectException(Exception::class);

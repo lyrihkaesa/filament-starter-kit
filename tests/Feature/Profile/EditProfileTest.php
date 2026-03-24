@@ -12,7 +12,7 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-it('can see the consolidated profile page', function () {
+it('can see the consolidated profile page', function (): void {
     $user = User::factory()->create();
 
     $this->actingAs($user);
@@ -24,7 +24,7 @@ it('can see the consolidated profile page', function () {
         ->assertSee(__('Browser Sessions'));
 });
 
-it('can update profile information', function () {
+it('can update profile information', function (): void {
     $user = User::factory()->create([
         'name' => 'Old Name',
         'email' => 'old@example.com',
@@ -33,10 +33,8 @@ it('can update profile information', function () {
     $this->actingAs($user);
 
     Livewire::test(EditProfile::class)
-        ->fillForm([
-            'name' => 'New Name',
-            'email' => 'new@example.com',
-        ], 'form')
+        ->set('data.name', 'New Name')
+        ->set('data.email', 'new@example.com')
         ->call('save')
         ->assertHasNoErrors();
 
@@ -45,7 +43,7 @@ it('can update profile information', function () {
         ->email->toBe('new@example.com');
 });
 
-it('can logout a single browser session', function () {
+it('can logout a single browser session', function (): void {
     $user = User::factory()->create();
     $this->actingAs($user);
 

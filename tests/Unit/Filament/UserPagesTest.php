@@ -17,22 +17,21 @@ function invokeHeaderActions(string $class): array
     $ref = new ReflectionClass($class);
     $instance = $ref->newInstanceWithoutConstructor();
     $method = $ref->getMethod('getHeaderActions');
-    $method->setAccessible(true);
 
     return $method->invoke($instance);
 }
 
-it('list users page defines header actions', function () {
+it('list users page defines header actions', function (): void {
     $actions = invokeHeaderActions(ListUsers::class);
     expect($actions)->toBeArray()->not->toBeEmpty();
 });
 
-it('edit user page defines header actions', function () {
+it('edit user page defines header actions', function (): void {
     $actions = invokeHeaderActions(EditUser::class);
     expect($actions)->toBeArray()->not->toBeEmpty();
 });
 
-it('view user page defines header actions', function () {
+it('view user page defines header actions', function (): void {
     $actions = invokeHeaderActions(ViewUser::class);
     expect($actions)->toBeArray()->not->toBeEmpty();
 });

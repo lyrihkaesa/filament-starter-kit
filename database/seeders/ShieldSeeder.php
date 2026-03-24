@@ -14,31 +14,22 @@ final class ShieldSeeder extends Seeder
     public function run(): void
     {
         // Reset cached roles and permissions
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        resolve(PermissionRegistrar::class)->forgetCachedPermissions();
 
         // Ensure roles exist (guard: web)
-        $superAdminRole = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
-        $panelUserRole = Role::firstOrCreate(['name' => 'panel_user', 'guard_name' => 'web']);
-        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $memberRole = Role::firstOrCreate(['name' => 'member', 'guard_name' => 'web']);
+        $superAdminRole = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
+        $panelUserRole = Role::query()->firstOrCreate(['name' => 'panel_user', 'guard_name' => 'web']);
+        $adminRole = Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $memberRole = Role::query()->firstOrCreate(['name' => 'member', 'guard_name' => 'web']);
 
         // Create users and assign roles
-        $superAdmin = User::firstOrCreate(
-            ['email' => 'superadmin@example.com'],
-            ['name' => 'Super Admin User', 'password' => 'password']
-        );
+        $superAdmin = User::query()->firstOrCreate(['email' => 'superadmin@example.com'], ['name' => 'Super Admin User', 'password' => 'password']);
         $superAdmin->syncRoles([$superAdminRole, $panelUserRole]);
 
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            ['name' => 'Admin User', 'password' => 'password']
-        );
+        $admin = User::query()->firstOrCreate(['email' => 'admin@example.com'], ['name' => 'Admin User', 'password' => 'password']);
         $admin->syncRoles([$adminRole, $panelUserRole]);
 
-        $member = User::firstOrCreate(
-            ['email' => 'member@example.com'],
-            ['name' => 'Member User', 'password' => 'password']
-        );
+        $member = User::query()->firstOrCreate(['email' => 'member@example.com'], ['name' => 'Member User', 'password' => 'password']);
         $member->syncRoles([$memberRole, $panelUserRole]);
     }
 }

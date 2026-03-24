@@ -8,13 +8,13 @@ use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
-it('reports non-anonymous by default', function () {
+it('reports non-anonymous by default', function (): void {
     $user = User::factory()->create();
 
     expect($user->isAnonymous())->toBeFalse();
 });
 
-it('reports anonymous when anonymized_at set', function () {
+it('reports anonymous when anonymized_at set', function (): void {
     $user = User::factory()->create([
         'anonymized_at' => now(),
     ]);

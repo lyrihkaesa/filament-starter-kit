@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\Pages;
 
+use App\Actions\Users\DeleteUserAction;
+use App\Actions\Users\UpdateUserAction;
 use App\Filament\Resources\Users\UserResource;
+use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -21,15 +24,16 @@ final class EditUser extends EditRecord
         return [
             ViewAction::make(),
             DeleteAction::make()
-                ->using(fn (\App\Models\User $record, \App\Actions\Users\DeleteUserAction $deleteAction) => $deleteAction->handle($record)),
+                ->using(fn (User $record, DeleteUserAction $deleteAction) => $deleteAction->handle($record)),
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
     }
 
-    protected function handleRecordUpdate(Model $record, $data): Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        /** @var \App\Models\User $record */
-        return app(\App\Actions\Users\UpdateUserAction::class)->handle($record, $data);
+        /** @var User $record */
+        /** @var array{name?: string, email?: string, password?: string, avatar?: string|null, email_verified_at?: string|null} $data */
+        return resolve(UpdateUserAction::class)->handle($record, $data);
     }
 }

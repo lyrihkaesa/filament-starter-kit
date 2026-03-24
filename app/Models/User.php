@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
@@ -14,14 +14,22 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
 final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasPanelShield, HasRoles, HasUuids, Notifiable, SoftDeletes;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory;
+
+    use HasPanelShield;
+    use HasRoles;
+    use HasUuids;
+    use Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -60,8 +68,8 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     public function anonymize(): void
     {
         $this->update([
-            'name' => "Anonymous {$this->name}",
-            'email' => "anonymous{$this->email}",
+            'name' => 'Anonymous '.$this->name,
+            'email' => 'anonymous'.$this->email,
             'deleted_at' => $this->deleted_at ?? now(),
             'anonymized_at' => now(),
         ]);
@@ -109,8 +117,8 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             return null;
         }
 
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = \Illuminate\Support\Facades\Storage::disk(config()->string('filament.default_filesystem_disk'));
+        /** @var FilesystemAdapter $disk */
+        $disk = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
         if (config('filament.default_filesystem_disk') === 'local') {
             return $disk->temporaryUrl($this->avatar, now()->addMinutes(5));

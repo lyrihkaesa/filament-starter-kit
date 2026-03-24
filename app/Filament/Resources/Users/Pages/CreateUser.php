@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\Pages;
 
+use App\Actions\Users\CreateUserAction;
 use App\Filament\Resources\Users\UserResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ final class CreateUser extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(\App\Actions\Users\CreateUserAction::class)->handle($data);
+        /** @var array{name: string, email: string, password: string, avatar?: string|null, email_verified_at?: string|null} $data */
+        return resolve(CreateUserAction::class)->handle($data);
     }
 }

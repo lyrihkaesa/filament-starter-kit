@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
@@ -37,7 +38,7 @@ final class AppPanelProvider extends PanelProvider
             ->passwordReset()
             // ->emailVerification()
             // ->emailChangeVerification()
-            ->profile(\App\Filament\Pages\Auth\EditProfile::class)
+            ->profile(EditProfile::class)
             ->colors([
                 'primary' => Color::Fuchsia,
             ])

@@ -8,11 +8,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('can delete a user', function () {
+it('can delete a user', function (): void {
     // Arrange
     $user = User::factory()->create();
 
-    $action = app(DeleteUserAction::class);
+    $action = resolve(DeleteUserAction::class);
 
     // Act
     $action->handle($user);

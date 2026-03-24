@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('soft delete should only fill deleted_at without anonymizing', function () {
+it('soft delete should only fill deleted_at without anonymizing', function (): void {
     $user = User::factory()->create();
 
     $user->delete();
@@ -17,7 +17,7 @@ it('soft delete should only fill deleted_at without anonymizing', function () {
         ->and($user->fresh()->name)->not->toStartWith('Anonymous');
 });
 
-it('force delete should anonymize user instead of removing record', function () {
+it('force delete should anonymize user instead of removing record', function (): void {
     $user = User::factory()->create([
         'name' => 'Farhan',
         'email' => 'farhan@example.com',

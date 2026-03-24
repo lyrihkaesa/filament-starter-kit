@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +12,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class Post extends Model
 {
-    /** @use HasFactory<\Database\Factories\PostFactory> */
-    use HasFactory, HasUuids;
+    /** @use HasFactory<PostFactory> */
+    use HasFactory;
+
+    use HasUuids;
 
     /**
      * The attributes that are mass assignable.

@@ -12,34 +12,30 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-it('can update password via the consolidated profile page', function () {
+it('can update password via the consolidated profile page', function (): void {
     $user = User::factory()->create(['password' => bcrypt('old-password')]);
 
     $this->actingAs($user);
 
     Livewire::test(EditProfile::class)
-        ->fillForm([
-            'current_password' => 'old-password',
-            'password' => 'new-password',
-            'password_confirmation' => 'new-password',
-        ], 'passwordForm')
+        ->set('passwordData.current_password', 'old-password')
+        ->set('passwordData.password', 'new-password')
+        ->set('passwordData.password_confirmation', 'new-password')
         ->call('savePassword')
         ->assertHasNoErrors();
 
     expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
 });
 
-it('validates password update requirements on the consolidated page', function () {
+it('validates password update requirements on the consolidated page', function (): void {
     $user = User::factory()->create(['password' => bcrypt('old-password')]);
 
     $this->actingAs($user);
 
     Livewire::test(EditProfile::class)
-        ->fillForm([
-            'current_password' => 'wrong-password',
-            'password' => 'new-password',
-            'password_confirmation' => 'mismatch',
-        ], 'passwordForm')
+        ->set('passwordData.current_password', 'wrong-password')
+        ->set('passwordData.password', 'new-password')
+        ->set('passwordData.password_confirmation', 'mismatch')
         ->call('savePassword')
         ->assertHasErrors(['passwordData.current_password', 'passwordData.password']);
 

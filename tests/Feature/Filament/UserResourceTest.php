@@ -14,18 +14,18 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->actingAs(User::factory()->create());
 });
 
-it('can list users', function () {
+it('can list users', function (): void {
     User::factory()->count(10)->create();
 
     Livewire::test(ListUsers::class)
-        ->assertCanSeeTableRecords(User::limit(10)->get());
+        ->assertCanSeeTableRecords(User::query()->limit(10)->get());
 });
 
-it('can create users using action class', function () {
+it('can create users using action class', function (): void {
     Livewire::test(CreateUser::class)
         ->set('data.name', 'New User')
         ->set('data.email', 'new@example.com')
@@ -39,7 +39,7 @@ it('can create users using action class', function () {
     ]);
 });
 
-it('can update users using action class', function () {
+it('can update users using action class', function (): void {
     $user = User::factory()->create();
     $updatedName = 'Updated Name';
 
@@ -54,7 +54,7 @@ it('can update users using action class', function () {
     expect($user->refresh()->name)->toBe($updatedName);
 });
 
-it('can delete users using action class from table', function () {
+it('can delete users using action class from table', function (): void {
     $user = User::factory()->create();
 
     Livewire::test(ListUsers::class)
@@ -63,7 +63,7 @@ it('can delete users using action class from table', function () {
     $this->assertSoftDeleted($user);
 });
 
-it('can delete users using action class from edit page', function () {
+it('can delete users using action class from edit page', function (): void {
     $user = User::factory()->create();
 
     Livewire::test(EditUser::class, [

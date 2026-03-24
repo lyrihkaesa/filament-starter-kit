@@ -4,30 +4,35 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\EmbeddedSchema;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use RuntimeException;
+use stdClass;
 use Throwable;
 
-final class EditProfile extends BaseEditProfile implements HasForms
+/**
+ * @property-read Schema $passwordForm
+ */
+final class EditProfile extends BaseEditProfile implements HasSchemas
 {
-    use InteractsWithForms;
+    use InteractsWithSchemas;
 
     /**
      * @var array<string, mixed> | null
@@ -102,8 +107,15 @@ final class EditProfile extends BaseEditProfile implements HasForms
     {
         $data = $this->passwordForm->getState();
 
-        Auth::user()->update([
-            'password' => Hash::make($data['password']),
+        $user = Auth::user();
+
+        throw_unless($user instanceof User, RuntimeException::class, 'User must be authenticated.');
+
+        /** @var string $password */
+        $password = $data['password'] ?? '';
+
+        $user->update([
+            'password' => Hash::make($password),
         ]);
 
         $this->passwordForm->fill();
@@ -140,7 +152,7 @@ final class EditProfile extends BaseEditProfile implements HasForms
 
             try {
                 $currentSessionIdRaw = session()->getId();
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 // No session
             }
 
@@ -156,6 +168,9 @@ final class EditProfile extends BaseEditProfile implements HasForms
             ->send();
     }
 
+    /**
+     * @return Collection<int|string, mixed>
+     */
     public function getBrowserSessionsList(): Collection
     {
         if (config('session.driver') !== 'database') {
@@ -165,32 +180,55 @@ final class EditProfile extends BaseEditProfile implements HasForms
         $currentSessionIdRaw = null;
         try {
             $currentSessionIdRaw = session()->getId();
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             // No session
         }
 
-        return DB::table('sessions')
+        /** @var Collection<int, stdClass> $sessions */
+        $sessions = DB::table('sessions')
             ->where('user_id', Auth::id())
             ->orderBy('last_activity', 'desc')
             ->get()
-            ->map(function ($session) use ($currentSessionIdRaw): object {
-                $agent = $this->createAgent((string) ($session->user_agent ?? ''));
+            ->map(function (object $session) use ($currentSessionIdRaw): stdClass {
+                /** @var stdClass $session */
+                $userAgent = is_string($session->user_agent) ? $session->user_agent : '';
+                $agent = $this->createAgent($userAgent);
 
-                return (object) [
-                    'id' => $session->id,
-                    'agent' => (object) [
-                        'is_desktop' => $agent['is_desktop'],
-                        'platform' => $agent['platform'],
-                        'browser' => $agent['browser'],
-                    ],
-                    'ip_address' => $session->ip_address,
-                    'is_current_device' => $currentSessionIdRaw && $session->id === $currentSessionIdRaw,
-                    'last_active' => Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
+                /** @var scalar $id */
+                $id = $session->id ?? '';
+                $sessionId = (string) $id;
+
+                /** @var scalar $ip */
+                $ip = $session->ip_address ?? '';
+                $ipAddress = (string) $ip;
+
+                /** @var scalar $activity */
+                $activity = $session->last_activity ?? 0;
+                $lastActive = Date::createFromTimestamp((int) $activity)->diffForHumans();
+
+                $sessionObj = new stdClass();
+                $sessionObj->id = $sessionId;
+                $sessionObj->agent = (object) [
+                    'is_desktop' => $agent['is_desktop'],
+                    'platform' => $agent['platform'],
+                    'browser' => $agent['browser'],
                 ];
-            });
+                $sessionObj->ip_address = $ipAddress;
+                $sessionObj->is_current_device = $currentSessionIdRaw && $sessionId === (string) $currentSessionIdRaw;
+                $sessionObj->last_active = $lastActive;
+
+                return $sessionObj;
+            })
+            ->values();
+
+        // @phpstan-ignore return.type
+        return $sessions;
     }
 
-    protected function getForms(): array
+    /**
+     * @return array<int, string>
+     */
+    protected function getSchemas(): array
     {
         return [
             'form',
@@ -198,10 +236,10 @@ final class EditProfile extends BaseEditProfile implements HasForms
         ];
     }
 
-    protected function getProfileSection(): Component
+    protected function getProfileSection(): Section
     {
         return Section::make(__('Profile Information'))
-            ->description(__('Update your account\'s profile information and email address.'))
+            ->description(__("Update your account's profile information and email address."))
             ->schema([
                 Form::make([
                     EmbeddedSchema::make('form'),
@@ -216,7 +254,7 @@ final class EditProfile extends BaseEditProfile implements HasForms
             ->aside();
     }
 
-    protected function getPasswordSection(): Component
+    protected function getPasswordSection(): Section
     {
         return Section::make(__('Update Password'))
             ->description(__('Ensure your account is using a long, random password to stay secure.'))
@@ -234,7 +272,7 @@ final class EditProfile extends BaseEditProfile implements HasForms
             ->aside();
     }
 
-    protected function getBrowserSessionsSection(): Component
+    protected function getBrowserSessionsSection(): Section
     {
         return Section::make(__('Browser Sessions'))
             ->description(__('Manage and log out your active sessions on other browsers and devices.'))
@@ -265,9 +303,20 @@ final class EditProfile extends BaseEditProfile implements HasForms
                     ->required()
                     ->currentPassword(guard: Filament::getAuthGuard()),
             ])
-            ->action(fn (array $data) => $this->logoutOtherBrowserSessions($data['password']));
+            ->action(function (array $data): void {
+                $password = $data['password'] ?? '';
+
+                if (! is_string($password)) {
+                    return;
+                }
+
+                $this->logoutOtherBrowserSessions($password);
+            });
     }
 
+    /**
+     * @return array{is_desktop: bool, browser: string, platform: string}
+     */
     protected function createAgent(string $userAgent): array
     {
         $isMobile = (bool) preg_match('/Mobile|Android|iPhone|iPad|Phone/i', $userAgent);

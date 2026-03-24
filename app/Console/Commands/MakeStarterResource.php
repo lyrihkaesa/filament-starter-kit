@@ -18,12 +18,11 @@ final class MakeStarterResource extends Command
     {
         $model = Str::studly($this->argument('model'));
         $modelPlural = Str::plural($model);
-        $resourceName = "{$model}Resource";
-        $namespace = "App\\Filament\\Resources\\{$modelPlural}";
-        $path = app_path("Filament/Resources/{$modelPlural}");
+        $namespace = 'App\Filament\Resources\\'.$modelPlural;
+        $path = app_path('Filament/Resources/'.$modelPlural);
 
         if (File::exists($path) && ! $this->option('force')) {
-            $this->error("Resource {$modelPlural} already exists!");
+            $this->error(sprintf('Resource %s already exists!', $modelPlural));
 
             return 1;
         }
@@ -31,7 +30,7 @@ final class MakeStarterResource extends Command
         $this->generateActions($model);
         $this->generateResourceFiles($model, $modelPlural, $namespace, $path);
 
-        $this->info("Starter Resource for {$model} generated successfully!");
+        $this->info(sprintf('Starter Resource for %s generated successfully!', $model));
 
         return 0;
     }
@@ -50,8 +49,8 @@ final class MakeStarterResource extends Command
             '{{ namespace }}' => $namespace,
             '{{ model }}' => $model,
             '{{ modelPlural }}' => $modelPlural,
-            '{{ modelFqn }}' => "App\\Models\\{$model}",
-            '{{ resourceFqn }}' => "{$namespace}\\{$model}Resource",
+            '{{ modelFqn }}' => 'App\Models\\'.$model,
+            '{{ resourceFqn }}' => sprintf('%s\%sResource', $namespace, $model),
             '{{ softDeletesImport }}' => $this->option('soft-deletes')
                 ? "use Illuminate\Database\Eloquent\SoftDeletingScope;\nuse Illuminate\Database\Eloquent\Builder;"
                 : '',
@@ -66,22 +65,25 @@ final class MakeStarterResource extends Command
         File::ensureDirectoryExists($path.'/Tables');
 
         // Generate files from stubs
-        $this->generateFile('resource', "{$path}/{$model}Resource.php", $replacements);
-        $this->generateFile('create', "{$path}/Pages/Create{$model}.php", $replacements);
-        $this->generateFile('edit', "{$path}/Pages/Edit{$model}.php", $replacements);
-        $this->generateFile('list', "{$path}/Pages/List{$modelPlural}.php", $replacements);
-        $this->generateFile('view-page', "{$path}/Pages/View{$model}.php", $replacements);
-        $this->generateFile('form', "{$path}/Schemas/{$model}Form.php", $replacements);
-        $this->generateFile('infolist', "{$path}/Schemas/{$model}Infolist.php", $replacements);
-        $this->generateFile('table', "{$path}/Tables/{$modelPlural}Table.php", $replacements);
+        $this->generateFile('resource', sprintf('%s/%sResource.php', $path, $model), $replacements);
+        $this->generateFile('create', sprintf('%s/Pages/Create%s.php', $path, $model), $replacements);
+        $this->generateFile('edit', sprintf('%s/Pages/Edit%s.php', $path, $model), $replacements);
+        $this->generateFile('list', sprintf('%s/Pages/List%s.php', $path, $modelPlural), $replacements);
+        $this->generateFile('view-page', sprintf('%s/Pages/View%s.php', $path, $model), $replacements);
+        $this->generateFile('form', sprintf('%s/Schemas/%sForm.php', $path, $model), $replacements);
+        $this->generateFile('infolist', sprintf('%s/Schemas/%sInfolist.php', $path, $model), $replacements);
+        $this->generateFile('table', sprintf('%s/Tables/%sTable.php', $path, $modelPlural), $replacements);
     }
 
+    /**
+     * @param  array<string, string>  $replacements
+     */
     private function generateFile(string $stubName, string $targetPath, array $replacements): void
     {
-        $stubPath = base_path("stubs/starter-kit/resource/{$stubName}.stub");
+        $stubPath = base_path(sprintf('stubs/starter-kit/resource/%s.stub', $stubName));
 
         if (! File::exists($stubPath)) {
-            $this->error("Stub not found: {$stubPath}");
+            $this->error('Stub not found: '.$stubPath);
 
             return;
         }
@@ -90,6 +92,6 @@ final class MakeStarterResource extends Command
         $content = str_replace(array_keys($replacements), array_values($replacements), $content);
 
         File::put($targetPath, $content);
-        $this->line("Generated: {$targetPath}");
+        $this->line('Generated: '.$targetPath);
     }
 }

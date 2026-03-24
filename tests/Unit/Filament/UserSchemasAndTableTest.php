@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('configures UserForm schema', function () {
+it('configures UserForm schema', function (): void {
     $schema = $this->getMockBuilder(Schema::class)
         ->disableOriginalConstructor()
         ->onlyMethods(['components'])
@@ -21,7 +21,7 @@ it('configures UserForm schema', function () {
     expect(UserForm::configure($schema))->toBe($schema);
 });
 
-it('configures UserInfolist schema', function () {
+it('configures UserInfolist schema', function (): void {
     $schema = $this->getMockBuilder(Schema::class)
         ->disableOriginalConstructor()
         ->onlyMethods(['components'])
@@ -31,7 +31,7 @@ it('configures UserInfolist schema', function () {
     expect(UserInfolist::configure($schema))->toBe($schema);
 });
 
-it('configures UsersTable', function () {
+it('configures UsersTable', function (): void {
     $table = $this->getMockBuilder(Table::class)
         ->disableOriginalConstructor()
         ->onlyMethods(['columns', 'filters', 'recordActions', 'toolbarActions'])

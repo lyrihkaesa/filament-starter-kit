@@ -15,18 +15,18 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->actingAs(User::factory()->create());
 });
 
-it('can list posts', function () {
+it('can list posts', function (): void {
     Post::factory()->count(10)->create();
 
     Livewire::test(ListPosts::class)
-        ->assertCanSeeTableRecords(Post::limit(10)->get());
+        ->assertCanSeeTableRecords(Post::query()->limit(10)->get());
 });
 
-it('can create posts', function () {
+it('can create posts', function (): void {
     $user = User::factory()->create();
 
     Livewire::test(CreatePost::class)
@@ -47,7 +47,7 @@ it('can create posts', function () {
     ]);
 });
 
-it('can update posts', function () {
+it('can update posts', function (): void {
     $post = Post::factory()->create();
     $updatedTitle = 'Updated Title';
 
@@ -61,7 +61,7 @@ it('can update posts', function () {
     expect($post->refresh()->title)->toBe($updatedTitle);
 });
 
-it('can delete posts from table', function () {
+it('can delete posts from table', function (): void {
     $post = Post::factory()->create();
 
     Livewire::test(ListPosts::class)
@@ -72,7 +72,7 @@ it('can delete posts from table', function () {
     ]);
 });
 
-it('can delete posts from edit page', function () {
+it('can delete posts from edit page', function (): void {
     $post = Post::factory()->create();
 
     Livewire::test(EditPost::class, [

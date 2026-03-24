@@ -63,9 +63,12 @@ final class UserResource extends Resource
      */
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
+        /** @var Builder<User> $query */
+        $query = parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+
+        return $query;
     }
 }

@@ -29,7 +29,7 @@ final class PostForm
                                 TextInput::make('title')
                                     ->required()
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
+                                    ->afterStateUpdated(fn (Set $set, ?string $state): mixed => $set('slug', Str::slug($state ?? ''))),
                                 TextInput::make('slug')
                                     ->required()
                                     ->unique(ignoreRecord: true),

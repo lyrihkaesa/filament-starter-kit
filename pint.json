@@ -2,6 +2,7 @@
     "preset": "laravel",
     "notPath": [
         "tests/TestCase.php",
+        "tmp",
         "intelephense_helper.php",
         "_ide_helper.php"
     ],

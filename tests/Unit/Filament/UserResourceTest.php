@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('configures UserResource form, infolist, table, relations, pages, and query', function () {
+it('configures UserResource form, infolist, table, relations, pages, and query', function (): void {
     // Mock Schema for form()
     $schemaForm = $this->getMockBuilder(Schema::class)
         ->disableOriginalConstructor()

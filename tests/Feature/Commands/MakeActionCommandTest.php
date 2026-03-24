@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Console\Commands\MakeActionCommand;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Tester\CommandTester;
 
-it('can run make:action command without errors', function () {
+it('can run make:action command without errors', function (): void {
     $filesystem = new Filesystem();
     $file = app_path('Actions/TestAction.php');
 
@@ -26,7 +28,7 @@ it('can run make:action command without errors', function () {
     }
 });
 
-it('generates create, update, delete actions by default', function () {
+it('generates create, update, delete actions by default', function (): void {
     $filesystem = new Filesystem();
     $model = 'Post';
     $subFolder = 'Custom';
@@ -39,9 +41,9 @@ it('generates create, update, delete actions by default', function () {
     ]);
 
     $expectedFiles = [
-        app_path("Actions/{$subFolder}/Create{$model}Action.php"),
-        app_path("Actions/{$subFolder}/Update{$model}Action.php"),
-        app_path("Actions/{$subFolder}/Delete{$model}Action.php"),
+        app_path(sprintf('Actions/%s/Create%sAction.php', $subFolder, $model)),
+        app_path(sprintf('Actions/%s/Update%sAction.php', $subFolder, $model)),
+        app_path(sprintf('Actions/%s/Delete%sAction.php', $subFolder, $model)),
     ];
 
     foreach ($expectedFiles as $file) {
@@ -51,10 +53,10 @@ it('generates create, update, delete actions by default', function () {
     }
 });
 
-it('generates only create action if --create is passed', function () {
+it('generates only create action if --create is passed', function (): void {
     $filesystem = new Filesystem();
     $model = 'Post';
-    $file = app_path("Actions/Posts/Create{$model}Action.php");
+    $file = app_path(sprintf('Actions/Posts/Create%sAction.php', $model));
 
     Artisan::call('make:action', [
         '--model' => $model,
@@ -66,10 +68,10 @@ it('generates only create action if --create is passed', function () {
     $filesystem->delete($file);
 });
 
-it('generates only update action if --update is passed', function () {
+it('generates only update action if --update is passed', function (): void {
     $filesystem = new Filesystem();
     $model = 'Post';
-    $file = app_path("Actions/Posts/Update{$model}Action.php");
+    $file = app_path(sprintf('Actions/Posts/Update%sAction.php', $model));
 
     Artisan::call('make:action', [
         '--model' => $model,
@@ -81,10 +83,10 @@ it('generates only update action if --update is passed', function () {
     $filesystem->delete($file);
 });
 
-it('generates only delete action if --delete is passed', function () {
+it('generates only delete action if --delete is passed', function (): void {
     $filesystem = new Filesystem();
     $model = 'Post';
-    $file = app_path("Actions/Posts/Delete{$model}Action.php");
+    $file = app_path(sprintf('Actions/Posts/Delete%sAction.php', $model));
 
     Artisan::call('make:action', [
         '--model' => $model,
@@ -96,10 +98,10 @@ it('generates only delete action if --delete is passed', function () {
     $filesystem->delete($file);
 });
 
-it('honors --force to overwrite existing files', function () {
+it('honors --force to overwrite existing files', function (): void {
     $filesystem = new Filesystem();
     $model = 'Post';
-    $file = app_path("Actions/Posts/Create{$model}Action.php");
+    $file = app_path(sprintf('Actions/Posts/Create%sAction.php', $model));
 
     $filesystem->ensureDirectoryExists(dirname($file));
     $filesystem->put($file, 'old content');
@@ -115,7 +117,7 @@ it('honors --force to overwrite existing files', function () {
     $filesystem->delete($file);
 });
 
-it('prompts for name when not provided and creates the file', function () {
+it('prompts for name when not provided and creates the file', function (): void {
     $filesystem = new Filesystem();
     $file = app_path('Actions/Posts/PublishPostAction.php');
 
@@ -132,13 +134,13 @@ it('prompts for name when not provided and creates the file', function () {
     }
 });
 
-it('returns early when empty name is provided after prompt', function () {
+it('returns early when empty name is provided after prompt', function (): void {
     $this->artisan('make:action')
         ->expectsQuestion('What is the class name? (e.g., Posts/PublishPostAction)', '')
         ->assertExitCode(0);
 });
 
-it('asks to overwrite existing file and skips when answered No', function () {
+it('asks to overwrite existing file and skips when answered No', function (): void {
     $filesystem = new Filesystem();
     $file = app_path('Actions/SkipAction.php');
 
@@ -146,9 +148,9 @@ it('asks to overwrite existing file and skips when answered No', function () {
         $filesystem->ensureDirectoryExists(dirname($file));
         $filesystem->put($file, 'old content');
 
-        $command = new App\Console\Commands\MakeActionCommand(app(Filesystem::class));
+        $command = new MakeActionCommand(resolve(Filesystem::class));
         $command->setLaravel(app());
-        $tester = new Symfony\Component\Console\Tester\CommandTester($command);
+        $tester = new CommandTester($command);
         $tester->setInputs(['no']);
         $exitCode = $tester->execute(['name' => 'SkipAction']);
 
@@ -162,7 +164,7 @@ it('asks to overwrite existing file and skips when answered No', function () {
     }
 });
 
-it('asks to overwrite existing file and overwrites when answered Yes', function () {
+it('asks to overwrite existing file and overwrites when answered Yes', function (): void {
     $filesystem = new Filesystem();
     $file = app_path('Actions/OverwriteAction.php');
 
@@ -170,9 +172,9 @@ it('asks to overwrite existing file and overwrites when answered Yes', function 
         $filesystem->ensureDirectoryExists(dirname($file));
         $filesystem->put($file, 'old content');
 
-        $command = new App\Console\Commands\MakeActionCommand(app(Filesystem::class));
+        $command = new MakeActionCommand(resolve(Filesystem::class));
         $command->setLaravel(app());
-        $tester = new Symfony\Component\Console\Tester\CommandTester($command);
+        $tester = new CommandTester($command);
         $tester->setInputs(['yes']);
         $exitCode = $tester->execute(['name' => 'OverwriteAction']);
 

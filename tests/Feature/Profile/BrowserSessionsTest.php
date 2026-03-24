@@ -12,11 +12,11 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     config(['session.driver' => 'database']);
 });
 
-it('can see the browser sessions on the consolidated profile page', function () {
+it('can see the browser sessions on the consolidated profile page', function (): void {
     $user = User::factory()->create();
 
     $this->actingAs($user);
@@ -26,7 +26,7 @@ it('can see the browser sessions on the consolidated profile page', function () 
         ->assertSee(__('Browser Sessions'));
 });
 
-it('can logout other browser sessions from the consolidated profile page', function () {
+it('can logout other browser sessions from the consolidated profile page', function (): void {
     $user = User::factory()->create(['password' => bcrypt('password')]);
 
     $this->actingAs($user);
