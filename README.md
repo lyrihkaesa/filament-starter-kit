@@ -7,14 +7,15 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 
 ## ✨ Fitur yang Tersedia
 
--   Filament panel dengan ID `app` (bukan default `admin`)
--   User Resource (CRUD user) with Action Pattern
--   Action Pattern (`php artisan make:action`)
--   User, Role & Permision Seeder (default admin user)
--   Custom Locale (APP_LOCALE `id`, APP_FAKER_LOCALE `id_ID`)
--   RBAC or ABAC (Role & Permission) using `bezhansalleh/filament-shield`
--   Impersonating User using `stechstudio/filament-impersonate`
--   API using `laravel/sanctum`
+- **Filament v5 Ready**: Dukungan penuh untuk Filament v5 dengan pola `HasSchemas` dan `InteractsWithSchemas`.
+- **Panel App**: Filament panel dengan ID `app` (bukan default `admin`).
+- **User & Post Resource**: CRUD lengkap untuk User dan Post dengan praktik terbaik.
+- **Action Pattern**: Logika bisnis yang terpisah menggunakan Action (`php artisan make:action`).
+- **Smoke Testing**: Pengujian otomatis untuk memastikan semua halaman publik dan terautentikasi dapat diakses (`tests/Feature/SmokeTest.php`).
+- **RBAC using Filament Shield**: Manajemen Role & Permission yang matang menggunakan `bezhansalleh/filament-shield`.
+- **Impersonation**: Fitur untuk masuk sebagai user lain menggunakan `stechstudio/filament-impersonate`.
+- **Custom Locale**: Konfigurasi Bahasa Indonesia (`id`) untuk aplikasi dan Faker.
+- **API Ready**: Integrasi API menggunakan `laravel/sanctum`.
 
 ## 🚀 Quick Start
 
@@ -62,21 +63,18 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
     composer dev
     ```
 
-    Jika menggunakan `Laravel Herd` langsung saja dibrowser [http://filament-starter-kit.test]([http://filament-starter-kit.test)
+    Jika menggunakan `Laravel Herd` langsung saja dibrowser [http://filament-starter-kit.test](http://filament-starter-kit.test)
 
 5.  Login default (automatis input jika `APP_DEBUG=true`):
-    -   Email: `admin@example.com`
-    -   Password: `password`
-
-> Jika menggunakan **Laravel Herd**, atur `APP_URL=http://filament-starter-kit.test`.  
-> Jika pakai `composer dev`, gunakan `APP_URL=http://localhost:8000`.
+    - Email: `admin@example.com`
+    - Password: `password`
 
 ### **Opsi 2: Manual (Clone Repository)**
 
 1. Clone repository:
 
     ```bash
-    git clone https://github.com/username/filament-starter-kit.git
+    git clone https://github.com/lyrihkaesa/filament-starter-kit.git
     cd filament-starter-kit
     ```
 
@@ -112,27 +110,18 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
     composer dev
     ```
 
-7. Login default:
-
-    - Email: `admin@example.com`
-    - Password: `password`
-
 ---
 
-## ⚙️ Development Tools
+## 🛠 Quality & Development Tools
 
-| Keterangan                                      | Package                                                                                                                   | Command                                                                          |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| [🧪 **Testing**](docs/03-test-pest-coverage.md) | [Pest v4](https://pestphp.com/)                                                                                           | `php artisan test` / `./vendor/bin/pest`                                         |
-| [🎨 **Code Style**](docs/04-pint-code-style.md) | [Laravel Pint](https://laravel.com/docs/pint)                                                                             | `composer lint` / `./vendor/bin/pint`                                            |
-| [🛠 **Refactoring**](docs/06-rector.md)          | [Rector](https://github.com/rectorphp/rector) + [driftingly/rector-laravel](https://github.com/driftingly/rector-laravel) | `composer test:refactor` (dry-run) / `composer refactor` / `./vendor/bin/rector` |
-| [🔍 **Static Analysis**](docs/05-larastan.md)   | [Larastan](https://github.com/nunomaduro/larastan)                                                                        | `composer test:types` / `./vendor/bin/phpstan`                                   |
+Proyek ini dilengkapi dengan alat penjaminan kualitas untuk menjaga kode tetap bersih dan aman:
 
----
-
-## 🤝 Kontribusi
-
-[TODO]
+| Alat                   | Kegunaan                                                                       | Perintah              |
+| :--------------------- | :----------------------------------------------------------------------------- | :-------------------- |
+| **🧪 Testing**         | Smoke & Feature Testing dengan [Pest v4](https://pestphp.com/)                 | `php artisan test`    |
+| **🔍 Static Analysis** | Analisis tipe statis dengan [Larastan](https://github.com/larastan/larastan)   | `composer test:types` |
+| **🎨 Code Style**      | Pemformatan kode otomatis dengan [Laravel Pint](https://laravel.com/docs/pint) | `composer lint`       |
+| **🛠 Refactoring**     | Modernisasi kode otomatis dengan [Rector](https://github.com/rectorphp/rector) | `composer refactor`   |
 
 ---
 
