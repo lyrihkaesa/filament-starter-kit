@@ -23,5 +23,10 @@
     "This device": "Perangkat ini",
     "Last active": "Terakhir aktif",
     "Unknown": "Tidak diketahui",
-    "The provided password does not match our records.": "Kata sandi yang diberikan tidak cocok dengan catatan kami."
+    "The provided password does not match our records.": "Kata sandi yang diberikan tidak cocok dengan catatan kami.",
+    "Log Out Session": "Keluar dari Sesi",
+    "Are you sure you want to log out of this session? This will immediately terminate the session on that device.": "Apakah Anda yakin ingin keluar dari sesi ini? Ini akan segera menghentikan sesi pada perangkat tersebut.",
+    "Cancel": "Batal",
+    "Log Out": "Keluar",
+    "Failed to log out session.": "Gagal keluar dari sesi."
 }

@@ -114,6 +114,23 @@ final class EditProfile extends BaseEditProfile implements HasForms
             ->send();
     }
 
+    public function logoutSession(string $sessionId): void
+    {
+        if (config('session.driver') !== 'database') {
+            return;
+        }
+
+        DB::table('sessions')
+            ->where('user_id', Auth::id())
+            ->where('id', $sessionId)
+            ->delete();
+
+        Notification::make()
+            ->title(__('Done.'))
+            ->success()
+            ->send();
+    }
+
     public function logoutOtherBrowserSessions(string $password): void
     {
         Auth::logoutOtherDevices($password);
@@ -160,6 +177,7 @@ final class EditProfile extends BaseEditProfile implements HasForms
                 $agent = $this->createAgent((string) ($session->user_agent ?? ''));
 
                 return (object) [
+                    'id' => $session->id,
                     'agent' => (object) [
                         'is_desktop' => $agent['is_desktop'],
                         'platform' => $agent['platform'],
