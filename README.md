@@ -125,6 +125,22 @@ Proyek ini dilengkapi dengan alat penjaminan kualitas untuk menjaga kode tetap b
 
 ---
 
+## 📖 Dokumentasi Detail
+
+- [00 - Intro](docs/00-intro.md)
+- [01 - App Service Provider](docs/01-app-service-provider.md)
+- [02 - Action Pattern](docs/02-action-pattern.md)
+- [03 - Test Pest Coverage](docs/03-test-pest-coverage.md)
+- [04 - Pint Code Style](docs/04-pint-code-style.md)
+- [05 - Larastan (Static Analysis)](docs/05-larastan.md)
+- [06 - Rector (Refactoring)](docs/06-rector.md)
+- [08 - User Resource](docs/08-user-resource.md)
+- [10 - AI Coding Guidelines](docs/10-AI-Coding-Guidelines.md)
+- [11 - Make Starter Resource](docs/11-make-starter-resource.md)
+- [12 - Upload Avatar & S3 Storage](docs/12-upload-avatar.md)
+
+---
+
 ## 📜 Lisensi
 
 [MIT License](LICENSE)

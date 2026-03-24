@@ -8,6 +8,7 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\EmbeddedSchema;
@@ -71,6 +72,13 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
     {
         return $schema
             ->components([
+                FileUpload::make('avatar')
+                    ->label(__('Avatar'))
+                    ->image()
+                    ->avatar()
+                    ->imageEditor()
+                    ->circleCropper()
+                    ->directory('avatars'),
                 $this->getNameFormComponent(),
                 $this->getEmailFormComponent(),
             ])
