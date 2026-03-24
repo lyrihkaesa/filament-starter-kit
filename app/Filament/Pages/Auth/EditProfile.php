@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Actions\Profile\LogoutOtherBrowserSessionsAction;
+use App\Actions\Profile\LogoutSessionAction;
+use App\Actions\Profile\UpdateUserPasswordAction;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
@@ -22,7 +25,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use RuntimeException;
 use stdClass;
@@ -111,7 +113,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->statePath('passwordData');
     }
 
-    public function savePassword(): void
+    public function savePassword(UpdateUserPasswordAction $action): void
     {
         $data = $this->passwordForm->getState();
 
@@ -122,9 +124,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         /** @var string $password */
         $password = $data['password'] ?? '';
 
-        $user->update([
-            'password' => Hash::make($password),
-        ]);
+        $action->handle($user, $password);
 
         $this->passwordForm->fill();
 
@@ -134,16 +134,13 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->send();
     }
 
-    public function logoutSession(string $sessionId): void
+    public function logoutSession(string $sessionId, LogoutSessionAction $action): void
     {
-        if (config('session.driver') !== 'database') {
-            return;
-        }
+        $user = Auth::user();
 
-        DB::table('sessions')
-            ->where('user_id', Auth::id())
-            ->where('id', $sessionId)
-            ->delete();
+        throw_unless($user instanceof User, RuntimeException::class, 'User must be authenticated.');
+
+        $action->handle($user, $sessionId);
 
         Notification::make()
             ->title(__('Done.'))
@@ -151,24 +148,13 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->send();
     }
 
-    public function logoutOtherBrowserSessions(string $password): void
+    public function logoutOtherBrowserSessions(string $password, LogoutOtherBrowserSessionsAction $action): void
     {
-        Auth::logoutOtherDevices($password);
+        $user = Auth::user();
 
-        if (config('session.driver') === 'database') {
-            $currentSessionIdRaw = null;
+        throw_unless($user instanceof User, RuntimeException::class, 'User must be authenticated.');
 
-            try {
-                $currentSessionIdRaw = session()->getId();
-            } catch (Throwable) {
-                // No session
-            }
-
-            DB::table('sessions')
-                ->where('user_id', Auth::id())
-                ->where('id', '<>', $currentSessionIdRaw ?? 'none')
-                ->delete();
-        }
+        $action->handle($user, $password);
 
         Notification::make()
             ->title(__('Done.'))
@@ -311,14 +297,14 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->required()
                     ->currentPassword(guard: Filament::getAuthGuard()),
             ])
-            ->action(function (array $data): void {
+            ->action(function (array $data, LogoutOtherBrowserSessionsAction $action): void {
                 $password = $data['password'] ?? '';
 
                 if (! is_string($password)) {
                     return;
                 }
 
-                $this->logoutOtherBrowserSessions($password);
+                $this->logoutOtherBrowserSessions($password, $action);
             });
     }
 
