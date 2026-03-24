@@ -10,6 +10,7 @@ use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,7 +21,7 @@ use Spatie\Permission\Traits\HasRoles;
 final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasPanelShield, HasRoles, Notifiable, SoftDeletes;
+    use HasFactory, HasPanelShield, HasRoles, HasUuids, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
