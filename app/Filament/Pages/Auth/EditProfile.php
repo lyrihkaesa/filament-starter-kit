@@ -12,6 +12,7 @@ use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\EmbeddedSchema;
@@ -25,7 +26,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use RuntimeException;
 use stdClass;
@@ -85,6 +85,13 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->directory('avatars'),
                 $this->getNameFormComponent(),
                 $this->getEmailFormComponent(),
+                Select::make('roles')
+                    ->label(__('Roles'))
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->disabled(fn () => ! auth()->user()?->can('Update:Role')),
             ])
             ->statePath('data');
     }

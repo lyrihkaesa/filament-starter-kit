@@ -61,19 +61,25 @@ public function run(): void
 }
 ```
 
-## 📦 Mengambil Data Role dari Database
+## 🚀 Cara Generate Seeder Shield (Modern)
 
-Jika Anda sudah capek-capek mengatur Role dan Izin lewat dashboard Filament dan ingin menyimpannya ke dalam kode seeder, gunakan cara ini di **Tinker**:
+Jika Anda sudah mengatur Role, Permission, dan akun User melalui dashboard Filament dan ingin menyimpannya ke dalam file seeder secara otomatis, gunakan perintah berikut:
 
-```php
-// Jalankan di 'php artisan tinker'
-$roles = \Spatie\Permission\Models\Role::with('permissions')->get();
-
-foreach ($roles as $role) {
-    echo "Role::firstOrCreate(['name' => '{$role->name}'])"
-         . "->syncPermissions([" . $role->permissions->pluck('name')->implode("', '") . "]);\n";
-}
+```bash
+php artisan shield:seeder --generate --with-users --all -F
 ```
 
+### Penjelasan Opsi:
+- `--generate`: Otomatis membuatkan Permission untuk semua Resource, Page, dan Widget yang terdaftar.
+- `--with-users`: Menyertakan data User yang sudah memiliki Role/Permission ke dalam file seeder.
+- `--all`: Mengekspor **semua** user dari database, bukan hanya yang memiliki role.
+- `-F` atau `--force`: Menimpa (overwrite) file `ShieldSeeder.php` yang sudah ada sebelumnya.
+
+### Langkah-langkah Interaktif:
+Saat menjalankan perintah di atas, Anda akan diminta memilih beberapa hal:
+1. **Pilih Panel**: Ketik `0` (untuk panel `app`).
+2. **What to generate?**: Pilih `Policies & Permissions` (default) untuk keamanan lengkap.
+3. **Handle user passwords?**: Pilih `include` jika ingin menyertakan password yang sudah ter-hash dari database, agar Anda bisa login kembali dengan password yang sama setelah migrate fresh.
+
 > [!TIP]
-> Hasil dari kode di atas tinggal Anda **Copy-Paste** saja ke dalam file Seeder Anda! Sangat praktis.
+> Dengan cara ini, Anda tidak perlu lagi melakukan copy-paste manual dari Tinker. Semua Role, Permission, dan User akan tersimpan dalam bentuk JSON di dalam `ShieldSeeder.php`.

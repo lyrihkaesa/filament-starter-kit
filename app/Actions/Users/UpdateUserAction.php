@@ -16,6 +16,7 @@ final readonly class UpdateUserAction
      *     password?: string,
      *     avatar?: string|null,
      *     email_verified_at?: string|null,
+     *     roles?: array<int, string>,
      * } $data
      */
     public function handle(User $user, array $data): User
@@ -23,7 +24,14 @@ final readonly class UpdateUserAction
 
         /** @var User $updatedUser */
         $updatedUser = DB::transaction(function () use ($user, $data): User {
+            $roles = $data['roles'] ?? null;
+            unset($data['roles']);
+
             $user->update($data);
+
+            if ($roles !== null) {
+                $user->syncRoles($roles);
+            }
 
             return $user->fresh() ?? $user;
         });

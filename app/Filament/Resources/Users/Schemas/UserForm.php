@@ -6,6 +6,7 @@ namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -34,6 +35,13 @@ final class UserForm
                     ->label(__('Password'))
                     ->password()
                     ->required(),
+                Select::make('roles')
+                    ->label(__('Roles'))
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->disabled(fn () => ! auth()->user()?->can('Update:Role')),
             ]);
     }
 }

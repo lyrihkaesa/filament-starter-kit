@@ -16,12 +16,24 @@ final readonly class CreateUserAction
      *     password: string,
      *     avatar?: string|null,
      *     email_verified_at?: string|null,
+     *     roles?: array<int, string>,
      * } $data
      */
     public function handle(array $data): User
     {
         /** @var User $createdUser */
-        $createdUser = DB::transaction(fn (): User => User::query()->create($data));
+        $createdUser = DB::transaction(function () use ($data): User {
+            $roles = $data['roles'] ?? null;
+            unset($data['roles']);
+
+            $user = User::query()->create($data);
+
+            if ($roles !== null) {
+                $user->syncRoles($roles);
+            }
+
+            return $user;
+        });
 
         return $createdUser;
     }
