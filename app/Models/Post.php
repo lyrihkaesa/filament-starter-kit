@@ -18,18 +18,11 @@ final class Post extends Model
     use HasUuids;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that are guarded from mass assignment.
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'title',
-        'slug',
-        'content',
-        'is_published',
-        'author_id',
-        'thumbnail',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * Get the author of the post.

@@ -12,6 +12,7 @@ use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +23,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
+
     use HasPanelShield;
     use HasRoles;
     use HasUuids;
@@ -29,17 +31,11 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     use SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that are guarded from mass assignment.
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'avatar',
-        'anonymized_at',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for serialization.

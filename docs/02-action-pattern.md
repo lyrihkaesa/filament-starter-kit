@@ -162,3 +162,4 @@ app/
 -   Gunakan `--sub-folder` untuk struktur domain-based (misal `Billing`, `Auth`, `Access`)
 -   Simpan action yang bukan CUD di folder khusus (misal `Posts/PublishPostAction`)
 -   Pisahkan validasi & otorisasi ke FormRequest atau Policy untuk menjaga SRP
+-   **Keamanan & Mass Assignment**: Dengan penggunaan Action Pattern, strict typing, dan PHPDoc, kita dapat dengan aman menggunakan `Model::unguard()` secara global karena setiap action secara eksplisit mendefinisikan data apa yang diproses.

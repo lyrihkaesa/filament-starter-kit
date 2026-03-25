@@ -16,6 +16,7 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
 - **Impersonation**: Fitur untuk masuk sebagai user lain menggunakan `stechstudio/filament-impersonate`.
 - **Custom Locale**: Konfigurasi Bahasa Indonesia (`id`) untuk aplikasi dan Faker.
 - **API Ready**: Integrasi API menggunakan `laravel/sanctum`.
+- **Global Unguard (Local Only)**: Menggunakan `Model::unguard()` saat development (`isLocal()`) demi fleksibilitas, dengan keamanan yang tetap terjaga melalui **Action Pattern**, **Strict Types**, dan **PHPDoc**.
 
 ## 🚀 Quick Start
 

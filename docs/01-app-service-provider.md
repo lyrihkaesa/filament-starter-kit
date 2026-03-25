@@ -49,7 +49,7 @@ DB::prohibitDestructiveCommands(app()->isProduction());
 ## ⚠ Optional / Commented Features
 
 -   **Strict Models**: `Model::shouldBeStrict()` → mencegah lazy loading tidak sengaja, atribut tidak ada.
--   **Unguard Mass Assignment**: `Model::unguard()` → mempermudah seeding / mocking di local.
+-   **Unguard Mass Assignment**: `Model::unguard()` → diaktifkan hanya pada environment `local` untuk fleksibilitas maksimal saat development (seeding/mocking). Keamanan tetap terjaga karena project ini menggunakan **Action Pattern** dengan **strict typing** dan **PHPDoc** yang mengatur attribute yang boleh diisi.
 -   **Automatic Eager Loading**: `Model::automaticallyEagerLoadRelationships()` → otomatis load relasi, bisa diaktifkan jika perlu. `Laravel v12.8`
 -   **Password Defaults**: `Password::defaults(...)` → atur minimum length password di production.
 

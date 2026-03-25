@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Validation\Rules\Password;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -61,13 +60,13 @@ final class AppServiceProvider extends ServiceProvider
         // Model::shouldBeStrict();
 
         /**
-         * ✅ Mass Assignment Optional Unguard (hanya untuk local/dev)
+         * ✅ Mass Assignment Optional Unguard
          * Berguna saat seeding atau mocking tanpa perlu $fillable
          * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/Unguard.php
          */
-        // if (app()->isLocal()) {
-        //     Model::unguard();
-        // }
+        if (app()->isLocal()) {
+            Model::unguard();
+        }
 
         /**
          * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/ProhibitDestructiveCommands.php
