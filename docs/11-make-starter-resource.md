@@ -1,8 +1,4 @@
-Berikut versi yang dioptimasi untuk AI agent — lebih eksplisit, kontekstual, dan minim ambiguitas:
-
----
-
-## ✨ Feature: `make:starter-resource` — Custom Filament Resource Generator with Action Pattern
+# ✨ Feature: `make:starter-resource` — Custom Filament Resource Generator with Action Pattern
 
 ### Context for AI Agent
 
