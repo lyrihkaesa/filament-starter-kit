@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: when make migration and Model Eloquent
+---
+
 # UUIDs
 
 Always use UUIDs instead of autoincrement for primary and foreign keys.
