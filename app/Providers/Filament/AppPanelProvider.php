@@ -39,6 +39,7 @@ final class AppPanelProvider extends PanelProvider
             // ->emailVerification()
             // ->emailChangeVerification()
             ->profile(EditProfile::class)
+            ->databaseNotifications()
             ->colors([
                 'primary' => Color::Fuchsia,
             ])
