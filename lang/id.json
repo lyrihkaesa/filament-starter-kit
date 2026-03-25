@@ -28,5 +28,9 @@
     "Are you sure you want to log out of this session? This will immediately terminate the session on that device.": "Apakah Anda yakin ingin keluar dari sesi ini? Ini akan segera menghentikan sesi pada perangkat tersebut.",
     "Cancel": "Batal",
     "Log Out": "Keluar",
-    "Failed to log out session.": "Gagal keluar dari sesi."
+    "Failed to log out session.": "Gagal keluar dari sesi.",
+    "Log Out Successful": "Berhasil Keluar",
+    "You have been logged out from :device (:ip). Last active: :last_active": "Anda telah keluar dari :device (:ip). Terakhir aktif: :last_active",
+    "Other Devices Logged Out": "Sesi Browser Lain Berhasil Keluar",
+    "All other browser sessions have been logged out successfully.": "Semua sesi browser lainnya telah berhasil dinonaktifkan."
 }
