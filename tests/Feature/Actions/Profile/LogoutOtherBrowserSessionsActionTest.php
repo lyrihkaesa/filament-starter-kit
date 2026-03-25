@@ -65,6 +65,19 @@ it('clears other database sessions when logging out other devices', function ():
     $this->assertDatabaseHas('sessions', ['id' => $currentSessionId]);
     $this->assertDatabaseMissing('sessions', ['id' => 'user_other_session']);
     $this->assertDatabaseHas('sessions', ['id' => 'other_user_session']);
+
+    // Assert: Notification is created
+    $this->assertDatabaseHas('notifications', [
+        'notifiable_id' => $user->id,
+        'notifiable_type' => $user->getMorphClass(),
+    ]);
+
+    $notification = DB::table('notifications')
+        ->where('notifiable_id', $user->id)
+        ->first();
+
+    $data = json_decode($notification->data, true);
+    expect($data['title'])->toBe('Other Devices Logged Out');
 });
 
 it('does not attempt to clear database sessions if driver is not database', function (): void {

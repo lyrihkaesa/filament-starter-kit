@@ -52,6 +52,21 @@ it('can logout a specific session', function (): void {
     $this->assertDatabaseMissing('sessions', ['id' => 'user_session_1']);
     $this->assertDatabaseHas('sessions', ['id' => 'user_session_2']);
     $this->assertDatabaseHas('sessions', ['id' => 'other_user_session']);
+
+    // Assert: Notification is created
+    $this->assertDatabaseHas('notifications', [
+        'notifiable_id' => $user->id,
+        'notifiable_type' => $user->getMorphClass(),
+    ]);
+
+    $notification = DB::table('notifications')
+        ->where('notifiable_id', $user->id)
+        ->first();
+
+    $data = json_decode($notification->data, true);
+    expect($data['title'])->toBe('Log Out Successful')
+        ->and($data['body'])->toContain('Unknown Browser on Unknown OS')
+        ->and($data['body'])->toContain('127.0.0.1');
 });
 
 it('does nothing if session driver is not database', function (): void {

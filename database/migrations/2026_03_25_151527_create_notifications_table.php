@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -17,7 +18,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('type');
             $table->uuidMorphs('notifiable');
-            $table->jsonb('data');
+            if (DB::getDriverName() === 'pgsql') {
+                $table->jsonb('data');
+            } else {
+                $table->json('data');
+            }
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });

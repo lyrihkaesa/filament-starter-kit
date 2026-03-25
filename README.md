@@ -139,6 +139,20 @@ Proyek ini dilengkapi dengan alat penjaminan kualitas untuk menjaga kode tetap b
 - [10 - AI Coding Guidelines](docs/10-AI-Coding-Guidelines.md)
 - [11 - Make Starter Resource](docs/11-make-starter-resource.md)
 - [12 - Upload Avatar & S3 Storage](docs/12-upload-avatar.md)
+- [13 - Notifications & Background Jobs](docs/13-notifications.md)
+
+---
+
+## 🔔 Background Jobs & Notifications
+
+Beberapa fitur seperti **Notifikasi Logout** menggunakan sistem antrean (Queue) Laravel.
+
+- Secara default di lokal (`.env`), `QUEUE_CONNECTION` diatur ke `database`.
+- Agar notifikasi muncul, Anda harus menjalankan worker:
+  ```bash
+  php artisan queue:work
+  ```
+- Untuk pengujian cepat tanpa worker, Anda bisa mengubah `.env` menjadi `QUEUE_CONNECTION=sync`.
 
 ---
 

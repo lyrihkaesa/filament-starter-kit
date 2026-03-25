@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Profile;
 
 use App\Models\User;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -29,5 +30,11 @@ final readonly class LogoutOtherBrowserSessionsAction
                 ->where('id', '<>', $currentSessionIdRaw ?? 'none')
                 ->delete();
         }
+
+        Notification::make()
+            ->title(__('Other Devices Logged Out'))
+            ->body(__('All other browser sessions have been logged out successfully.'))
+            ->warning()
+            ->sendToDatabase($user);
     }
 }
