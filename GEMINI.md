@@ -166,7 +166,6 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 ## Database
 
-- **UUIDs**: Always use UUIDs instead of autoincrement for primary and foreign keys. Use `$table->uuid('id')->primary()` instead of `$table->id()` in migrations, and use `$table->foreignUuid()` instead of `$table->foreignId()`. Ensure all Eloquent Models use the `Illuminate\Database\Eloquent\Concerns\HasUuids` trait.
 - Always use proper Eloquent relationship methods with return type hints. Prefer relationship methods over raw queries or manual joins.
 - Use Eloquent models and relationships before suggesting raw database queries.
 - Avoid `DB::`; prefer `Model::query()`. Generate code that leverages Laravel's ORM capabilities rather than bypassing them.

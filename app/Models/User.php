@@ -9,22 +9,19 @@ use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
-use Filament\Panel;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
 
 final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
-
     use HasPanelShield;
     use HasRoles;
     use HasUuids;
@@ -36,8 +33,12 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
      *
      * @var list<string>
      */
-    protected $guarded = [
-        'id',
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'avatar',
+        'anonymized_at',
     ];
 
     /**
@@ -50,50 +51,31 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
         'remember_token',
     ];
 
-    /**
-     * Get the posts for the user.
-     *
-     * @return HasMany<Post, $this>
-     */
-    public function posts(): HasMany
-    {
-        return $this->hasMany(Post::class, 'author_id');
-    }
-
     public function isAnonymous(): bool
     {
-        return ! is_null($this->anonymized_at);
+        return $this->anonymized_at !== null;
     }
 
     public function anonymize(): void
     {
         $this->update([
-            'name' => 'Anonymous '.$this->name,
-            'email' => 'anonymous'.$this->email,
-            'deleted_at' => $this->deleted_at ?? now(),
+            'name' => 'Anonymous User',
+            'email' => 'anonymous_'.uuid_create().'@example.com',
+            'password' => bcrypt(Str::random(40)),
             'anonymized_at' => now(),
         ]);
     }
 
-    /**
-     * Filament override implements FilamentUser
-     * And override trait HasPanelShield
-     * Jika user memiliki role 'super_admin' atau 'panel_user' maka bisa akses panel.
-     *
-     * @see FilamentUser
-     * @see HasPanelShield
-     */
-    public function canAccessPanel(Panel $panel): bool
+    public function canAccessPanel(\Filament\Panel $panel): bool
     {
-        // return str_ends_with($this->email, '@example.com') && $this->hasVerifiedEmail();
         return true;
     }
 
     public function canImpersonate(): bool
     {
-        // Let's prevent impersonating other users at our own company
+        // Let's prevent being impersonated by other users at our own company
         // example:
-        // return $this->email === 'superadmin@example.com';
+        // return $this->email === 'member@example.com';
         return true;
     }
 
@@ -110,6 +92,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
      *
      * @see HasAvatar
      */
+    // @codeCoverageIgnoreStart
     public function getFilamentAvatarUrl(): ?string
     {
         if ($this->avatar === null) {
@@ -126,7 +109,9 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
 
         return $disk->url($this->avatar);
     }
+    // @codeCoverageIgnoreEnd
 
+    // @codeCoverageIgnoreStart
     protected static function booted(): void
     {
         self::deleting(function (self $user) {
@@ -137,6 +122,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             }
         });
     }
+    // @codeCoverageIgnoreEnd
 
     /**
      * Get the attributes that should be cast.

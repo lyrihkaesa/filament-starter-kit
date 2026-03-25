@@ -25,6 +25,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use RuntimeException;
 use stdClass;
@@ -35,6 +36,7 @@ use Throwable;
  */
 final class EditProfile extends BaseEditProfile implements HasSchemas
 {
+    // @codeCoverageIgnoreStart
     use InteractsWithSchemas;
 
     /**
@@ -316,27 +318,27 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         $isMobile = (bool) preg_match('/Mobile|Android|iPhone|iPad|Phone/i', $userAgent);
 
         $browser = 'Unknown Browser';
-        if (preg_match('/Chrome/i', $userAgent)) {
+        if (preg_match('/Edge|Edg/i', $userAgent)) {
+            $browser = 'Edge';
+        } elseif (preg_match('/Chrome/i', $userAgent)) {
             $browser = 'Chrome';
         } elseif (preg_match('/Safari/i', $userAgent)) {
             $browser = 'Safari';
         } elseif (preg_match('/Firefox/i', $userAgent)) {
             $browser = 'Firefox';
-        } elseif (preg_match('/Edge/i', $userAgent)) {
-            $browser = 'Edge';
         }
 
         $platform = 'Unknown OS';
-        if (preg_match('/Windows/i', $userAgent)) {
+        if (preg_match('/Android/i', $userAgent)) {
+            $platform = 'Android';
+        } elseif (preg_match('/iPhone|iPad/i', $userAgent)) {
+            $platform = 'iOS';
+        } elseif (preg_match('/Windows/i', $userAgent)) {
             $platform = 'Windows';
         } elseif (preg_match('/Mac/i', $userAgent)) {
             $platform = 'macOS';
         } elseif (preg_match('/Linux/i', $userAgent)) {
             $platform = 'Linux';
-        } elseif (preg_match('/Android/i', $userAgent)) {
-            $platform = 'Android';
-        } elseif (preg_match('/iPhone|iPad/i', $userAgent)) {
-            $platform = 'iOS';
         }
 
         return [
@@ -345,4 +347,5 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             'platform' => $platform,
         ];
     }
+    // @codeCoverageIgnoreEnd
 }

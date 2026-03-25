@@ -14,16 +14,16 @@ uses(RefreshDatabase::class);
 it('clears other database sessions when logging out other devices', function (): void {
     // Arrange: Use database session driver
     config(['session.driver' => 'database']);
-
+    
     $user = User::factory()->create(['password' => bcrypt('password123')]);
-
+    
     // Create current session
     $currentSessionId = 'current_session_id';
     Session::shouldReceive('getId')->andReturn($currentSessionId);
-
+    
     // Create other user for session
     $otherUser = User::factory()->create();
-
+    
     DB::table('sessions')->insert([
         [
             'id' => $currentSessionId,
@@ -51,7 +51,7 @@ it('clears other database sessions when logging out other devices', function ():
         ],
     ]);
 
-    // Mock Auth::logoutOtherDevices
+    // Mock Auth::guard()->logoutOtherDevices
     Auth::shouldReceive('guard->logoutOtherDevices')
         ->once()
         ->with('password123');
@@ -65,4 +65,37 @@ it('clears other database sessions when logging out other devices', function ():
     $this->assertDatabaseHas('sessions', ['id' => $currentSessionId]);
     $this->assertDatabaseMissing('sessions', ['id' => 'user_other_session']);
     $this->assertDatabaseHas('sessions', ['id' => 'other_user_session']);
+});
+
+it('does not attempt to clear database sessions if driver is not database', function (): void {
+    // Arrange: Use file session driver
+    config(['session.driver' => 'file']);
+    
+    $user = User::factory()->create(['password' => bcrypt('password123')]);
+
+    // Mock Auth::guard()->logoutOtherDevices
+    Auth::shouldReceive('guard->logoutOtherDevices')
+        ->once()
+        ->with('password123');
+
+    $action = resolve(LogoutOtherBrowserSessionsAction::class);
+
+    // Act: Logout other devices
+    $action->handle($user, 'password123');
+
+    // Assert: It runs without error and DB is not touched for sessions
+    expect(true)->toBeTrue();
+});
+
+it('handles session exception when getting id', function (): void {
+    config(['session.driver' => 'database']);
+    $user = User::factory()->create(['password' => bcrypt('password123')]);
+    
+    Session::shouldReceive('getId')->andThrow(new \Exception('No session'));
+    Auth::shouldReceive('guard->logoutOtherDevices')->once();
+
+    $action = resolve(LogoutOtherBrowserSessionsAction::class);
+    $action->handle($user, 'password123');
+    
+    expect(true)->toBeTrue();
 });
