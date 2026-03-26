@@ -132,8 +132,8 @@ it('returns the authenticated user for tokens with profile access', function ():
     $response->assertSuccessful();
 
     expect($response->json('message'))->toBe('Authenticated user retrieved successfully.')
-        ->and($response->json('data.user.id'))->toBe((string) $user->getKey())
-        ->and($response->json('data.user.email'))->toBe($user->email)
+        ->and($response->json('data.id'))->toBe((string) $user->getKey())
+        ->and($response->json('data.email'))->toBe($user->email)
         ->and(array_key_exists('errors', $response->json()))->toBeFalse();
 });
 

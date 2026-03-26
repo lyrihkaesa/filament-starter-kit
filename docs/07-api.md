@@ -35,16 +35,41 @@ Starter kit ini memakai kontrak response yang konsisten dan ramah untuk Flutter:
 - `message` selalu string
 - `data` hanya muncul jika ada payload sukses
 - `errors` hanya muncul jika ada error
+- `meta` hanya muncul jika endpoint memang mengembalikan metadata tambahan, misalnya pagination
 
-Jika `data` atau `errors` tidak ada, key tersebut memang sengaja **tidak dikirim**.
+Jika `data`, `errors`, atau `meta` tidak ada, key tersebut memang sengaja **tidak dikirim**.
 
-Contoh sukses:
+Untuk success response, implementasi sekarang mengikuti gaya Laravel Resource response. Jadi controller langsung me-return `UserResource` atau `UserCollection`, lalu menambahkan `message` lewat `->additional(...)`.
+
+Aturan kontraknya sekarang sederhana:
+
+- `data` = object untuk endpoint detail atau single resource
+- `data` = array untuk endpoint collection/list
+- `meta` = object tambahan, misalnya pagination
+
+Contoh sukses untuk detail object:
 
 ```json
 {
     "message": "User retrieved successfully.",
     "data": {
-        "user": {
+        "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+        "name": "Kaesa",
+        "email": "kaesa@example.com",
+        "avatar": null,
+        "created_at": "2026-03-27T10:15:30+00:00",
+        "updated_at": "2026-03-27T10:15:30+00:00"
+    }
+}
+```
+
+Contoh sukses untuk list:
+
+```json
+{
+    "message": "Users retrieved successfully.",
+    "data": [
+        {
             "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
             "name": "Kaesa",
             "email": "kaesa@example.com",
@@ -52,6 +77,16 @@ Contoh sukses:
             "created_at": "2026-03-27T10:15:30+00:00",
             "updated_at": "2026-03-27T10:15:30+00:00"
         }
+    ],
+    "meta": {
+        "pagination_type": "page",
+        "current_page": 1,
+        "per_page": 10,
+        "total": 25,
+        "last_page": 3,
+        "from": 1,
+        "to": 10,
+        "has_more_pages": true
     }
 }
 ```
@@ -185,14 +220,12 @@ Contoh response:
 {
     "message": "Authenticated user retrieved successfully.",
     "data": {
-        "user": {
-            "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
-            "name": "Flutter User",
-            "email": "flutter@example.com",
-            "avatar": null,
-            "created_at": "2026-03-27T10:15:30+00:00",
-            "updated_at": "2026-03-27T10:15:30+00:00"
-        }
+        "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+        "name": "Flutter User",
+        "email": "flutter@example.com",
+        "avatar": null,
+        "created_at": "2026-03-27T10:15:30+00:00",
+        "updated_at": "2026-03-27T10:15:30+00:00"
     }
 }
 ```
@@ -223,6 +256,9 @@ Semua endpoint di atas:
 - butuh bearer token Sanctum
 - tetap melewati policy/gate
 - ability token dicek di **API controller**
+
+Untuk endpoint detail atau mutation user, `data` langsung berisi object user.
+Untuk endpoint list user, `data` langsung berisi array user dan metadata pagination ada di top-level `meta`.
 
 ## Dual Pagination untuk Mobile
 
@@ -257,27 +293,25 @@ Contoh response:
 ```json
 {
     "message": "Users retrieved successfully.",
-    "data": {
-        "users": [
-            {
-                "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
-                "name": "Kaesa",
-                "email": "kaesa@example.com",
-                "avatar": null,
-                "created_at": "2026-03-27T10:15:30+00:00",
-                "updated_at": "2026-03-27T10:15:30+00:00"
-            }
-        ],
-        "meta": {
-            "pagination_type": "page",
-            "current_page": 1,
-            "per_page": 10,
-            "total": 25,
-            "last_page": 3,
-            "from": 1,
-            "to": 10,
-            "has_more_pages": true
+    "data": [
+        {
+            "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+            "name": "Kaesa",
+            "email": "kaesa@example.com",
+            "avatar": null,
+            "created_at": "2026-03-27T10:15:30+00:00",
+            "updated_at": "2026-03-27T10:15:30+00:00"
         }
+    ],
+    "meta": {
+        "pagination_type": "page",
+        "current_page": 1,
+        "per_page": 10,
+        "total": 25,
+        "last_page": 3,
+        "from": 1,
+        "to": 10,
+        "has_more_pages": true
     }
 }
 ```
@@ -295,24 +329,22 @@ Contoh response:
 ```json
 {
     "message": "Users retrieved successfully.",
-    "data": {
-        "users": [
-            {
-                "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
-                "name": "Kaesa",
-                "email": "kaesa@example.com",
-                "avatar": null,
-                "created_at": "2026-03-27T10:15:30+00:00",
-                "updated_at": "2026-03-27T10:15:30+00:00"
-            }
-        ],
-        "meta": {
-            "pagination_type": "cursor",
-            "per_page": 10,
-            "next_cursor": "eyJpZCI6IjJmNGY0YWQ4LTUzMjAtNGY2Ni04YmM0LWU4ZjVkMWI2ZmNiMCIsIl9wb2ludHNUb05leHRJdGVtcyI6dHJ1ZX0",
-            "prev_cursor": null,
-            "has_more_pages": true
+    "data": [
+        {
+            "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+            "name": "Kaesa",
+            "email": "kaesa@example.com",
+            "avatar": null,
+            "created_at": "2026-03-27T10:15:30+00:00",
+            "updated_at": "2026-03-27T10:15:30+00:00"
         }
+    ],
+    "meta": {
+        "pagination_type": "cursor",
+        "per_page": 10,
+        "next_cursor": "eyJpZCI6IjJmNGY0YWQ4LTUzMjAtNGY2Ni04YmM0LWU4ZjVkMWI2ZmNiMCIsIl9wb2ludHNUb05leHRJdGVtcyI6dHJ1ZX0",
+        "prev_cursor": null,
+        "has_more_pages": true
     }
 }
 ```
@@ -402,7 +434,24 @@ Untuk list users:
 
 - pakai tanpa query `pagination` jika ingin mode default
 - pakai `pagination=cursor` jika screen memakai infinite scroll
-- baca `data.meta.pagination_type` agar parsing meta jelas
+- baca item list langsung dari `data`
+- baca metadata pagination dari `meta`
+- baca `meta.pagination_type` agar parsing meta jelas
+
+## Catatan Error di Local vs Production
+
+Jika Anda mencoba endpoint dengan method yang salah saat **local** dan `APP_DEBUG=true`, Laravel masih bisa menampilkan detail exception seperti:
+
+- `exception`
+- `file`
+- `line`
+- `trace`
+
+Ini masih berguna untuk debugging lokal.
+
+Tetapi untuk **production**, pastikan `APP_DEBUG=false`. Dalam kondisi itu, detail sensitif seperti stack trace tidak boleh diekspos ke client.
+
+Artinya, kalau Anda melihat trace saat development lokal, itu masih normal. Yang penting adalah environment production tidak berjalan dengan debug aktif.
 
 ## HTTP Status Code yang Dipakai
 
@@ -413,6 +462,7 @@ Starter kit ini memakai status code REST yang umum:
 - `401 Unauthorized` untuk belum login atau credential salah
 - `403 Forbidden` untuk token ability/policy tidak mengizinkan
 - `404 Not Found` untuk resource atau route yang tidak ada
+- `405 Method Not Allowed` untuk method yang salah pada endpoint yang benar
 - `422 Unprocessable Entity` untuk validasi gagal
 
 ## Catatan Arsitektur

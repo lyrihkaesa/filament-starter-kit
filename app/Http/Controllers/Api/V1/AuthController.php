@@ -13,6 +13,7 @@ use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Symfony\Component\HttpFoundation\Response;
 
 final class AuthController
@@ -28,15 +29,14 @@ final class AuthController
         $abilities = $this->resolveAbilities($user);
         $token = $loginUserAction->handle($user, (string) $request->string('password'), $deviceName, $abilities);
 
-        return response()->json([
+        return JsonResource::make([
+            'user' => new UserResource($user),
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'abilities' => $abilities,
+        ])->additional([
             'message' => 'User registered successfully.',
-            'data' => [
-                'user' => (new UserResource($user))->resolve($request),
-                'token' => $token,
-                'token_type' => 'Bearer',
-                'abilities' => $abilities,
-            ],
-        ], Response::HTTP_CREATED);
+        ])->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
     public function login(LoginRequest $request, LoginUserAction $loginUserAction): JsonResponse
@@ -67,15 +67,14 @@ final class AuthController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        return response()->json([
+        return JsonResource::make([
+            'user' => new UserResource($user),
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'abilities' => $abilities,
+        ])->additional([
             'message' => 'Login successful.',
-            'data' => [
-                'user' => (new UserResource($user))->resolve($request),
-                'token' => $token,
-                'token_type' => 'Bearer',
-                'abilities' => $abilities,
-            ],
-        ]);
+        ])->response();
     }
 
     public function me(): JsonResponse
@@ -87,12 +86,11 @@ final class AuthController
             throw new AuthorizationException('Missing required token ability.');
         }
 
-        return response()->json([
-            'message' => 'Authenticated user retrieved successfully.',
-            'data' => [
-                'user' => (new UserResource($user))->resolve(request()),
-            ],
-        ]);
+        return (new UserResource($user))
+            ->additional([
+                'message' => 'Authenticated user retrieved successfully.',
+            ])
+            ->response();
     }
 
     public function logout(LogoutCurrentTokenAction $logoutCurrentTokenAction): JsonResponse

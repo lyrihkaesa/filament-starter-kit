@@ -14,15 +14,24 @@ final class UserCollection extends ResourceCollection
     public $collects = UserResource::class;
 
     /**
-     * @return array{users: array<int, array<string, mixed>>, meta: array<string, int|string|bool|null>}
+     * @return array<int, array<string, mixed>>
      */
     public function toArray(Request $request): array
+    {
+        return UserResource::collection($this->collection)->resolve($request);
+    }
+
+    /**
+     * @param array<string, mixed> $paginated
+     * @param array<string, mixed> $default
+     * @return array{meta: array<string, int|string|bool|null>}
+     */
+    public function paginationInformation(Request $request, array $paginated, array $default): array
     {
         /** @var LengthAwarePaginator|CursorPaginator $paginator */
         $paginator = $this->resource;
 
         return [
-            'users' => UserResource::collection($this->collection)->resolve($request),
             'meta' => $this->meta($paginator),
         ];
     }

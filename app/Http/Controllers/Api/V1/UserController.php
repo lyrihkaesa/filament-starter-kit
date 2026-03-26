@@ -36,10 +36,11 @@ final class UserController
             ? $query->cursorPaginate($perPage, ['*'], 'cursor', $validated['cursor'] ?? null)->withQueryString()
             : $query->paginate($perPage)->withQueryString();
 
-        return response()->json([
-            'message' => 'Users retrieved successfully.',
-            'data' => (new UserCollection($users))->resolve($request),
-        ]);
+        return (new UserCollection($users))
+            ->additional([
+                'message' => 'Users retrieved successfully.',
+            ])
+            ->response();
     }
 
     public function store(StoreUserRequest $request, CreateUserAction $createUserAction): JsonResponse
@@ -48,24 +49,23 @@ final class UserController
 
         $user = $createUserAction->handle($request->validated());
 
-        return response()->json([
-            'message' => 'User created successfully.',
-            'data' => [
-                'user' => (new UserResource($user))->resolve($request),
-            ],
-        ], Response::HTTP_CREATED);
+        return (new UserResource($user))
+            ->additional([
+                'message' => 'User created successfully.',
+            ])
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     public function show(Request $request, User $user): JsonResponse
     {
         $this->authorizeAction($request, 'users:read', 'view', $user);
 
-        return response()->json([
-            'message' => 'User retrieved successfully.',
-            'data' => [
-                'user' => (new UserResource($user))->resolve($request),
-            ],
-        ]);
+        return (new UserResource($user))
+            ->additional([
+                'message' => 'User retrieved successfully.',
+            ])
+            ->response();
     }
 
     public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUserAction): JsonResponse
@@ -74,12 +74,11 @@ final class UserController
 
         $updatedUser = $updateUserAction->handle($user, $request->validated());
 
-        return response()->json([
-            'message' => 'User updated successfully.',
-            'data' => [
-                'user' => (new UserResource($updatedUser))->resolve($request),
-            ],
-        ]);
+        return (new UserResource($updatedUser))
+            ->additional([
+                'message' => 'User updated successfully.',
+            ])
+            ->response();
     }
 
     public function destroy(Request $request, User $user, DeleteUserAction $deleteUserAction): JsonResponse

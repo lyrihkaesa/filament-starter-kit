@@ -30,8 +30,8 @@ it('returns paginated users by default with typed metadata', function (): void {
 
     $response->assertSuccessful();
 
-    $meta = $response->json('data.meta');
-    $firstUser = $response->json('data.users.0');
+    $meta = $response->json('meta');
+    $firstUser = $response->json('data.0');
 
     expect($meta['pagination_type'])->toBe('page')
         ->and($meta['current_page'])->toBeInt()
@@ -55,7 +55,7 @@ it('returns cursor pagination when requested', function (): void {
 
     $response->assertSuccessful();
 
-    $meta = $response->json('data.meta');
+    $meta = $response->json('meta');
 
     expect($meta['pagination_type'])->toBe('cursor')
         ->and($meta['per_page'])->toBeInt()
@@ -76,7 +76,7 @@ it('keeps the list item resource shape identical for page and cursor modes', fun
     $pageResponse = $this->getJson('/api/v1/users?pagination=page&per_page=2');
     $cursorResponse = $this->getJson('/api/v1/users?pagination=cursor&per_page=2');
 
-    expect(array_keys($pageResponse->json('data.users.0')))->toBe(array_keys($cursorResponse->json('data.users.0')));
+    expect(array_keys($pageResponse->json('data.0')))->toBe(array_keys($cursorResponse->json('data.0')));
 });
 
 it('validates unsupported pagination types', function (): void {
@@ -109,8 +109,8 @@ it('creates a user with the correct rest status code', function (): void {
     $response->assertCreated();
 
     expect($response->json('message'))->toBe('User created successfully.')
-        ->and($response->json('data.user.id'))->toBeString()
-        ->and($response->json('data.user.email'))->toBe('api-user@example.com');
+        ->and($response->json('data.id'))->toBeString()
+        ->and($response->json('data.email'))->toBe('api-user@example.com');
 });
 
 it('rejects role assignment when the caller cannot manage roles during creation', function (): void {
@@ -141,7 +141,7 @@ it('shows a user when policy and token ability both allow it', function (): void
 
     $response->assertSuccessful();
 
-    expect($response->json('data.user.id'))->toBe((string) $target->getKey());
+    expect($response->json('data.id'))->toBe((string) $target->getKey());
 });
 
 it('forbids show requests without the required token ability', function (): void {
@@ -179,8 +179,8 @@ it('updates a user and keeps response typing stable', function (): void {
 
     $response->assertSuccessful();
 
-    expect($response->json('data.user.name'))->toBe('Updated Name')
-        ->and($response->json('data.user.id'))->toBeString();
+    expect($response->json('data.name'))->toBe('Updated Name')
+        ->and($response->json('data.id'))->toBeString();
 });
 
 it('rejects role assignment when the caller cannot manage roles during update', function (): void {
