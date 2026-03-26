@@ -19,12 +19,12 @@ function grantUserApiPermissions(User $user, array $permissions): void
     $user->givePermissionTo($permissions);
 }
 
-it('returns paginated users by default with typed metadata', function (): void {
+it('returns paginated users by default with typed metadata and can flags', function (): void {
     $admin = User::factory()->create();
-    grantUserApiPermissions($admin, ['ViewAny:User']);
+    grantUserApiPermissions($admin, ['ViewAny:User', 'Create:User', 'View:User']);
     User::factory()->count(20)->create();
 
-    Sanctum::actingAs($admin, ['users:read']);
+    Sanctum::actingAs($admin, ['users:read', 'users:create']);
 
     $response = $this->getJson('/api/v1/users?per_page=5');
 
@@ -39,9 +39,13 @@ it('returns paginated users by default with typed metadata', function (): void {
         ->and($meta['total'])->toBeInt()
         ->and($meta['last_page'])->toBeInt()
         ->and($meta['has_more_pages'])->toBeBool()
+        ->and($meta['can']['create'])->toBeTrue()
         ->and($firstUser['id'])->toBeString()
         ->and($firstUser['name'])->toBeString()
-        ->and($firstUser['avatar'])->toBeNull();
+        ->and($firstUser['avatar'])->toBeNull()
+        ->and($firstUser['can']['view'])->toBeTrue()
+        ->and($firstUser['can']['update'])->toBeFalse()
+        ->and($firstUser['can']['delete'])->toBeFalse();
 });
 
 it('returns cursor pagination when requested', function (): void {
@@ -61,7 +65,8 @@ it('returns cursor pagination when requested', function (): void {
         ->and($meta['per_page'])->toBeInt()
         ->and($meta['has_more_pages'])->toBeBool()
         ->and($meta['next_cursor'])->toBeString()
-        ->and($meta['prev_cursor'])->toBeNull();
+        ->and($meta['prev_cursor'])->toBeNull()
+        ->and($meta['can']['create'])->toBeFalse();
 
     expect(array_key_exists('current_page', $meta))->toBeFalse();
 });
@@ -94,10 +99,10 @@ it('validates unsupported pagination types', function (): void {
 
 it('creates a user with the correct rest status code', function (): void {
     $admin = User::factory()->create();
-    grantUserApiPermissions($admin, ['Create:User', 'Update:Role']);
+    grantUserApiPermissions($admin, ['Create:User', 'View:User', 'Update:Role']);
     Role::create(['name' => 'member', 'guard_name' => 'web']);
 
-    Sanctum::actingAs($admin, ['users:create']);
+    Sanctum::actingAs($admin, ['users:create', 'users:read']);
 
     $response = $this->postJson('/api/v1/users', [
         'name' => 'API User',
@@ -110,7 +115,10 @@ it('creates a user with the correct rest status code', function (): void {
 
     expect($response->json('message'))->toBe('User created successfully.')
         ->and($response->json('data.id'))->toBeString()
-        ->and($response->json('data.email'))->toBe('api-user@example.com');
+        ->and($response->json('data.email'))->toBe('api-user@example.com')
+        ->and($response->json('data.can.view'))->toBeTrue()
+        ->and($response->json('data.can.update'))->toBeFalse()
+        ->and($response->json('data.can.delete'))->toBeFalse();
 });
 
 it('rejects role assignment when the caller cannot manage roles during creation', function (): void {
@@ -133,15 +141,18 @@ it('rejects role assignment when the caller cannot manage roles during creation'
 it('shows a user when policy and token ability both allow it', function (): void {
     $admin = User::factory()->create();
     $target = User::factory()->create();
-    grantUserApiPermissions($admin, ['View:User']);
+    grantUserApiPermissions($admin, ['View:User', 'Update:User']);
 
-    Sanctum::actingAs($admin, ['users:read']);
+    Sanctum::actingAs($admin, ['users:read', 'users:update']);
 
     $response = $this->getJson('/api/v1/users/'.$target->getKey());
 
     $response->assertSuccessful();
 
-    expect($response->json('data.id'))->toBe((string) $target->getKey());
+    expect($response->json('data.id'))->toBe((string) $target->getKey())
+        ->and($response->json('data.can.view'))->toBeTrue()
+        ->and($response->json('data.can.update'))->toBeTrue()
+        ->and($response->json('data.can.delete'))->toBeFalse();
 });
 
 it('forbids show requests without the required token ability', function (): void {
@@ -169,9 +180,9 @@ it('forbids list requests when the policy denies access', function (): void {
 it('updates a user and keeps response typing stable', function (): void {
     $admin = User::factory()->create();
     $target = User::factory()->create();
-    grantUserApiPermissions($admin, ['Update:User']);
+    grantUserApiPermissions($admin, ['View:User', 'Update:User']);
 
-    Sanctum::actingAs($admin, ['users:update']);
+    Sanctum::actingAs($admin, ['users:read', 'users:update']);
 
     $response = $this->patchJson('/api/v1/users/'.$target->getKey(), [
         'name' => 'Updated Name',
@@ -180,7 +191,10 @@ it('updates a user and keeps response typing stable', function (): void {
     $response->assertSuccessful();
 
     expect($response->json('data.name'))->toBe('Updated Name')
-        ->and($response->json('data.id'))->toBeString();
+        ->and($response->json('data.id'))->toBeString()
+        ->and($response->json('data.can.view'))->toBeTrue()
+        ->and($response->json('data.can.update'))->toBeTrue()
+        ->and($response->json('data.can.delete'))->toBeFalse();
 });
 
 it('rejects role assignment when the caller cannot manage roles during update', function (): void {

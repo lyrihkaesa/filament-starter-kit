@@ -14,25 +14,65 @@ final class UserCollection extends ResourceCollection
     public $collects = UserResource::class;
 
     /**
+     * @var array<string, array<string, bool>>
+     */
+    private array $itemCapabilities = [];
+
+    /**
+     * @var array<string, bool>
+     */
+    private array $collectionCapabilities = [];
+
+    /**
+     * @param array<string, array<string, bool>> $itemCapabilities
+     * @param array<string, bool> $collectionCapabilities
+     */
+    public function withCapabilities(array $itemCapabilities, array $collectionCapabilities = []): self
+    {
+        $this->itemCapabilities = $itemCapabilities;
+        $this->collectionCapabilities = $collectionCapabilities;
+
+        return $this;
+    }
+
+    /**
      * @return array<int, array<string, mixed>>
      */
     public function toArray(Request $request): array
     {
-        return UserResource::collection($this->collection)->resolve($request);
+        return $this->collection
+            ->map(function (UserResource $resource) use ($request): array {
+                $key = (string) $resource->resource->getRouteKey();
+
+                return $resource
+                    ->withCapabilities($this->itemCapabilities[$key] ?? [
+                        'view' => false,
+                        'update' => false,
+                        'delete' => false,
+                    ])
+                    ->toArray($request);
+            })
+            ->all();
     }
 
     /**
      * @param array<string, mixed> $paginated
      * @param array<string, mixed> $default
-     * @return array{meta: array<string, int|string|bool|null>}
+     * @return array{meta: array<string, mixed>}
      */
     public function paginationInformation(Request $request, array $paginated, array $default): array
     {
         /** @var LengthAwarePaginator|CursorPaginator $paginator */
         $paginator = $this->resource;
 
+        $meta = $this->meta($paginator);
+
+        if ($this->collectionCapabilities !== []) {
+            $meta['can'] = $this->collectionCapabilities;
+        }
+
         return [
-            'meta' => $this->meta($paginator),
+            'meta' => $meta,
         ];
     }
 

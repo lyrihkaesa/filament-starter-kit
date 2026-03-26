@@ -47,7 +47,18 @@ Aturan kontraknya sekarang sederhana:
 - `data` = array untuk endpoint collection/list
 - `meta` = object tambahan, misalnya pagination
 
-Contoh sukses untuk detail object:
+## Field `can` untuk Frontend
+
+Agar Flutter bisa menyembunyikan tombol seperti gaya Filament atau Inertia, API mengirim hasil final authorization dalam bentuk boolean `can`.
+
+Prinsipnya:
+
+- frontend tidak perlu menebak dari role
+- frontend cukup baca boolean `can`
+- keputusan akhir tetap datang dari backend
+- `can` dihitung dari kombinasi **token ability Sanctum** dan **policy**
+
+Contoh untuk single item:
 
 ```json
 {
@@ -58,12 +69,17 @@ Contoh sukses untuk detail object:
         "email": "kaesa@example.com",
         "avatar": null,
         "created_at": "2026-03-27T10:15:30+00:00",
-        "updated_at": "2026-03-27T10:15:30+00:00"
+        "updated_at": "2026-03-27T10:15:30+00:00",
+        "can": {
+            "view": true,
+            "update": false,
+            "delete": false
+        }
     }
 }
 ```
 
-Contoh sukses untuk list:
+Contoh untuk list:
 
 ```json
 {
@@ -75,7 +91,12 @@ Contoh sukses untuk list:
             "email": "kaesa@example.com",
             "avatar": null,
             "created_at": "2026-03-27T10:15:30+00:00",
-            "updated_at": "2026-03-27T10:15:30+00:00"
+            "updated_at": "2026-03-27T10:15:30+00:00",
+            "can": {
+                "view": true,
+                "update": false,
+                "delete": false
+            }
         }
     ],
     "meta": {
@@ -86,23 +107,19 @@ Contoh sukses untuk list:
         "last_page": 3,
         "from": 1,
         "to": 10,
-        "has_more_pages": true
+        "has_more_pages": true,
+        "can": {
+            "create": true
+        }
     }
 }
 ```
 
-Contoh validation error:
+Dengan ini, frontend tinggal melakukan hal seperti:
 
-```json
-{
-    "message": "The given data was invalid.",
-    "errors": {
-        "email": [
-            "The email field is required."
-        ]
-    }
-}
-```
+- tampilkan tombol edit jika `data.can.update == true`
+- tampilkan tombol delete jika `data.can.delete == true`
+- tampilkan tombol create di halaman list jika `meta.can.create == true`
 
 ## Aturan Typing untuk Flutter
 
@@ -114,6 +131,7 @@ Supaya aman dipakai di Dart yang ketat terhadap tipe data, API ini mengikuti atu
 - field nullable tetap `null`
 - timestamp dikirim sebagai string ISO-8601
 - response list dan detail tidak memakai serialisasi model mentah
+- semua nilai `can.*` selalu boolean
 
 Artinya, frontend tidak perlu menebak apakah `per_page` itu number atau string.
 
@@ -300,7 +318,12 @@ Contoh response:
             "email": "kaesa@example.com",
             "avatar": null,
             "created_at": "2026-03-27T10:15:30+00:00",
-            "updated_at": "2026-03-27T10:15:30+00:00"
+            "updated_at": "2026-03-27T10:15:30+00:00",
+            "can": {
+                "view": true,
+                "update": false,
+                "delete": false
+            }
         }
     ],
     "meta": {
@@ -311,7 +334,10 @@ Contoh response:
         "last_page": 3,
         "from": 1,
         "to": 10,
-        "has_more_pages": true
+        "has_more_pages": true,
+        "can": {
+            "create": true
+        }
     }
 }
 ```
@@ -336,7 +362,12 @@ Contoh response:
             "email": "kaesa@example.com",
             "avatar": null,
             "created_at": "2026-03-27T10:15:30+00:00",
-            "updated_at": "2026-03-27T10:15:30+00:00"
+            "updated_at": "2026-03-27T10:15:30+00:00",
+            "can": {
+                "view": true,
+                "update": false,
+                "delete": false
+            }
         }
     ],
     "meta": {
@@ -344,7 +375,10 @@ Contoh response:
         "per_page": 10,
         "next_cursor": "eyJpZCI6IjJmNGY0YWQ4LTUzMjAtNGY2Ni04YmM0LWU4ZjVkMWI2ZmNiMCIsIl9wb2ludHNUb05leHRJdGVtcyI6dHJ1ZX0",
         "prev_cursor": null,
-        "has_more_pages": true
+        "has_more_pages": true,
+        "can": {
+            "create": false
+        }
     }
 }
 ```
@@ -437,6 +471,13 @@ Untuk list users:
 - baca item list langsung dari `data`
 - baca metadata pagination dari `meta`
 - baca `meta.pagination_type` agar parsing meta jelas
+- baca `meta.can.create` untuk menentukan apakah tombol create ditampilkan
+- baca `data[index].can.update` atau `data[index].can.delete` untuk action per row
+
+Untuk detail user:
+
+- baca `data.can.update` untuk tombol edit
+- baca `data.can.delete` untuk tombol delete
 
 ## Catatan Error di Local vs Production
 
@@ -473,6 +514,7 @@ Supaya struktur project tetap bersih:
 - **Form Request** menangani validasi dan authorization yang reusable
 - **Action** menangani logika bisnis
 - **API Resource** menangani transformasi output
+- field `can` dihitung di controller dari token ability + policy, lalu dikirim ke resource
 
 Jadi, action tidak bertugas mengecek ability token.
 

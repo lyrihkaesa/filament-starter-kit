@@ -13,6 +13,25 @@ use Illuminate\Http\Resources\Json\JsonResource;
 final class UserResource extends JsonResource
 {
     /**
+     * @var array<string, bool>
+     */
+    private array $capabilities = [
+        'view' => false,
+        'update' => false,
+        'delete' => false,
+    ];
+
+    /**
+     * @param array<string, bool> $capabilities
+     */
+    public function withCapabilities(array $capabilities): self
+    {
+        $this->capabilities = $capabilities;
+
+        return $this;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -27,6 +46,7 @@ final class UserResource extends JsonResource
             'updated_at' => $this->resource->updated_at?->toISOString(),
             'deleted_at' => $this->resource->deleted_at?->toISOString(),
             'anonymized_at' => $this->resource->anonymized_at?->toISOString(),
+            'can' => $this->capabilities,
         ];
     }
 }

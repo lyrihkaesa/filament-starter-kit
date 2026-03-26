@@ -14,8 +14,11 @@ use App\Http\Resources\Api\V1\UserCollection;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -36,7 +39,14 @@ final class UserController
             ? $query->cursorPaginate($perPage, ['*'], 'cursor', $validated['cursor'] ?? null)->withQueryString()
             : $query->paginate($perPage)->withQueryString();
 
+        $items = $this->collectionItems($users);
+        $itemCapabilities = $this->capabilitiesForUsers($request, $items);
+        $collectionCapabilities = [
+            'create' => $this->canPerform($request, 'users:create', 'create'),
+        ];
+
         return (new UserCollection($users))
+            ->withCapabilities($itemCapabilities, $collectionCapabilities)
             ->additional([
                 'message' => 'Users retrieved successfully.',
             ])
@@ -49,23 +59,14 @@ final class UserController
 
         $user = $createUserAction->handle($request->validated());
 
-        return (new UserResource($user))
-            ->additional([
-                'message' => 'User created successfully.',
-            ])
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+        return $this->userResponse($request, $user, 'User created successfully.', Response::HTTP_CREATED);
     }
 
     public function show(Request $request, User $user): JsonResponse
     {
         $this->authorizeAction($request, 'users:read', 'view', $user);
 
-        return (new UserResource($user))
-            ->additional([
-                'message' => 'User retrieved successfully.',
-            ])
-            ->response();
+        return $this->userResponse($request, $user, 'User retrieved successfully.');
     }
 
     public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUserAction): JsonResponse
@@ -74,11 +75,7 @@ final class UserController
 
         $updatedUser = $updateUserAction->handle($user, $request->validated());
 
-        return (new UserResource($updatedUser))
-            ->additional([
-                'message' => 'User updated successfully.',
-            ])
-            ->response();
+        return $this->userResponse($request, $updatedUser, 'User updated successfully.');
     }
 
     public function destroy(Request $request, User $user, DeleteUserAction $deleteUserAction): JsonResponse
@@ -89,6 +86,17 @@ final class UserController
         return response()->json([
             'message' => 'User deleted successfully.',
         ]);
+    }
+
+    private function userResponse(Request $request, User $user, string $message, int $status = Response::HTTP_OK): JsonResponse
+    {
+        return (new UserResource($user))
+            ->withCapabilities($this->capabilitiesForUser($request, $user))
+            ->additional([
+                'message' => $message,
+            ])
+            ->response()
+            ->setStatusCode($status);
     }
 
     private function authorizeAction(Request $request, string $ability, string $policyAbility, User $user): void
@@ -105,5 +113,59 @@ final class UserController
         if (! $authUser->tokenCan($ability)) {
             throw new AuthorizationException('Missing required token ability.');
         }
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    private function capabilitiesForUser(Request $request, User $user): array
+    {
+        return [
+            'view' => $this->canPerform($request, 'users:read', 'view', $user),
+            'update' => $this->canPerform($request, 'users:update', 'update', $user),
+            'delete' => $this->canPerform($request, 'users:delete', 'delete', $user),
+        ];
+    }
+
+    /**
+     * @param iterable<int, User> $users
+     * @return array<string, array<string, bool>>
+     */
+    private function capabilitiesForUsers(Request $request, iterable $users): array
+    {
+        $capabilities = [];
+
+        foreach ($users as $user) {
+            $capabilities[(string) $user->getRouteKey()] = $this->capabilitiesForUser($request, $user);
+        }
+
+        return $capabilities;
+    }
+
+    private function canPerform(Request $request, string $tokenAbility, string $policyAbility, ?User $subject = null): bool
+    {
+        /** @var User|null $authUser */
+        $authUser = $request->user();
+
+        if (! $authUser instanceof User || ! $authUser->tokenCan($tokenAbility)) {
+            return false;
+        }
+
+        $gate = Gate::forUser($authUser);
+
+        return $subject instanceof User
+            ? $gate->allows($policyAbility, $subject)
+            : $gate->allows($policyAbility, User::class);
+    }
+
+    /**
+     * @return iterable<int, User>
+     */
+    private function collectionItems(LengthAwarePaginator|CursorPaginator $paginator): iterable
+    {
+        /** @var Collection<int, User> $items */
+        $items = $paginator->getCollection();
+
+        return $items;
     }
 }
