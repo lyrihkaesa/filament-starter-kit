@@ -1,224 +1,432 @@
-# API Sanctum (Default)
+# API Sanctum (Mobile Ready)
 
-> **Catatan:** Starter kit ini menggunakan **Laravel Sanctum** untuk autentikasi API secara default. Saya sengaja tidak memakai JWT sebagai default karena untuk banyak kasus admin panel dan API project Laravel biasa, Sanctum sudah cukup dan jauh lebih sederhana untuk dirawat.
+> **Catatan:** Starter kit ini memakai **Laravel Sanctum** untuk autentikasi API mobile dan integrasi client luar. Fokus implementasinya adalah sederhana, typed, dan enak dipakai oleh frontend seperti Flutter.
 
-## Kenapa Saya Memilih Sanctum, Bukan JWT
+## Kenapa Sanctum
 
-Kalau Anda masih pemula, pertanyaan yang sangat wajar adalah:
+Saya sengaja memilih Sanctum sebagai default karena:
 
-> "Kenapa tidak langsung pakai JWT saja?"
+- solusi resmi Laravel
+- lebih sederhana dirawat dibanding JWT
+- cocok untuk mobile app yang memakai bearer token
+- logout cukup dengan revoke token saat ini
+- mendukung token ability yang jelas
 
-Jawaban saya: karena saya tidak ingin starter kit ini memulai dari kompleksitas yang belum tentu dibutuhkan.
+Untuk kebutuhan starter kit, ini biasanya lebih waras daripada langsung membawa kompleksitas refresh token dan token lifecycle ala JWT.
 
-## Cara Pikirnya
+## Base URL dan Versi API
 
-### Sanctum lebih sederhana untuk kebutuhan umum
+API menggunakan **URL versioning** dan saat ini semua endpoint public ada di prefix:
 
-Dengan Sanctum, kita bisa memakai token yang disimpan dan dikelola dengan cara yang lebih mudah dipahami. Untuk banyak kebutuhan aplikasi admin, mobile app sederhana, atau integrasi internal, ini sudah sangat cukup.
-
-Kalau user logout, kita tinggal **hapus token Sanctum** yang sedang dipakai.
-
-Itu jauh lebih mudah dijelaskan ke developer baru.
-
-### JWT mendorong pola pikir stateless token
-
-Kalau Anda memilih JWT secara serius, biasanya Anda juga harus siap dengan pola pikir **stateless authentication**.
-
-Masalahnya, begitu masuk ke sana, kompleksitasnya ikut naik:
-
-- perlu memikirkan **access token**
-- perlu memikirkan **refresh token**
-- perlu memikirkan masa berlaku token
-- perlu memikirkan rotasi token
-- perlu memikirkan invalidasi token
-- logout jadi tidak sesederhana "hapus token dari database"
-
-Untuk project yang memang butuh arsitektur seperti itu, JWT bisa masuk akal. Tetapi untuk starter kit ini, saya sengaja memilih jalur yang lebih simpel dan lebih mudah di-maintain.
-
-## Kenapa Sanctum Cocok untuk Starter Kit Ini
-
-Alasan saya memilih Sanctum:
-
-- solusi resmi dari Laravel
-- setup lebih sederhana
-- flow logout lebih mudah
-- cocok untuk personal access token
-- cocok untuk kebutuhan API umum
-- lebih mudah dipahami developer pemula
-
-Selain itu, Sanctum juga mendukung pendekatan token yang lebih fleksibel dan "fine-grained", mirip arah pemakaian token modern seperti token personal access ala GitHub.
-
-Artinya, token tidak harus dianggap satu kunci besar untuk semua hal. Kita bisa memikirkan token berdasarkan kemampuan atau kebutuhan tertentu.
-
-## 1. Autentikasi API dengan Sanctum
-
-Laravel Sanctum menyediakan sistem **token-based authentication** yang ringan dan aman. Cara kerja dasarnya adalah:
-
-1. **Client** mengirimkan request login dengan `email` dan `password`
-2. Server melakukan validasi lalu mengembalikan **personal access token**
-3. Client menyertakan token ini di header setiap request API
-
-```http
-Authorization: Bearer {token}
+```text
+/api/v1
 ```
 
-### Referensi
+Contoh base URL lokal jika memakai Herd:
 
-- Dokumentasi Laravel Sanctum: [https://laravel.com/docs/12.x/sanctum](https://laravel.com/docs/12.x/sanctum)
+```text
+http://filament-starter-kit.test/api/v1
+```
 
-## 2. Struktur Response JSON
+## Format Response JSON
 
-Semua endpoint API pada starter kit ini sebaiknya mengembalikan **response JSON** dengan format standar berikut:
+Starter kit ini memakai kontrak response yang konsisten dan ramah untuk Flutter:
+
+- `message` selalu string
+- `data` hanya muncul jika ada payload sukses
+- `errors` hanya muncul jika ada error
+
+Jika `data` atau `errors` tidak ada, key tersebut memang sengaja **tidak dikirim**.
+
+Contoh sukses:
 
 ```json
 {
-    "message": "Deskripsi singkat response",
-    "data": {
-        // objek data spesifik endpoint
-    },
-    "errors": null
-}
-```
-
-### Penjelasan field
-
-- `message`: deskripsi singkat hasil request
-- `data`: objek atau array data utama dari endpoint
-- `errors`: detail error jika ada, atau `null` jika tidak ada
-
-Contoh response sukses login:
-
-```json
-{
-    "message": "Login berhasil",
+    "message": "User retrieved successfully.",
     "data": {
         "user": {
-            "id": 1,
+            "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
             "name": "Kaesa",
-            "email": "kaesa@example.com"
-        },
-        "token": "1|ABCD1234TOKENEXAMPLE"
-    },
-    "errors": null
-}
-```
-
-Contoh response gagal login:
-
-```json
-{
-    "message": "Email atau password salah",
-    "data": {},
-    "errors": {
-        "email": ["Email tidak ditemukan"]
+            "email": "kaesa@example.com",
+            "avatar": null,
+            "created_at": "2026-03-27T10:15:30+00:00",
+            "updated_at": "2026-03-27T10:15:30+00:00"
+        }
     }
 }
 ```
 
-## 3. Cara Menggunakan Sanctum
+Contoh validation error:
 
-### Login / Mendapatkan Token
-
-```http
-POST /api/login
-Content-Type: application/json
-
+```json
 {
-  "email": "kaesa@example.com",
-  "password": "password123"
+    "message": "The given data was invalid.",
+    "errors": {
+        "email": [
+            "The email field is required."
+        ]
+    }
 }
 ```
 
-Response akan mengembalikan token yang kemudian disimpan oleh client.
+## Aturan Typing untuk Flutter
 
-### Mengakses Endpoint yang Dilindungi
+Supaya aman dipakai di Dart yang ketat terhadap tipe data, API ini mengikuti aturan berikut:
+
+- UUID tetap string
+- integer tetap number, bukan string
+- boolean tetap boolean
+- field nullable tetap `null`
+- timestamp dikirim sebagai string ISO-8601
+- response list dan detail tidak memakai serialisasi model mentah
+
+Artinya, frontend tidak perlu menebak apakah `per_page` itu number atau string.
+
+## Authentication Flow
+
+Alur dasarnya:
+
+1. client login atau register
+2. API mengembalikan Sanctum token
+3. client menyimpan token
+4. request berikutnya mengirim bearer token
+5. logout akan mencabut token yang sedang dipakai
+
+Header yang dipakai:
 
 ```http
-GET /api/user
 Authorization: Bearer {token}
+Accept: application/json
+Content-Type: application/json
 ```
 
-### Logout / Mencabut Token
+## Endpoint Auth
 
-```http
-POST /api/logout
-Authorization: Bearer {token}
+### `POST /api/v1/register`
+
+Body:
+
+```json
+{
+    "name": "Flutter User",
+    "email": "flutter@example.com",
+    "password": "password123",
+    "password_confirmation": "password123",
+    "device_name": "pixel-8"
+}
 ```
 
-Pada flow Sanctum, logout biasanya cukup berarti:
+Contoh response:
 
-- ambil token yang sedang dipakai
-- hapus token tersebut
+```json
+{
+    "message": "User registered successfully.",
+    "data": {
+        "user": {
+            "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+            "name": "Flutter User",
+            "email": "flutter@example.com",
+            "avatar": null,
+            "created_at": "2026-03-27T10:15:30+00:00",
+            "updated_at": "2026-03-27T10:15:30+00:00"
+        },
+        "token": "1|plainTextTokenExample",
+        "token_type": "Bearer",
+        "abilities": [
+            "profile:read"
+        ]
+    }
+}
+```
 
-Jadi, kita tidak perlu memikirkan mekanisme refresh token seperti pada banyak implementasi JWT.
+### `POST /api/v1/login`
 
-## Studi Kasus
+Body:
 
-Bayangkan Anda membuat mobile app sederhana untuk admin operasional.
+```json
+{
+    "email": "flutter@example.com",
+    "password": "password123",
+    "device_name": "pixel-8"
+}
+```
 
-Alurnya:
+Contoh response:
 
-1. Admin login dari aplikasi mobile
-2. API memverifikasi email dan password
-3. API mengembalikan token Sanctum
-4. Mobile app memakai token itu untuk request berikutnya
-5. Saat logout, token dicabut atau dihapus
+```json
+{
+    "message": "Login successful.",
+    "data": {
+        "user": {
+            "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+            "name": "Flutter User",
+            "email": "flutter@example.com",
+            "avatar": null,
+            "created_at": "2026-03-27T10:15:30+00:00",
+            "updated_at": "2026-03-27T10:15:30+00:00"
+        },
+        "token": "2|plainTextTokenExample",
+        "token_type": "Bearer",
+        "abilities": [
+            "profile:read",
+            "users:read"
+        ]
+    }
+}
+```
 
-Untuk kebutuhan seperti ini, Sanctum sudah sangat cukup.
+### `GET /api/v1/me`
 
-Kalau Anda memaksa JWT sejak awal, Anda mungkin akan ikut memikirkan:
+Butuh ability token `profile:read`.
 
-- access token berumur pendek
-- refresh token
-- endpoint refresh token
-- rotasi token
-- revoke strategy
+Contoh response:
 
-Padahal kebutuhan bisnisnya belum tentu sampai ke sana.
+```json
+{
+    "message": "Authenticated user retrieved successfully.",
+    "data": {
+        "user": {
+            "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+            "name": "Flutter User",
+            "email": "flutter@example.com",
+            "avatar": null,
+            "created_at": "2026-03-27T10:15:30+00:00",
+            "updated_at": "2026-03-27T10:15:30+00:00"
+        }
+    }
+}
+```
 
-## Sanctum dan Fine-Grained Token
+### `POST /api/v1/logout`
 
-Salah satu hal yang saya suka dari Sanctum adalah kita bisa memikirkan token dengan lebih spesifik.
+Contoh response:
 
-Misalnya, ke depan Anda ingin membuat token yang hanya boleh:
+```json
+{
+    "message": "Logout successful."
+}
+```
 
-- membaca data tertentu
-- membuat data tertentu
-- dipakai untuk integrasi tertentu
+## Endpoint User
 
-Cara pikir seperti ini mirip dengan evolusi personal access token modern yang makin granular, bukan satu token superpower untuk semua kebutuhan.
+Endpoint user memakai REST style:
 
-## Cara Pikir Saya Soal API di Starter Kit
+- `GET /api/v1/users`
+- `POST /api/v1/users`
+- `GET /api/v1/users/{user}`
+- `PUT /api/v1/users/{user}`
+- `PATCH /api/v1/users/{user}`
+- `DELETE /api/v1/users/{user}`
 
-Saya ingin flow API tetap:
+Semua endpoint di atas:
 
-- mudah dipahami pemula
-- aman secara dasar
-- konsisten format response-nya
-- mudah dikembangkan ke policy, ability, dan validation layer
+- butuh bearer token Sanctum
+- tetap melewati policy/gate
+- ability token dicek di **API controller**
 
-Karena itu, untuk starter kit ini saya memilih Sanctum sebagai baseline yang lebih masuk akal.
+## Dual Pagination untuk Mobile
 
-## Kapan JWT Mungkin Baru Layak Dipertimbangkan
+Endpoint list user mendukung dua mode:
 
-JWT bisa mulai masuk akal jika Anda memang punya kebutuhan yang benar-benar menuntut arsitektur token stateless yang lebih kompleks.
+- default page pagination
+- optional cursor pagination
 
-Contohnya:
+Query parameter yang dipakai:
 
-- banyak external client dengan pola auth tertentu
-- arsitektur distributed auth yang memang dirancang untuk itu
-- kebutuhan token lifecycle yang lebih kompleks dari sekadar revoke token biasa
+- `pagination=page|cursor`
+- `per_page`
+- `page` hanya untuk page mode
+- `cursor` hanya untuk cursor mode
 
-Kalau belum ada kebutuhan itu, Sanctum biasanya adalah pilihan yang lebih waras.
+Jika `pagination` tidak dikirim, default-nya adalah:
 
-## Kesimpulan
+```text
+pagination=page
+```
 
-Saya tidak memakai JWT sebagai default bukan karena JWT buruk, tetapi karena:
+### Page Pagination
 
-- Sanctum sudah cukup untuk banyak kebutuhan
-- flow-nya lebih sederhana
-- logout lebih mudah
-- developer baru lebih cepat paham
-- kita tidak dipaksa masuk ke kompleksitas refresh token vs access token terlalu dini
+Request:
 
-Untuk starter kit ini, kesederhanaan yang jelas lebih saya utamakan daripada kompleksitas yang "mungkin nanti berguna".
+```text
+GET /api/v1/users?per_page=10
+```
+
+Contoh response:
+
+```json
+{
+    "message": "Users retrieved successfully.",
+    "data": {
+        "users": [
+            {
+                "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+                "name": "Kaesa",
+                "email": "kaesa@example.com",
+                "avatar": null,
+                "created_at": "2026-03-27T10:15:30+00:00",
+                "updated_at": "2026-03-27T10:15:30+00:00"
+            }
+        ],
+        "meta": {
+            "pagination_type": "page",
+            "current_page": 1,
+            "per_page": 10,
+            "total": 25,
+            "last_page": 3,
+            "from": 1,
+            "to": 10,
+            "has_more_pages": true
+        }
+    }
+}
+```
+
+### Cursor Pagination
+
+Request:
+
+```text
+GET /api/v1/users?pagination=cursor&per_page=10
+```
+
+Contoh response:
+
+```json
+{
+    "message": "Users retrieved successfully.",
+    "data": {
+        "users": [
+            {
+                "id": "2f4f4ad8-5320-4f66-8bc4-e8f5d1b6fcb0",
+                "name": "Kaesa",
+                "email": "kaesa@example.com",
+                "avatar": null,
+                "created_at": "2026-03-27T10:15:30+00:00",
+                "updated_at": "2026-03-27T10:15:30+00:00"
+            }
+        ],
+        "meta": {
+            "pagination_type": "cursor",
+            "per_page": 10,
+            "next_cursor": "eyJpZCI6IjJmNGY0YWQ4LTUzMjAtNGY2Ni04YmM0LWU4ZjVkMWI2ZmNiMCIsIl9wb2ludHNUb05leHRJdGVtcyI6dHJ1ZX0",
+            "prev_cursor": null,
+            "has_more_pages": true
+        }
+    }
+}
+```
+
+### Kapan Pilih Page vs Cursor
+
+- pilih **page pagination** jika UI butuh nomor halaman
+- pilih **cursor pagination** jika UI mobile lebih fokus ke infinite scroll
+
+Karena keduanya memakai endpoint yang sama, frontend mobile cukup mengganti query parameter tanpa mengubah model item user.
+
+## Cara Coba dengan cURL
+
+### Register
+
+```bash
+curl --request POST \
+  --url http://filament-starter-kit.test/api/v1/register \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "Flutter User",
+    "email": "flutter@example.com",
+    "password": "password123",
+    "password_confirmation": "password123",
+    "device_name": "pixel-8"
+  }'
+```
+
+### Login
+
+```bash
+curl --request POST \
+  --url http://filament-starter-kit.test/api/v1/login \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "flutter@example.com",
+    "password": "password123",
+    "device_name": "pixel-8"
+  }'
+```
+
+### Ambil profile user saat ini
+
+```bash
+curl --request GET \
+  --url http://filament-starter-kit.test/api/v1/me \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+### List user dengan pagination default
+
+```bash
+curl --request GET \
+  --url 'http://filament-starter-kit.test/api/v1/users?per_page=5' \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+### List user dengan cursor pagination
+
+```bash
+curl --request GET \
+  --url 'http://filament-starter-kit.test/api/v1/users?pagination=cursor&per_page=5' \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+## Cara Pakai dari Flutter
+
+Minimal, frontend cukup menyimpan:
+
+- `token`
+- `token_type`
+- `abilities`
+
+Lalu kirim header:
+
+```text
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+Untuk list users:
+
+- pakai tanpa query `pagination` jika ingin mode default
+- pakai `pagination=cursor` jika screen memakai infinite scroll
+- baca `data.meta.pagination_type` agar parsing meta jelas
+
+## HTTP Status Code yang Dipakai
+
+Starter kit ini memakai status code REST yang umum:
+
+- `200 OK` untuk read, update, logout
+- `201 Created` untuk create dan register
+- `401 Unauthorized` untuk belum login atau credential salah
+- `403 Forbidden` untuk token ability/policy tidak mengizinkan
+- `404 Not Found` untuk resource atau route yang tidak ada
+- `422 Unprocessable Entity` untuk validasi gagal
+
+## Catatan Arsitektur
+
+Supaya struktur project tetap bersih:
+
+- **API controller** menangani orchestration dan cek ability token
+- **Form Request** menangani validasi dan authorization yang reusable
+- **Action** menangani logika bisnis
+- **API Resource** menangani transformasi output
+
+Jadi, action tidak bertugas mengecek ability token.
+
+## Referensi
+
+- Laravel Sanctum: [https://laravel.com/docs/12.x/sanctum](https://laravel.com/docs/12.x/sanctum)
+- Laravel API Resources: [https://laravel.com/docs/12.x/eloquent-resources](https://laravel.com/docs/12.x/eloquent-resources)

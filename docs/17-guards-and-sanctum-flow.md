@@ -95,6 +95,29 @@ public function store(Request $request): Response
 
 Catatan: di starter kit ini pola action yang saya gunakan adalah `handle()`, jadi jika Anda menulis implementasi final-nya, tetap ikuti pola itu.
 
+## Catatan Implementasi di Starter Kit Ini
+
+Pada starter kit ini, saya sengaja membagi tanggung jawab seperti berikut:
+
+- **API controller** mengecek Sanctum token ability seperti `tokenCan('users:read')`
+- **Form Request** menangani validasi dan authorization yang bisa dipakai ulang di web maupun API
+- **Action** hanya menangani logika bisnis
+
+Artinya, saya **tidak meletakkan authorization ability token di Action**.
+
+Alasan utamanya:
+
+- action tetap reusable
+- request class tetap bisa dipakai oleh web controller dan API controller
+- token-specific concern tetap tinggal di lapisan API
+
+Dengan pembagian ini, flow API biasanya menjadi:
+
+1. API controller cek ability token Sanctum
+2. Form Request cek authorization dan validasi
+3. controller memanggil action
+4. API Resource membentuk response JSON
+
 ## Studi Kasus
 
 Bayangkan ada mobile app untuk supervisor.
