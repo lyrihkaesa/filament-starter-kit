@@ -8,9 +8,13 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\Http;
+// use Illuminate\Support\Sleep;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+
+// use Illuminate\Validation\Rules\Password;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -27,70 +31,46 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        /**
-         * 🚀 Asset Prefetching
-         * Meningkatkan performa saat mengakses asset
-         * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/AggressivePrefetching.php
-         */
+        // 🚀 Optimasi Asset: Prefetching agresif (Laravel 11.7+)
         Vite::useAggressivePrefetching();
 
-        /**
-         * ✅ Force HTTPS in production
-         * Memastikan semua URL menggunakan https://
-         * Penting untuk keamanan saat live deployment
-         * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/ForceScheme.php
-         */
-        // if (app()->isProduction()) {
+        // 🛡️ Keamanan: Paksa HTTPS pastikan Herd dijadikan Secure Site atau kamu komentari baris ini:
         URL::forceHttps();
-        // }
 
-        /**
-         * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/SetDefaultPassword.php
-         */
-        // Password::defaults(fn (): ?Password => app()->isProduction() ? Password::min(8)->max(255)->uncompromised() : null);
+        // 🛡️ Keamanan: Standar password global (Laravel 8.43+)
+        // Password::defaults(fn (): Password => app()->isProduction()
+        //     ? Password::min(8)->uncompromised()->letters()->numbers()->symbols()
+        //     : Password::min(8)
+        // );
 
-        /**
-         * ✅ Eloquent Strict Models
-         * Hindari bug diam-diam karena:
-         * - Akses atribut yang tidak ada
-         * - Lazy loading yang tidak diatur
-         * - Penugasan atribut yang tidak terdefinisi
-         * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/ShouldBeStrict.php
-         */
+        // 💎 Kualitas: Mode ketat Eloquent (Laravel 9.11+)
         // Model::shouldBeStrict();
 
-        /**
-         * ✅ Mass Assignment Optional Unguard
-         * Berguna saat seeding atau mocking tanpa perlu $fillable
-         * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/Unguard.php
-         */
+        // 💎 Kualitas: Matikan proteksi mass-assignment di local
         if (app()->isLocal()) {
             Model::unguard();
         }
 
-        /**
-         * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/ProhibitDestructiveCommands.php
-         */
-        DB::prohibitDestructiveCommands(
-            app()->isProduction(),
-        );
+        // 🛡️ Database: Cegah perintah berbahaya di production (Laravel 10.0+)
+        DB::prohibitDestructiveCommands(app()->isProduction());
 
-        /**
-         * ✅ Eager Load Relationships Automatically
-         * Release: Laravel v12.8
-         * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/AutomaticallyEagerLoadRelationships.php
-         */
-        // Model::automaticallyEagerLoadRelationships();
+        // 🛡️ Database: Jamin integritas transaksi (Laravel 11.10+)
+        DB::handlePotentiallyLostTransactions();
 
-        /**
-         * ✅ Immutable DateTime
-         * Gunakan CarbonImmutable untuk mencegah perubahan tanggal tidak sengaja
-         * https://github.com/nunomaduro/essentials/blob/main/src/Configurables/ImmutableDates.php
-         */
+        // 📅 Tanggal: Gunakan CarbonImmutable secara global (Laravel 8.x+)
         Date::use(CarbonImmutable::class);
 
-        // Todo: Testing
-        // https://github.com/nunomaduro/essentials/blob/main/src/Configurables/FakeSleep.php
-        // https://github.com/nunomaduro/essentials/blob/main/src/Configurables/PreventStrayRequests.php
+        // 💎 Kualitas: Otomatis load relasi (Laravel 12.8+)
+        Model::automaticallyEagerLoadRelationships();
+
+        // 🧪 Testing: Cegah request HTTP keluar saat testing (Laravel 9.x+)
+        // if (app()->runningUnitTests()) {
+        //     Http::preventStrayRequests();
+        // }
+
+        // 🧪 Testing: Matikan jeda sleep saat testing (Laravel 10.x+)
+        // if (app()->runningUnitTests()) {
+        //     Sleep::fake();
+        // }
     }
 }
