@@ -60,7 +60,7 @@ it('returns direct filament avatar url when not using local disk', function (): 
     expect($user->getFilamentAvatarUrl())->toBe(Storage::disk('s3')->url('avatars/test.jpg'));
 });
 
-it('anonymizes instead of force deleting', function () {
+it('anonymizes instead of force deleting', function (): void {
     $user = User::factory()->create([
         'name' => 'Should Be Anonymized',
     ]);

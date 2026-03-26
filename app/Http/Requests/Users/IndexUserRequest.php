@@ -16,13 +16,6 @@ final class IndexUserRequest extends FormRequest
         return $user !== null && $user->can('viewAny', User::class);
     }
 
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'pagination' => $this->input('pagination', 'page'),
-        ]);
-    }
-
     /**
      * @return array<string, mixed>
      */
@@ -34,5 +27,12 @@ final class IndexUserRequest extends FormRequest
             'page' => ['nullable', 'integer', 'min:1'],
             'cursor' => ['nullable', 'string'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'pagination' => $this->input('pagination', 'page'),
+        ]);
     }
 }

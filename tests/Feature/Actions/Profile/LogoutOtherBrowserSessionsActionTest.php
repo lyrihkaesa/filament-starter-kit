@@ -11,19 +11,24 @@ use Illuminate\Support\Facades\Session;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function (): void {
+    config(['queue.default' => 'sync']);
+    app()->setLocale('en');
+});
+
 it('clears other database sessions when logging out other devices', function (): void {
     // Arrange: Use database session driver
     config(['session.driver' => 'database']);
-    
+
     $user = User::factory()->create(['password' => bcrypt('password123')]);
-    
+
     // Create current session
     $currentSessionId = 'current_session_id';
     Session::shouldReceive('getId')->andReturn($currentSessionId);
-    
+
     // Create other user for session
     $otherUser = User::factory()->create();
-    
+
     DB::table('sessions')->insert([
         [
             'id' => $currentSessionId,
@@ -76,14 +81,14 @@ it('clears other database sessions when logging out other devices', function ():
         ->where('notifiable_id', $user->id)
         ->first();
 
-    $data = json_decode($notification->data, true);
+    $data = json_decode((string) $notification->data, true);
     expect($data['title'])->toBe('Other Devices Logged Out');
 });
 
 it('does not attempt to clear database sessions if driver is not database', function (): void {
     // Arrange: Use file session driver
     config(['session.driver' => 'file']);
-    
+
     $user = User::factory()->create(['password' => bcrypt('password123')]);
 
     // Mock Auth::guard()->logoutOtherDevices
@@ -103,12 +108,12 @@ it('does not attempt to clear database sessions if driver is not database', func
 it('handles session exception when getting id', function (): void {
     config(['session.driver' => 'database']);
     $user = User::factory()->create(['password' => bcrypt('password123')]);
-    
-    Session::shouldReceive('getId')->andThrow(new \Exception('No session'));
+
+    Session::shouldReceive('getId')->andThrow(new Exception('No session'));
     Auth::shouldReceive('guard->logoutOtherDevices')->once();
 
     $action = resolve(LogoutOtherBrowserSessionsAction::class);
     $action->handle($user, 'password123');
-    
+
     expect(true)->toBeTrue();
 });

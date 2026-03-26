@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\User;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Collection;
 
 final class UserCollection extends ResourceCollection
 {
@@ -24,8 +26,8 @@ final class UserCollection extends ResourceCollection
     private array $collectionCapabilities = [];
 
     /**
-     * @param array<string, array<string, bool>> $itemCapabilities
-     * @param array<string, bool> $collectionCapabilities
+     * @param  array<string, array<string, bool>>  $itemCapabilities
+     * @param  array<string, bool>  $collectionCapabilities
      */
     public function withCapabilities(array $itemCapabilities, array $collectionCapabilities = []): self
     {
@@ -40,9 +42,16 @@ final class UserCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return $this->collection
+        /** @var Collection<int, UserResource> $collection */
+        $collection = $this->collection;
+
+        /** @var array<int, array<string, mixed>> $items */
+        $items = $collection
             ->map(function (UserResource $resource) use ($request): array {
-                $key = (string) $resource->resource->getRouteKey();
+                /** @var User $user */
+                $user = $resource->resource;
+                $routeKey = $user->getRouteKey();
+                $key = is_scalar($routeKey) ? (string) $routeKey : '';
 
                 return $resource
                     ->withCapabilities($this->itemCapabilities[$key] ?? [
@@ -53,16 +62,18 @@ final class UserCollection extends ResourceCollection
                     ->toArray($request);
             })
             ->all();
+
+        return $items;
     }
 
     /**
-     * @param array<string, mixed> $paginated
-     * @param array<string, mixed> $default
+     * @param  array<string, array<string, mixed>>  $paginated
+     * @param  array<string, mixed>  $default
      * @return array{meta: array<string, mixed>}
      */
     public function paginationInformation(Request $request, array $paginated, array $default): array
     {
-        /** @var LengthAwarePaginator|CursorPaginator $paginator */
+        /** @var LengthAwarePaginator<int, User>|CursorPaginator<int, User> $paginator */
         $paginator = $this->resource;
 
         $meta = $this->meta($paginator);
@@ -77,6 +88,7 @@ final class UserCollection extends ResourceCollection
     }
 
     /**
+     * @param  LengthAwarePaginator<int, User>|CursorPaginator<int, User>  $paginator
      * @return array<string, int|string|bool|null>
      */
     private function meta(LengthAwarePaginator|CursorPaginator $paginator): array

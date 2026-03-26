@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('type');
             $table->uuidMorphs('notifiable');
@@ -23,6 +23,7 @@ return new class extends Migration
             } else {
                 $table->json('data');
             }
+
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });

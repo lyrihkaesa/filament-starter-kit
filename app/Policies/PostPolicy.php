@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use Illuminate\Foundation\Auth\User as AuthUser;
-use App\Models\Post;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
-class PostPolicy
+final class PostPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:Post');
     }
 
-    public function view(AuthUser $authUser, Post $post): bool
+    public function view(AuthUser $authUser): bool
     {
         return $authUser->can('View:Post');
     }
@@ -27,22 +26,22 @@ class PostPolicy
         return $authUser->can('Create:Post');
     }
 
-    public function update(AuthUser $authUser, Post $post): bool
+    public function update(AuthUser $authUser): bool
     {
         return $authUser->can('Update:Post');
     }
 
-    public function delete(AuthUser $authUser, Post $post): bool
+    public function delete(AuthUser $authUser): bool
     {
         return $authUser->can('Delete:Post');
     }
 
-    public function restore(AuthUser $authUser, Post $post): bool
+    public function restore(AuthUser $authUser): bool
     {
         return $authUser->can('Restore:Post');
     }
 
-    public function forceDelete(AuthUser $authUser, Post $post): bool
+    public function forceDelete(AuthUser $authUser): bool
     {
         return $authUser->can('ForceDelete:Post');
     }
@@ -57,7 +56,7 @@ class PostPolicy
         return $authUser->can('RestoreAny:Post');
     }
 
-    public function replicate(AuthUser $authUser, Post $post): bool
+    public function replicate(AuthUser $authUser): bool
     {
         return $authUser->can('Replicate:Post');
     }
@@ -66,5 +65,4 @@ class PostPolicy
     {
         return $authUser->can('Reorder:Post');
     }
-
 }

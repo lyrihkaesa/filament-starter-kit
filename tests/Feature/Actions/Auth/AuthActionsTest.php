@@ -15,7 +15,7 @@ uses(RefreshDatabase::class);
 it('assigns the member role during registration when it exists', function (): void {
     Role::create(['name' => 'member', 'guard_name' => 'web']);
 
-    $user = app(RegisterUserAction::class)->handle([
+    $user = resolve(RegisterUserAction::class)->handle([
         'name' => 'Mobile User',
         'email' => 'mobile@example.com',
         'password' => 'password123',
@@ -25,7 +25,7 @@ it('assigns the member role during registration when it exists', function (): vo
 });
 
 it('registers a user without roles when the member role does not exist', function (): void {
-    $user = app(RegisterUserAction::class)->handle([
+    $user = resolve(RegisterUserAction::class)->handle([
         'name' => 'Mobile User',
         'email' => 'mobile@example.com',
         'password' => 'password123',
@@ -39,7 +39,7 @@ it('creates a token with the abilities provided by the controller layer', functi
         'password' => bcrypt('password123'),
     ]);
 
-    $token = app(LoginUserAction::class)->handle($user, 'password123', 'flutter-phone', ['profile:read', 'users:read']);
+    $token = resolve(LoginUserAction::class)->handle($user, 'password123', 'flutter-phone', ['profile:read', 'users:read']);
 
     expect($token)->toBeString();
     expect(PersonalAccessToken::query()->count())->toBe(1);
@@ -51,7 +51,7 @@ it('returns null when login credentials are invalid', function (): void {
         'password' => bcrypt('password123'),
     ]);
 
-    $result = app(LoginUserAction::class)->handle($user, 'wrong-password', 'flutter-phone', ['profile:read']);
+    $result = resolve(LoginUserAction::class)->handle($user, 'wrong-password', 'flutter-phone', ['profile:read']);
 
     expect($result)->toBeNull();
 });
@@ -62,7 +62,7 @@ it('revokes the current access token', function (): void {
 
     $user->withAccessToken($token->accessToken);
 
-    app(LogoutCurrentTokenAction::class)->handle($user);
+    resolve(LogoutCurrentTokenAction::class)->handle($user);
 
     expect(PersonalAccessToken::query()->count())->toBe(0);
 });

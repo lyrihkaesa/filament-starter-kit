@@ -17,11 +17,7 @@ final class StoreUserRequest extends FormRequest
             return false;
         }
 
-        if ($this->has('roles') && ! $user->can('Update:Role')) {
-            return false;
-        }
-
-        return true;
+        return ! ($this->has('roles') && ! $user->can('Update:Role'));
     }
 
     /**

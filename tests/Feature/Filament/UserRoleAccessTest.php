@@ -15,13 +15,13 @@ uses(RefreshDatabase::class);
 
 it('disables roles field for users without Update:Role permission', function (): void {
     $user = User::factory()->create();
-    
+
     // Give permission to view/update user, but NOT to update roles
     $role = Role::create(['name' => 'admin', 'guard_name' => 'web']);
     $role->givePermissionTo(Permission::create(['name' => 'ViewAny:User', 'guard_name' => 'web']));
     $role->givePermissionTo(Permission::create(['name' => 'View:User', 'guard_name' => 'web']));
     $role->givePermissionTo(Permission::create(['name' => 'Update:User', 'guard_name' => 'web']));
-    
+
     $user->assignRole($role);
     $targetUser = User::factory()->create();
 
@@ -35,14 +35,14 @@ it('disables roles field for users without Update:Role permission', function ():
 
 it('enables roles field for users with Update:Role permission', function (): void {
     $user = User::factory()->create();
-    
+
     // Give permission to view/update user AND update roles
     $role = Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
     $role->givePermissionTo(Permission::create(['name' => 'ViewAny:User', 'guard_name' => 'web']));
     $role->givePermissionTo(Permission::create(['name' => 'View:User', 'guard_name' => 'web']));
     $role->givePermissionTo(Permission::create(['name' => 'Update:User', 'guard_name' => 'web']));
     $role->givePermissionTo(Permission::create(['name' => 'Update:Role', 'guard_name' => 'web']));
-    
+
     $user->assignRole($role);
     $targetUser = User::factory()->create();
 

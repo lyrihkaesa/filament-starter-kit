@@ -91,7 +91,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->multiple()
                     ->preload()
                     ->searchable()
-                    ->disabled(fn () => ! auth()->user()?->can('Update:Role')),
+                    ->disabled(fn (): bool => ! auth()->user()?->can('Update:Role')),
             ])
             ->statePath('data');
     }
@@ -354,5 +354,6 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             'platform' => $platform,
         ];
     }
+
     // @codeCoverageIgnoreEnd
 }

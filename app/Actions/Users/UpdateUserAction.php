@@ -33,7 +33,7 @@ final readonly class UpdateUserAction
                 $user->syncRoles($roles);
             }
 
-            return $user->fresh() ?? $user;
+            return $user->fresh() ?: $user;
         });
 
         return $updatedUser;

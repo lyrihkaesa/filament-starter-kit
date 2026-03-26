@@ -10,6 +10,10 @@ final readonly class LogoutCurrentTokenAction
 {
     public function handle(User $user): void
     {
-        $user->currentAccessToken()?->delete();
+        $token = $user->currentAccessToken();
+
+        if ($token !== null) {
+            $token->delete();
+        }
     }
 }

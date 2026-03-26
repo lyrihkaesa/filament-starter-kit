@@ -21,13 +21,17 @@ final class AuthController
     public function register(RegisterRequest $request, RegisterUserAction $registerUserAction, LoginUserAction $loginUserAction): JsonResponse
     {
         $validated = $request->validated();
-        $deviceName = (string) ($validated['device_name'] ?? 'flutter-mobile');
+        $deviceName = isset($validated['device_name']) && is_scalar($validated['device_name']) ? (string) $validated['device_name'] : 'flutter-mobile';
         unset($validated['device_name'], $validated['password_confirmation']);
 
+        /** @var array{name: string, email: string, password: string} $payload */
+        $payload = $validated;
+
         /** @var User $user */
-        $user = $registerUserAction->handle($validated);
+        $user = $registerUserAction->handle($payload);
         $abilities = $this->resolveAbilities($user);
-        $token = $loginUserAction->handle($user, (string) $request->string('password'), $deviceName, $abilities);
+        $passwordInput = $request->input('password', '');
+        $token = $loginUserAction->handle($user, is_scalar($passwordInput) ? (string) $passwordInput : '', $deviceName, $abilities);
 
         return JsonResource::make([
             'user' => new UserResource($user),
@@ -42,9 +46,9 @@ final class AuthController
     public function login(LoginRequest $request, LoginUserAction $loginUserAction): JsonResponse
     {
         $validated = $request->validated();
-        $deviceName = (string) ($validated['device_name'] ?? 'flutter-mobile');
+        $deviceName = isset($validated['device_name']) && is_scalar($validated['device_name']) ? (string) $validated['device_name'] : 'flutter-mobile';
 
-        $user = User::query()->where('email', $validated['email'])->first();
+        $user = User::query()->where('email', isset($validated['email']) && is_scalar($validated['email']) ? (string) $validated['email'] : '')->first();
 
         if (! $user instanceof User) {
             return response()->json([
@@ -56,7 +60,7 @@ final class AuthController
         }
 
         $abilities = $this->resolveAbilities($user);
-        $token = $loginUserAction->handle($user, (string) $validated['password'], $deviceName, $abilities);
+        $token = $loginUserAction->handle($user, isset($validated['password']) && is_scalar($validated['password']) ? (string) $validated['password'] : '', $deviceName, $abilities);
 
         if ($token === null) {
             return response()->json([
@@ -82,9 +86,7 @@ final class AuthController
         /** @var User $user */
         $user = request()->user();
 
-        if (! $user->tokenCan('profile:read')) {
-            throw new AuthorizationException('Missing required token ability.');
-        }
+        throw_unless($user->tokenCan('profile:read'), AuthorizationException::class, 'Missing required token ability.');
 
         return (new UserResource($user))
             ->additional([

@@ -63,13 +63,13 @@ it('can generate resource with view option', function (): void {
     expect(File::exists($path.'/Pages/ViewTestModel.php'))->toBeTrue();
 });
 
-it('shows error if stub is missing', function () {
+it('shows error if stub is missing', function (): void {
     // We temporarily move a stub to simulate missing stub
     $stubPath = base_path('stubs/starter-kit/resource/resource.stub');
     $backupPath = base_path('stubs/starter-kit/resource/resource.stub.bak');
-    
+
     File::move($stubPath, $backupPath);
-    
+
     try {
         $this->artisan('make:starter-resource MissingStubModel')
             ->expectsOutputToContain('Stub not found')

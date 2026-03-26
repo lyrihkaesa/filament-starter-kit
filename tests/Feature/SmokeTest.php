@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 it('redirects home to login', function (): void {
     $this->get('/')
@@ -18,6 +19,7 @@ it('can visit public pages', function (string $url): void {
 
 it('can visit authenticated pages', function (string $url): void {
     $user = User::factory()->create();
+    $user->assignRole(Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']));
 
     $this->actingAs($user)
         ->get($url)

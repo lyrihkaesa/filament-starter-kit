@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 final readonly class LoginUserAction
 {
     /**
-     * @param array<int, string> $abilities
+     * @param  array<int, string>  $abilities
      */
     public function handle(User $user, string $password, string $deviceName, array $abilities): ?string
     {

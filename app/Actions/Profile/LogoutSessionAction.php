@@ -26,10 +26,9 @@ final readonly class LogoutSessionAction
             return;
         }
 
-        /** @var string $userAgent */
         $userAgent = is_string($session->user_agent) ? $session->user_agent : '';
         $agent = $this->parseUserAgent($userAgent);
-        $device = "{$agent['browser']} on {$agent['platform']}";
+        $device = sprintf('%s on %s', $agent['browser'], $agent['platform']);
 
         /** @var scalar $activity */
         $activity = $session->last_activity ?? 0;
@@ -42,10 +41,10 @@ final readonly class LogoutSessionAction
 
         Notification::make()
             ->title(__('Log Out Successful'))
-            ->body(__("You have been logged out from :device (:ip). Last active: :last_active", [
+            ->body(__('You have been logged out from :device (:ip). Last active: :last_active', [
                 'device' => $device,
-                'ip' => $session->ip_address,
-                'last_active' => $lastActive,
+                'ip' => is_scalar($session->ip_address) ? (string) $session->ip_address : '',
+                'last_active' => is_scalar($lastActive) ? (string) $lastActive : '',
             ]))
             ->warning()
             ->sendToDatabase($user);

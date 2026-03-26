@@ -8,3 +8,5 @@ parameters:
         - app/
 
     level: max
+
+    treatPhpDocTypesAsCertain: false

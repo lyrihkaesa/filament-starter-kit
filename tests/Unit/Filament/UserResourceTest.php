@@ -12,32 +12,23 @@ uses(TestCase::class);
 
 it('configures UserResource form, infolist, table, relations, pages, and query', function (): void {
     // Mock Schema for form()
-    $schemaForm = $this->getMockBuilder(Schema::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['components'])
-        ->getMock();
-    $schemaForm->method('components')->willReturnSelf();
+    $schemaForm = mock(Schema::class);
+    $schemaForm->shouldReceive('components')->once()->andReturnSelf();
 
     expect(UserResource::form($schemaForm))->toBe($schemaForm);
 
     // Mock Schema for infolist()
-    $schemaInfo = $this->getMockBuilder(Schema::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['components'])
-        ->getMock();
-    $schemaInfo->method('components')->willReturnSelf();
+    $schemaInfo = mock(Schema::class);
+    $schemaInfo->shouldReceive('components')->once()->andReturnSelf();
 
     expect(UserResource::infolist($schemaInfo))->toBe($schemaInfo);
 
     // Mock Table for table()
-    $table = $this->getMockBuilder(Table::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['columns', 'filters', 'recordActions', 'toolbarActions'])
-        ->getMock();
-    $table->method('columns')->willReturnSelf();
-    $table->method('filters')->willReturnSelf();
-    $table->method('recordActions')->willReturnSelf();
-    $table->method('toolbarActions')->willReturnSelf();
+    $table = mock(Table::class);
+    $table->shouldReceive('columns')->once()->andReturnSelf();
+    $table->shouldReceive('filters')->once()->andReturnSelf();
+    $table->shouldReceive('recordActions')->once()->andReturnSelf();
+    $table->shouldReceive('toolbarActions')->once()->andReturnSelf();
 
     expect(UserResource::table($table))->toBe($table);
 

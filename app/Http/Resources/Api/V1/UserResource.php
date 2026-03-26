@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\User
+ * @mixin User
+ *
+ * @property-read User $resource
  */
 final class UserResource extends JsonResource
 {
@@ -22,7 +26,7 @@ final class UserResource extends JsonResource
     ];
 
     /**
-     * @param array<string, bool> $capabilities
+     * @param  array<string, bool>  $capabilities
      */
     public function withCapabilities(array $capabilities): self
     {
@@ -36,16 +40,19 @@ final class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $this->resource;
+        $routeKey = $user->getRouteKey();
+
         return [
-            'id' => (string) $this->resource->getRouteKey(),
-            'name' => (string) $this->resource->name,
-            'email' => (string) $this->resource->email,
-            'avatar' => $this->resource->avatar !== null ? (string) $this->resource->avatar : null,
-            'email_verified_at' => $this->resource->email_verified_at?->toISOString(),
-            'created_at' => $this->resource->created_at?->toISOString(),
-            'updated_at' => $this->resource->updated_at?->toISOString(),
-            'deleted_at' => $this->resource->deleted_at?->toISOString(),
-            'anonymized_at' => $this->resource->anonymized_at?->toISOString(),
+            'id' => is_scalar($routeKey) ? (string) $routeKey : '',
+            'name' => is_scalar($user->name) ? (string) $user->name : '',
+            'email' => is_scalar($user->email) ? (string) $user->email : '',
+            'avatar' => is_scalar($user->avatar) ? (string) $user->avatar : null,
+            'email_verified_at' => $user->email_verified_at instanceof CarbonInterface ? $user->email_verified_at->toISOString() : null,
+            'created_at' => $user->created_at instanceof CarbonInterface ? $user->created_at->toISOString() : null,
+            'updated_at' => $user->updated_at instanceof CarbonInterface ? $user->updated_at->toISOString() : null,
+            'deleted_at' => $user->deleted_at instanceof CarbonInterface ? $user->deleted_at->toISOString() : null,
+            'anonymized_at' => $user->anonymized_at instanceof CarbonInterface ? $user->anonymized_at->toISOString() : null,
             'can' => $this->capabilities,
         ];
     }

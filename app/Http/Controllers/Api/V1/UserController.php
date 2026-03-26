@@ -29,14 +29,15 @@ final class UserController
         $this->ensureAbility($request, 'users:read');
 
         $validated = $request->validated();
-        $perPage = (int) ($validated['per_page'] ?? 15);
+        $perPage = isset($validated['per_page']) && is_numeric($validated['per_page']) ? (int) ($validated['per_page']) : 15;
 
-        $query = User::query()
-            ->orderByDesc('created_at')
+        $query = User::query()->latest()
             ->orderByDesc('id');
 
-        $users = $validated['pagination'] === 'cursor'
-            ? $query->cursorPaginate($perPage, ['*'], 'cursor', $validated['cursor'] ?? null)->withQueryString()
+        $cursor = isset($validated['cursor']) && is_scalar($validated['cursor']) ? (string) $validated['cursor'] : null;
+
+        $users = isset($validated['pagination']) && $validated['pagination'] === 'cursor'
+            ? $query->cursorPaginate($perPage, ['*'], 'cursor', $cursor)->withQueryString()
             : $query->paginate($perPage)->withQueryString();
 
         $items = $this->collectionItems($users);
@@ -57,7 +58,9 @@ final class UserController
     {
         $this->ensureAbility($request, 'users:create');
 
-        $user = $createUserAction->handle($request->validated());
+        /** @var array{name: string, email: string, password: string, avatar?: string|null, email_verified_at?: string|null, roles?: array<int, string>} $payload */
+        $payload = $request->validated();
+        $user = $createUserAction->handle($payload);
 
         return $this->userResponse($request, $user, 'User created successfully.', Response::HTTP_CREATED);
     }
@@ -73,7 +76,9 @@ final class UserController
     {
         $this->ensureAbility($request, 'users:update');
 
-        $updatedUser = $updateUserAction->handle($user, $request->validated());
+        /** @var array{name?: string, email?: string, password?: string, avatar?: string|null, email_verified_at?: string|null, roles?: array<int, string>} $payload */
+        $payload = $request->validated();
+        $updatedUser = $updateUserAction->handle($user, $payload);
 
         return $this->userResponse($request, $updatedUser, 'User updated successfully.');
     }
@@ -110,9 +115,7 @@ final class UserController
         /** @var User $authUser */
         $authUser = $request->user();
 
-        if (! $authUser->tokenCan($ability)) {
-            throw new AuthorizationException('Missing required token ability.');
-        }
+        throw_unless($authUser->tokenCan($ability), AuthorizationException::class, 'Missing required token ability.');
     }
 
     /**
@@ -128,7 +131,7 @@ final class UserController
     }
 
     /**
-     * @param iterable<int, User> $users
+     * @param  iterable<int, User>  $users
      * @return array<string, array<string, bool>>
      */
     private function capabilitiesForUsers(Request $request, iterable $users): array
@@ -136,7 +139,8 @@ final class UserController
         $capabilities = [];
 
         foreach ($users as $user) {
-            $capabilities[(string) $user->getRouteKey()] = $this->capabilitiesForUser($request, $user);
+            $routeKey = $user->getRouteKey();
+            $capabilities[is_scalar($routeKey) ? (string) $routeKey : ''] = $this->capabilitiesForUser($request, $user);
         }
 
         return $capabilities;
@@ -159,12 +163,20 @@ final class UserController
     }
 
     /**
-     * @return iterable<int, User>
+     * @param  LengthAwarePaginator<int, User>|CursorPaginator<int, User>  $paginator
+     * @return Collection<int, User>
      */
-    private function collectionItems(LengthAwarePaginator|CursorPaginator $paginator): iterable
+    private function collectionItems(LengthAwarePaginator|CursorPaginator $paginator): Collection
     {
+        if (method_exists($paginator, 'getCollection')) {
+            /** @var Collection<int, User> $items */
+            $items = $paginator->getCollection();
+
+            return $items;
+        }
+
         /** @var Collection<int, User> $items */
-        $items = $paginator->getCollection();
+        $items = collect([]);
 
         return $items;
     }

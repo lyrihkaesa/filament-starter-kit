@@ -9,11 +9,8 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 it('configures PostInfolist schema', function (): void {
-    $schema = $this->getMockBuilder(Schema::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['components'])
-        ->getMock();
-    $schema->method('components')->willReturnSelf();
+    $schema = mock(Schema::class);
+    $schema->shouldReceive('components')->once()->andReturnSelf();
 
     expect(PostInfolist::configure($schema))->toBe($schema);
 });

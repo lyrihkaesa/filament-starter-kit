@@ -17,7 +17,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     $user = User::factory()->create();
-    $role = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
     $user->assignRole($role);
     $this->actingAs($user);
 });

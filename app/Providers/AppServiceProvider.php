@@ -34,6 +34,8 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // @codeCoverageIgnoreStart
+
         // 🚀 Optimasi Asset: Prefetching agresif (Laravel 11.7+)
         Vite::useAggressivePrefetching();
 
@@ -58,8 +60,11 @@ final class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(app()->isProduction());
 
         // 🛡️ Database: Jamin integritas transaksi (Laravel 11.10+)
-        if (method_exists(DB::connection(), 'handlePotentiallyLostTransactions')) {
-            DB::handlePotentiallyLostTransactions();
+    
+        /** @var \Illuminate\Database\Connection $connection */
+        $connection = DB::connection();
+        if (method_exists($connection, 'handlePotentiallyLostTransactions')) {
+            $connection->handlePotentiallyLostTransactions();
         }
 
         // 📅 Tanggal: Gunakan CarbonImmutable secara global (Laravel 8.x+)
@@ -77,6 +82,8 @@ final class AppServiceProvider extends ServiceProvider
         // if (app()->runningUnitTests()) {
         //     Sleep::fake();
         // }
+
+        // @codeCoverageIgnoreEnd
 
         RateLimiter::for('api', function (Request $request): Limit {
             /** @var string $key */

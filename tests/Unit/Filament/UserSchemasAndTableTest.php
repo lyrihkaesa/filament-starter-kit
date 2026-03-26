@@ -12,35 +12,25 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 it('configures UserForm schema', function (): void {
-    $schema = $this->getMockBuilder(Schema::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['components'])
-        ->getMock();
-    $schema->method('components')->willReturnSelf();
+    $schema = mock(Schema::class);
+    $schema->shouldReceive('components')->once()->andReturnSelf();
 
     expect(UserForm::configure($schema))->toBe($schema);
 });
 
 it('configures UserInfolist schema', function (): void {
-    $schema = $this->getMockBuilder(Schema::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['components'])
-        ->getMock();
-    $schema->method('components')->willReturnSelf();
+    $schema = mock(Schema::class);
+    $schema->shouldReceive('components')->once()->andReturnSelf();
 
     expect(UserInfolist::configure($schema))->toBe($schema);
 });
 
 it('configures UsersTable', function (): void {
-    $table = $this->getMockBuilder(Table::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['columns', 'filters', 'recordActions', 'toolbarActions'])
-        ->getMock();
-
-    $table->method('columns')->willReturnSelf();
-    $table->method('filters')->willReturnSelf();
-    $table->method('recordActions')->willReturnSelf();
-    $table->method('toolbarActions')->willReturnSelf();
+    $table = mock(Table::class);
+    $table->shouldReceive('columns')->once()->andReturnSelf();
+    $table->shouldReceive('filters')->once()->andReturnSelf();
+    $table->shouldReceive('recordActions')->once()->andReturnSelf();
+    $table->shouldReceive('toolbarActions')->once()->andReturnSelf();
 
     expect(UsersTable::configure($table))->toBe($table);
 });

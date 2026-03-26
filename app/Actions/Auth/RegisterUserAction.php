@@ -15,7 +15,7 @@ final readonly class RegisterUserAction
     ) {}
 
     /**
-     * @param array{name: string, email: string, password: string} $data
+     * @param  array{name: string, email: string, password: string}  $data
      */
     public function handle(array $data): User
     {

@@ -9,6 +9,7 @@ use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,22 +23,16 @@ use Spatie\Permission\Traits\HasRoles;
 
 final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
+    use HasApiTokens;
+
     /** @use HasFactory<UserFactory> */
     use HasFactory;
 
     use HasPanelShield;
-    use HasApiTokens;
     use HasRoles;
     use HasUuids;
     use Notifiable;
     use SoftDeletes;
-
-    /**
-     * The primary key type.
-     *
-     * @var string
-     */
-    protected $keyType = 'string';
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -45,6 +40,13 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
      * @var bool
      */
     public $incrementing = false;
+
+    /**
+     * The primary key type.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
 
     /**
      * The attributes that are guarded from mass assignment.
@@ -70,15 +72,17 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function anonymize(): void
     {
+        $uuid = uuid_create();
+
         $this->update([
             'name' => 'Anonymous User',
-            'email' => 'anonymous_'.uuid_create().'@example.com',
+            'email' => 'anonymous_'.(is_scalar($uuid) ? (string) $uuid : 'unknown').'@example.com',
             'password' => bcrypt(Str::random(40)),
             'anonymized_at' => now(),
         ]);
     }
 
-    public function canAccessPanel(\Filament\Panel $panel): bool
+    public function canAccessPanel(Panel $panel): bool
     {
         return true;
     }
@@ -121,6 +125,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
 
         return $disk->url($this->avatar);
     }
+
     // @codeCoverageIgnoreEnd
 
     // @codeCoverageIgnoreStart
@@ -134,6 +139,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             }
         });
     }
+
     // @codeCoverageIgnoreEnd
 
     /**

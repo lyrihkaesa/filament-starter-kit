@@ -41,7 +41,7 @@ final class UserForm
                     ->multiple()
                     ->preload()
                     ->searchable()
-                    ->disabled(fn () => ! auth()->user()?->can('Update:Role')),
+                    ->disabled(fn (): bool => ! auth()->user()?->can('Update:Role')),
             ]);
     }
 }

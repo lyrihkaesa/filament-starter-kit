@@ -23,11 +23,7 @@ final class UpdateUserRequest extends FormRequest
             return false;
         }
 
-        if ($this->has('roles') && ! $authUser->can('Update:Role')) {
-            return false;
-        }
-
-        return true;
+        return ! ($this->has('roles') && ! $authUser->can('Update:Role'));
     }
 
     /**
