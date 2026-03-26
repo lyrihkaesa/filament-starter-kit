@@ -1,39 +1,52 @@
 # Pint - Code Style or Linter
 
-Project ini menggunakan [Laravel Pint](https://laravel.com/docs/pint) dengan preset `laravel` dan beberapa aturan tambahan/kustom.  
-Tujuannya untuk menjaga konsistensi dan kualitas kode di seluruh project.
+Project ini menggunakan [Laravel Pint](https://laravel.com/docs/12.x/pint) dengan preset `laravel` dan beberapa aturan tambahan atau kustom.
 
----
+Tujuannya bukan sekadar membuat kode terlihat rapi. Pint dipakai supaya tim tidak menghabiskan energi untuk memperdebatkan format penulisan yang sebenarnya bisa diserahkan ke tool.
+
+## Kenapa Saya Pakai Pint
+
+Saat project mulai berkembang, inkonsistensi kecil akan menumpuk:
+
+- ada yang pakai `==`, ada yang pakai `===`
+- ada yang tidak menulis visibility
+- ada yang masih pakai `DateTime`
+- ada yang menulis beberapa statement dalam satu baris
+
+Masalahnya bukan hanya estetika. Inkonsistensi seperti ini membuat review lebih lambat dan menambah beban mental saat membaca kode.
+
+Dengan Pint, sebagian besar keputusan gaya penulisan dipindahkan ke tool.
 
 ## Visual Studio Code
 
-Jika anda menggunakan visual studio code gunakanlah ekstensi [Laravel Pint](https://marketplace.visualstudio.com/items?itemName=open-southeners.laravel-pint) untuk formating dengan Pint, Biasanya anda melakukan formating php menggunakan Ekstensi [PHP Intelephense](https://marketplace.visualstudio.com/.items?itemName=bmewburn.vscode-intelephense-client).
+Jika Anda menggunakan Visual Studio Code, saya sarankan gunakan ekstensi [Laravel Pint](https://marketplace.visualstudio.com/items?itemName=open-southeners.laravel-pint).
 
-Saya merekomendasikan Laravel Pint untuk best partice linter.
-Buka file `.php` > click kanan mouse pada editor > `Format Document With` > `Laravel Pint`. Atau bisa diconfigurasi secara default lewat `settings.json` vscode:
+Biasanya developer PHP pemula sudah terbiasa menggunakan Intelephense untuk banyak hal, tetapi untuk formatting saya lebih merekomendasikan Pint agar hasilnya konsisten dengan aturan repository.
+
+Contoh konfigurasi `settings.json`:
 
 ```json
 "editor.formatOnSave": true,
 "[php]": {
     "editor.defaultFormatter": "open-southeners.laravel-pint"
-},
+}
 ```
 
----
+Dengan konfigurasi ini, setiap kali file PHP disimpan, formatnya akan langsung disesuaikan.
 
-## 📂 File yang Dikecualikan
+## File yang Dikecualikan
 
-Rule Pint **tidak dijalankan** pada file berikut:
+Rule Pint **tidak dijalankan** pada beberapa file tertentu, misalnya:
 
--   `tests/TestCase.php`
--   `intelephense_helper.php`
--   `_ide_helper.php`
+- `tests/TestCase.php`
+- `intelephense_helper.php`
+- `_ide_helper.php`
 
----
+Lihat file `pint.json` untuk daftar final dan aturan yang benar-benar aktif di project ini.
 
-## ⚙️ Aturan yang Digunakan
+## Aturan yang Digunakan
 
-Berikut adalah aturan yang aktif di `pint.json`:
+Berikut beberapa aturan penting yang aktif di `pint.json`.
 
 ### `array_push`
 
@@ -47,8 +60,6 @@ array_push($arr, 1);
 $arr[] = 1;
 ```
 
----
-
 ### `backtick_to_shell_exec`
 
 Hindari backtick, gunakan `shell_exec()`.
@@ -60,8 +71,6 @@ $a = `ls -la`;
 // After
 $a = shell_exec('ls -la');
 ```
-
----
 
 ### `date_time_immutable`
 
@@ -75,8 +84,6 @@ $d = new DateTime();
 $d = new DateTimeImmutable();
 ```
 
----
-
 ### `declare_strict_types`
 
 Tambahkan `declare(strict_types=1);` di setiap file PHP.
@@ -88,8 +95,6 @@ Tambahkan `declare(strict_types=1);` di setiap file PHP.
 // After
 declare(strict_types=1);
 ```
-
----
 
 ### `lowercase_keywords`
 
@@ -103,11 +108,9 @@ IF ($a) {}
 if ($a) {}
 ```
 
----
-
 ### `lowercase_static_reference`
 
-Gunakan lowercase untuk `self`, `static`, `parent`.
+Gunakan lowercase untuk `self`, `static`, dan `parent`.
 
 ```php
 // Before
@@ -116,8 +119,6 @@ SELF::class;
 // After
 self::class;
 ```
-
----
 
 ### `final_class`
 
@@ -131,11 +132,9 @@ class User {}
 final class User {}
 ```
 
----
-
 ### `no_superfluous_elseif`
 
-Hindari `elseif` yang bisa jadi `if`.
+Hindari `elseif` yang sebenarnya bisa dipisah menjadi `if`.
 
 ```php
 // Before
@@ -149,8 +148,6 @@ if ($a) {
 if ($b) {
 }
 ```
-
----
 
 ### `no_useless_else`
 
@@ -166,8 +163,6 @@ if ($a) return 1;
 return 2;
 ```
 
----
-
 ### `no_multiple_statements_per_line`
 
 Satu statement per baris.
@@ -181,11 +176,9 @@ $a = 1;
 $b = 2;
 ```
 
----
-
 ### `ordered_class_elements`
 
-Elemen class harus sesuai urutan (use, const, property, construct, method, dll).
+Elemen class harus sesuai urutan yang rapi, misalnya `use`, `const`, property, constructor, lalu method.
 
 ```php
 // Before
@@ -197,11 +190,9 @@ public const BAR = 'bar';
 public function foo() {}
 ```
 
----
-
 ### `protected_to_private`
 
-Property/method `protected` jadi `private` jika tidak diwariskan.
+Property atau method `protected` akan diubah menjadi `private` jika memang tidak perlu diwariskan.
 
 ```php
 // Before
@@ -211,11 +202,9 @@ protected $value;
 private $value;
 ```
 
----
-
 ### `strict_comparison`
 
-Gunakan `===` atau `!==` bukan `==` atau `!=`.
+Gunakan `===` atau `!==`, bukan `==` atau `!=`.
 
 ```php
 // Before
@@ -225,11 +214,9 @@ if ($a == $b) {}
 if ($a === $b) {}
 ```
 
----
-
 ### `visibility_required`
 
-Semua method/property wajib ada visibility.
+Semua method dan property wajib memiliki visibility.
 
 ```php
 // Before
@@ -239,22 +226,37 @@ function foo() {}
 public function foo() {}
 ```
 
----
-
-## ❌ Rule Dimatikan
+## Rule yang Dimatikan
 
 ### `new_with_parentheses`
 
-Rule ini **dimatikan** (`false`) → membolehkan `new Class` tanpa `()`.
+Rule ini **dimatikan** (`false`) sehingga `new Class` tanpa `()` masih diperbolehkan.
 
 ```php
 // Allowed
 $user = new User;
 ```
 
----
+## Studi Kasus
 
-## 🚀 Menjalankan Pint
+Misalnya ada dua developer yang sama-sama membuat action:
+
+- Developer A menulis pendek, rapat, dan tidak strict
+- Developer B menulis sangat verbose dan urutannya berbeda
+
+Kalau tidak ada formatter, review akan dipenuhi komentar seperti:
+
+- "tolong pakai strict comparison"
+- "visibility-nya mana?"
+- "urutkan property dulu"
+
+Dengan Pint, sebagian besar diskusi itu hilang. Review bisa fokus ke hal yang lebih penting seperti:
+
+- apakah authorization sudah benar
+- apakah logic bisnis sudah tepat
+- apakah test sudah cukup
+
+## Menjalankan Pint
 
 Linting otomatis bisa dijalankan dengan:
 
@@ -268,13 +270,8 @@ Atau untuk mengecek tanpa auto-fix:
 composer lint -- --test
 ```
 
----
+## Catatan
 
-## 📌 Catatan
-
--   Jika ada rule yang dianggap terlalu ketat, bisa **dimatikan di `pint.json`**.
--   Selalu commit perubahan linting secara terpisah dengan prefix:
-
-    ```bash
-    chore(lint): apply Pint code style fixes
-    ```
+- Jika ada rule yang dianggap terlalu ketat, Anda bisa menyesuaikannya di `pint.json`
+- Sebaiknya commit perubahan linting besar secara terpisah agar diff logic dan diff formatting tidak bercampur
+- Pint bukan pengganti review, tetapi sangat membantu menjaga standar dasar project

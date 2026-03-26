@@ -2,15 +2,28 @@
 
 Dokumen ini menjelaskan bagaimana `UserResource` di Filament diintegrasikan dengan **Action Pattern** untuk menangani operasi Create, Update, dan Delete secara terpisah.
 
----
+Ini adalah salah satu contoh paling penting di starter kit karena biasanya dari sinilah developer mulai memahami bagaimana saya ingin Filament dan logika bisnis saling bekerja sama.
 
-## 🏗️ Struktur Action
+## Kenapa `UserResource` Dijadikan Contoh
+
+Karena modul user hampir selalu ada di admin panel, dan modul ini cukup kompleks untuk menunjukkan pola yang saya sukai:
+
+- create user
+- update user
+- delete user
+- policy
+- role dan permission
+- notifikasi atau side effect tambahan
+
+Kalau pola di `UserResource` sudah dipahami, Anda biasanya akan lebih mudah meniru pendekatan yang sama untuk `ProductResource`, `OrderResource`, dan resource lain.
+
+## Struktur Action
 
 Semua logika bisnis untuk User disimpan dalam folder `app/Actions/Users/`:
 
--   `CreateUserAction`: Menangani pembuatan user baru.
--   `UpdateUserAction`: Menangani pembaruan data user.
--   `DeleteUserAction`: Menangani penghapusan user (termasuk soft delete dan anonymization logic).
+- `CreateUserAction`: menangani pembuatan user baru
+- `UpdateUserAction`: menangani pembaruan data user
+- `DeleteUserAction`: menangani penghapusan user
 
 ### Contoh Penggunaan Action
 
@@ -25,9 +38,19 @@ app(UpdateUserAction::class)->handle($user, $data);
 app(DeleteUserAction::class)->handle($user);
 ```
 
----
+## Kenapa Bukan Langsung di Resource
 
-## 🛠️ Integrasi Filament
+Kalau semua logic diletakkan langsung di `UserResource` atau halaman-halamannya, biasanya file akan cepat membesar dan sulit dipakai ulang.
+
+Contoh masalah yang sering muncul:
+
+- API juga butuh create user
+- import command juga butuh create user
+- business rule create user berubah
+
+Kalau logic ada di action, Anda cukup ubah satu tempat.
+
+## Integrasi Filament
 
 ### 1. Create Page (`CreateUser.php`)
 
@@ -67,11 +90,49 @@ DeleteAction::make()
     ->using(fn (User $record, DeleteUserAction $deleteAction) => $deleteAction->handle($record)),
 ```
 
----
+## Studi Kasus
 
-## ✅ Keuntungan Menggunakan Action Pattern
+Bayangkan aturan bisnis user Anda seperti ini:
 
-1.  **Reusability**: Logika pembuatan user bisa dipanggil dari Filament, API, atau Artisan Command tanpa duplikasi kode.
-2.  **Testability**: Kita dapat melakukan Unit Testing pada masing-masing Action secara terisolasi.
-3.  **Maintainability**: Memisahkan logika besar dari file Resource/Page Filament yang cenderung cepat membesar.
-4.  **Transaction Safety**: Setiap action dibungkus dalam `DB::transaction()` untuk memastikan integritas data.
+- saat user dibuat, password harus di-hash
+- role default perlu diberikan
+- avatar default mungkin perlu di-set
+- notifikasi welcome mungkin perlu dikirim
+
+Kalau logic ini tersebar di:
+
+- halaman create Filament
+- API controller
+- import command
+
+maka Anda akan duplikasi kode. Dengan `CreateUserAction`, semua logic itu tinggal dipusatkan.
+
+Filament cukup menjadi pemanggil:
+
+```php
+return app(CreateUserAction::class)->handle($data);
+```
+
+## Keuntungan Menggunakan Action Pattern
+
+1. **Reusability**: logika pembuatan user bisa dipanggil dari Filament, API, atau Artisan Command tanpa duplikasi kode.
+2. **Testability**: kita dapat menulis test untuk masing-masing action secara terisolasi.
+3. **Maintainability**: logika besar tidak menumpuk di Resource/Page Filament.
+4. **Transaction Safety**: action dapat dibungkus dalam `DB::transaction()` jika perlu.
+
+## Catatan Penting
+
+- Action di sini menggunakan method `handle()`, bukan `execute()`
+- Authorization sebaiknya tetap dilakukan oleh policy, FormRequest, atau layer pemanggil
+- Resource bertugas mengorkestrasi, bukan menjadi pusat semua business logic
+
+## Cara Meniru Pola Ini untuk Resource Lain
+
+Jika Anda ingin membuat `ProductResource`, cara berpikirnya sama:
+
+1. Buat `CreateProductAction`
+2. Buat `UpdateProductAction`
+3. Buat `DeleteProductAction`
+4. Hubungkan page Filament ke action tersebut
+
+Dengan pola ini, semua resource di project akan terasa konsisten.

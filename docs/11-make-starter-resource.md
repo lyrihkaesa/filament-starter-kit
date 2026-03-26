@@ -1,158 +1,160 @@
-# ✨ Feature: `make:starter-resource` — Custom Filament Resource Generator with Action Pattern
+# `make:starter-resource`
 
-### Context for AI Agent
+Dokumen ini menjelaskan command kustom `make:starter-resource` yang ada di starter kit ini.
 
-This issue is part of a **Laravel + Filament v3 starter kit**. The goal is to create a custom Artisan command that generates Filament Resource files using project-specific stubs — integrating the **action pattern** (as popularized by `nunomaduro/laravel-actions` or similar single-responsibility action classes).
+Command ini saya buat karena saya tidak ingin setiap developer harus mengulang wiring yang sama setiap kali membuat Filament resource baru. Tujuan utamanya adalah menyesuaikan generator resource dengan pola arsitektur starter kit ini, terutama **Action Pattern**.
 
-The generated files must **not** override or conflict with Filament's built-in `make:filament-resource` command.
+## Kenapa Tidak Cukup Pakai `make:filament-resource`
 
----
+Command bawaan Filament memang bagus untuk membuat struktur awal resource. Tetapi untuk kebutuhan starter kit ini, ada beberapa kekurangan:
 
-### Problem Statement
+- create page belum otomatis terhubung ke `Create...Action`
+- edit page belum otomatis terhubung ke `Update...Action`
+- struktur schema dan table belum mengikuti pola stub yang saya siapkan
+- developer harus mengulang wiring manual terus-menerus
 
-`php artisan make:filament-resource` generates standard Filament resource files without any action pattern integration. Developers must manually wire `handleRecordCreation` and `handleRecordUpdate` to dedicated Action classes every time. This is repetitive, inconsistent, and not enforced by the starter kit.
+Karena itu saya membuat command sendiri.
 
----
+## Signature Command
 
-### Expected Behavior
+Berdasarkan implementasi yang ada saat ini, signature command-nya adalah:
 
-Running the new command:
+```bash
+php artisan make:starter-resource {model} {--view} {--soft-deletes} {--force}
+```
+
+## Lokasi Implementasi
+
+Command berada di:
+
+```text
+app/Console/Commands/MakeStarterResource.php
+```
+
+Stub berada di:
+
+```text
+stubs/starter-kit/resource/
+```
+
+## File yang Dihasilkan
+
+Secara umum, command ini menghasilkan struktur seperti berikut untuk model `User`:
+
+```text
+app/Filament/Resources/Users/UserResource.php
+app/Filament/Resources/Users/Pages/CreateUser.php
+app/Filament/Resources/Users/Pages/EditUser.php
+app/Filament/Resources/Users/Pages/ListUsers.php
+app/Filament/Resources/Users/Pages/ViewUser.php
+app/Filament/Resources/Users/Schemas/UserForm.php
+app/Filament/Resources/Users/Schemas/UserInfolist.php
+app/Filament/Resources/Users/Tables/UsersTable.php
+app/Actions/Users/CreateUserAction.php
+app/Actions/Users/UpdateUserAction.php
+app/Actions/Users/DeleteUserAction.php
+```
+
+## Cara Kerja Umum
+
+Saat Anda menjalankan:
 
 ```bash
 php artisan make:starter-resource User
 ```
 
-Must produce the following files:
+command akan:
 
-| File                   | Location                                     |
-| ---------------------- | -------------------------------------------- |
-| `UserResource.php`     | `app/Filament/Resources/`                    |
-| `CreateUser.php`       | `app/Filament/Resources/UserResource/Pages/` |
-| `EditUser.php`         | `app/Filament/Resources/UserResource/Pages/` |
-| `CreateUserAction.php` | `app/Actions/User/` _(skip if exists)_       |
-| `UpdateUserAction.php` | `app/Actions/User/` _(skip if exists)_       |
+1. Menentukan nama model dan bentuk plural-nya
+2. Membuat folder resource Filament sesuai struktur starter kit
+3. Menjalankan `make:action` untuk action terkait model
+4. Mengisi file resource dari stub yang sudah disiapkan
 
----
+## Integrasi dengan Action Pattern
 
-### Command Specification
+Bagian paling penting dari command ini adalah wiring ke action.
 
-**Signature:**
-
-```bash
-php artisan make:starter-resource {model}
-    {--view              : Also generate ViewRecord page}
-    {--soft-deletes      : Add soft delete support to stubs}
-    {--force             : Overwrite existing files}
-    {--namespace=        : Override default resource namespace}
-    {--panel=            : Target a specific Filament panel}
-```
-
-**Location:** `app/Console/Commands/MakeStarterResource.php`
-
----
-
-### Stub Specifications
-
-**Stub directory:**
-
-```
-stubs/starter-kit/resource/
-├── create.stub
-├── edit.stub
-├── view.stub       ← only when --view is passed
-└── manage.stub
-```
-
-**`create.stub` must render as:**
+Tujuannya supaya halaman create dan edit Filament langsung menggunakan pola starter kit, misalnya:
 
 ```php
-<?php
-
-namespace {{ namespace }}\Pages;
-
-use Illuminate\Database\Eloquent\Model;
-use Filament\Resources\Pages\CreateRecord;
-use {{ resourceFqn }};
-use App\Actions\{{ model }}\Create{{ model }}Action;
-
-class Create{{ model }} extends CreateRecord
+protected function handleRecordCreation(array $data): Model
 {
-    protected static string $resource = {{ resourceFqn }}::class;
-
-    protected function handleRecordCreation(array $data): Model
-    {
-        return app(Create{{ model }}Action::class)->handle($data);
-    }
+    return app(CreateUserAction::class)->handle($data);
 }
 ```
 
-**`edit.stub` must render as:**
+dan:
 
 ```php
-<?php
-
-namespace {{ namespace }}\Pages;
-
-use Illuminate\Database\Eloquent\Model;
-use Filament\Resources\Pages\EditRecord;
-use {{ resourceFqn }};
-use App\Actions\{{ model }}\Update{{ model }}Action;
-
-class Edit{{ model }} extends EditRecord
+protected function handleRecordUpdate(Model $record, array $data): Model
 {
-    protected static string $resource = {{ resourceFqn }}::class;
-
-    protected function handleRecordUpdate(Model $record, array $data): Model
-    {
-        return app(Update{{ model }}Action::class)->handle($record, $data);
-    }
+    return app(UpdateUserAction::class)->handle($record, $data);
 }
 ```
 
-**Action stub (`action.stub`) must render as:**
+Perhatikan bahwa saya mempertahankan method `handle()` karena itu memang pola yang saya gunakan di seluruh starter kit.
 
-```php
-<?php
+## Opsi yang Tersedia
 
-namespace App\Actions\{{ model }};
+### `--view`
 
-use App\Models\{{ model }};
+Digunakan ketika Anda ingin resource juga memiliki halaman view/read-only.
 
-class {{ actionName }}
-{
-    public function handle(array $data): {{ model }}
-    {
-        // TODO: implement
-    }
-}
-```
+### `--soft-deletes`
 
----
+Digunakan jika model menggunakan soft delete dan Anda ingin stub resource menyesuaikan query-nya.
 
-### Constraints & Rules
+### `--force`
 
-1. **Do not modify** any file under `vendor/` or any Filament core class.
-2. **Do not register** the new command by overriding Filament's command — register it independently in `app/Providers/AppServiceProvider.php` or a dedicated service provider.
-3. Action classes must only be created if the file **does not already exist** (no `--force` override for actions unless explicitly passed).
-4. All stub variables use `{{ double_curly }}` syntax, consistent with Laravel's default stub system.
-5. The command must be **fully testable** — no direct static calls or unresolvable dependencies.
+Digunakan untuk menimpa file yang sudah ada.
 
----
+## Studi Kasus
 
-### Acceptance Criteria
+Bayangkan Anda sedang membuat modul `Product`.
 
-- [x] `php artisan make:starter-resource User` generates all 4 files listed in the expected behavior table
-- [x] Re-running the command without `--force` does **not** overwrite existing files
-- [x] `--view` flag generates an additional `ViewUser.php` page with no action wiring (view only)
-- [x] `--soft-deletes` flag injects soft delete trait/scope into the resource stub
-- [x] Generated Action classes are skipped (not overwritten) if already present
-- [x] All behavior is covered by **Pest tests** in `tests/Feature/Console/Commands/MakeStarterResourceTest.php`
-- [x] Usage documented in `README.md` and `docs/11-make-starter-resource.md`
+Tanpa command ini, Anda biasanya perlu:
 
----
+- generate resource
+- buat create page
+- buat edit page
+- buat list page
+- buat table
+- buat form schema
+- buat infolist
+- buat action create/update/delete
+- hubungkan semuanya manual
 
-### Out of Scope
+Dengan command ini, beban itu berkurang drastis. Anda tinggal fokus pada:
 
-- Generating `form()` or `table()` column definitions (left to developer)
-- Generating migrations or model files
-- Modifying or wrapping `make:filament-resource`
+- field form
+- kolom table
+- business rule di action
+
+## Cara Pikir di Balik Command Ini
+
+Saya ingin generator membantu menghasilkan struktur yang "memaksa ke arah yang benar".
+
+Artinya:
+
+- developer baru tidak perlu menebak pola project
+- struktur resource lebih konsisten
+- action pattern lebih mudah diadopsi
+- copy-paste wiring berkurang
+
+Ini salah satu contoh bagaimana saya lebih memilih sedikit boilerplate generator daripada boilerplate manual berulang.
+
+## Hal yang Perlu Anda Lengkapi Setelah Generate
+
+Command ini tidak otomatis menyelesaikan semua hal. Setelah file dibuat, biasanya Anda masih perlu:
+
+- melengkapi field `form`
+- melengkapi `table`
+- melengkapi `infolist`
+- mengisi logic sebenarnya di action
+- menulis test jika resource punya perilaku khusus
+
+## Catatan
+
+- Jangan modifikasi file `vendor/` untuk menyesuaikan generator
+- Jika butuh perubahan struktur output, ubah stub dan command starter kit
+- Anggap hasil generate sebagai pondasi, bukan hasil final production-ready
