@@ -1,150 +1,98 @@
 # Filament Starter Kit
 
-Starter Kit untuk membangun aplikasi berbasis [Laravel 12](https://laravel.com/) + [Filament v5](https://filamentphp.com/).  
-Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** dengan praktik terbaik (Action Pattern, custom resource, dsb).
+Starter kit untuk membangun admin panel dengan [Laravel 12](https://laravel.com/) dan [Filament v5](https://filamentphp.com/).
 
----
+Fokus starter kit ini adalah struktur yang rapi, strict typing, dan pola kode yang enak dirawat untuk project jangka panjang. Cocok untuk developer yang suka pendekatan ketat seperti saat memakai TypeScript, tetapi di ekosistem Laravel.
 
-## ✨ Fitur yang Tersedia
+## Highlight
 
-- **Filament v5 Ready**: Dukungan penuh untuk Filament v5 dengan pola `HasSchemas` dan `InteractsWithSchemas`.
-- **Panel App**: Filament panel dengan ID `app` (bukan default `admin`).
-- **User & Post Resource**: CRUD lengkap untuk User dan Post dengan praktik terbaik.
-- **Action Pattern**: Logika bisnis yang terpisah menggunakan Action (`php artisan make:action`).
-- **Smoke Testing**: Pengujian otomatis untuk memastikan semua halaman publik dan terautentikasi dapat diakses (`tests/Feature/SmokeTest.php`).
-- **RBAC using Filament Shield**: Manajemen Role & Permission yang matang menggunakan `bezhansalleh/filament-shield`.
-- **Impersonation**: Fitur untuk masuk sebagai user lain menggunakan `stechstudio/filament-impersonate`.
-- **Custom Locale**: Konfigurasi Bahasa Indonesia (`id`) untuk aplikasi dan Faker.
-- **API Ready**: Integrasi API menggunakan `laravel/sanctum`.
-- **Global Unguard (Local Only)**: Menggunakan `Model::unguard()` saat development (`isLocal()`) demi fleksibilitas, dengan keamanan yang tetap terjaga melalui **Action Pattern**, **Strict Types**, dan **PHPDoc**.
+- Filament v5 ready
+- Laravel 12 + Livewire 4
+- Action Pattern dengan `handle()`
+- Strict type friendly
+- API ready dengan Laravel Sanctum
+- RBAC dengan Filament Shield
+- UUID-first untuk tabel baru
+- Laravel Boost ready
+- Pest, Pint, Larastan, dan Rector sudah siap
 
-## 🚀 Quick Start
+## Kenapa Pakai Starter Kit Ini
 
-### **Opsi 1: Install Baru dengan Laravel Installer**
+- Business logic tidak menumpuk di controller atau Filament page
+- Cocok untuk developer yang suka kode lebih strict dan lebih terstruktur
+- Lebih nyaman untuk scaling fitur daripada setup CRUD cepat yang serba campur
+- Sudah ada pondasi untuk testing, static analysis, dan refactor
 
-1.  Pastikan [Laravel Installer](https://laravel.com/docs/12.x/installation#installing-php), Jika Anda menggunakan **Laravel Herd** otomatis Anda sudah install `Laravel Installer`:
+## Cocok Untuk
 
-    Check `Laravel Installer` terpasang:
+- developer Laravel yang suka strict type
+- developer yang terbiasa dengan pola pikir TypeScript
+- admin panel internal
+- dashboard operasional
+- project yang ingin mulai rapi dari awal
 
-    ```bash
-    laravel --version
-    ```
+## Quick Start
 
-    <details>
-      <summary><strong>Panduan menginstal Laravel Installer</strong></summary>
-      Jika Anda sudah menginstal `PHP` dan `Composer`, Anda dapat menginstal `Laravel Installer` melalui Composer:
+### Install dengan Laravel Installer
 
-    ```bash
-    composer global require laravel/installer
-    ```
+```bash
+laravel new my-app --using=lyrihkaesa/filament-starter-kit
+cd my-app
+composer install
+npm install
+npm run build
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+composer dev
+```
 
-    </details>
+### Login Default
 
-2.  Buat project baru langsung dari starter kit:
+- Email: `admin@example.com`
+- Password: `password`
 
-    ```bash
-    laravel new my-app --using=lyrihkaesa/filament-starter-kit
-    cd my-app
-    ```
+## Stack
 
-3.  Jalankan perintah dibawah ini jika ada script saat create project ada yang gagal dimuat:
+- Laravel 12
+- Filament 5
+- Livewire 4
+- Sanctum
+- Filament Shield
+- Pest 4
+- Pint
+- Larastan
+- Rector
+- Laravel Boost
 
-    ```bash
-    composer install
-    npm install
-    npm run build
-    cp .env.example .env
-    php artisan migrate --seed
-    php artisan key:generate
-    ```
+## Pendekatan Utama
 
-4.  Jalankan server:
+- **Action Pattern** untuk business logic
+- **Sanctum** sebagai default API auth, bukan JWT
+- **UUID** sebagai rekomendasi default untuk tabel baru
+- **Strict typing** sebagai arah utama codebase
 
-    ```bash
-    composer dev
-    ```
+## Dokumentasi
 
-    Jika menggunakan `Laravel Herd` langsung saja dibrowser [http://filament-starter-kit.test](http://filament-starter-kit.test)
+Dokumentasi lengkap ada di folder [`docs`](./docs) dan otomatis ter-publish ke:
 
-5.  Login default (automatis input jika `APP_DEBUG=true`):
-    - Email: `admin@example.com`
-    - Password: `password`
+- [Dokumentasi Kaesa Filament Starter Kit](https://kaesa.charapon.my.id/filament-starter-kit)
 
-### **Opsi 2: Manual (Clone Repository)**
+Dokumen yang paling penting untuk mulai:
 
-1. Clone repository:
+- [`00-intro.md`](./docs/00-intro.md)
+- [`02-action-pattern.md`](./docs/02-action-pattern.md)
+- [`07-api.md`](./docs/07-api.md)
+- [`08-user-resource.md`](./docs/08-user-resource.md)
+- [`18-uuid-primary-keys.md`](./docs/18-uuid-primary-keys.md)
 
-    ```bash
-    git clone https://github.com/lyrihkaesa/filament-starter-kit.git
-    cd filament-starter-kit
-    ```
+## Quality Tools
 
-2. Install dependencies:
+- Test: `php artisan test`
+- Lint: `composer lint`
+- Static analysis: `composer test:types`
+- Refactor: `composer refactor`
 
-    ```bash
-    composer install
-    npm install
-    npm run build
-    ```
-
-3. Salin file `.env`:
-
-    ```bash
-    cp .env.example .env
-    ```
-
-4. Generate app key:
-
-    ```bash
-    php artisan key:generate
-    ```
-
-5. Migrasi database & jalankan seeder:
-
-    ```bash
-    php artisan migrate --seed
-    ```
-
-6. Jalankan server:
-
-    ```bash
-    composer dev
-    ```
-
----
-
-## 🛠 Quality & Development Tools
-
-Proyek ini dilengkapi dengan alat penjaminan kualitas untuk menjaga kode tetap bersih dan aman:
-
-| Alat                   | Kegunaan                                                                       | Perintah              |
-| :--------------------- | :----------------------------------------------------------------------------- | :-------------------- |
-| **🧪 Testing**         | Smoke & Feature Testing dengan [Pest v4](https://pestphp.com/)                 | `php artisan test`    |
-| **🔍 Static Analysis** | Analisis tipe statis dengan [Larastan](https://github.com/larastan/larastan)   | `composer test:types` |
-| **🎨 Code Style**      | Pemformatan kode otomatis dengan [Laravel Pint](https://laravel.com/docs/pint) | `composer lint`       |
-| **🛠 Refactoring**     | Modernisasi kode otomatis dengan [Rector](https://github.com/rectorphp/rector) | `composer refactor`   |
-
----
-
-## 📖 Dokumentasi Detail
-
-Dokumentasi dapat dilihat di folder `./docs/*.md` atau disini: [Dokumentasi Kaesa Filament Stater Kit](https://kaesa.charapon.my.id/filament-starter-kit)
-
----
-
-## 🔔 Background Jobs & Notifications
-
-Beberapa fitur seperti **Notifikasi Logout** menggunakan sistem antrean (Queue) Laravel.
-
-- Secara default di lokal (`.env`), `QUEUE_CONNECTION` diatur ke `database`.
-- Agar notifikasi muncul, Anda harus menjalankan worker:
-    ```bash
-    php artisan queue:work
-    ```
-- Untuk pengujian cepat tanpa worker, Anda bisa mengubah `.env` menjadi `QUEUE_CONNECTION=sync`.
-
----
-
-## 📜 Lisensi
+## Lisensi
 
 [MIT License](LICENSE)
