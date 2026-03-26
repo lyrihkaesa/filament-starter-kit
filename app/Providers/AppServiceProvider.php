@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Facades\Http;
 // use Illuminate\Support\Sleep;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -55,7 +58,9 @@ final class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(app()->isProduction());
 
         // 🛡️ Database: Jamin integritas transaksi (Laravel 11.10+)
-        DB::handlePotentiallyLostTransactions();
+        if (method_exists(DB::connection(), 'handlePotentiallyLostTransactions')) {
+            DB::handlePotentiallyLostTransactions();
+        }
 
         // 📅 Tanggal: Gunakan CarbonImmutable secara global (Laravel 8.x+)
         Date::use(CarbonImmutable::class);
@@ -72,5 +77,14 @@ final class AppServiceProvider extends ServiceProvider
         // if (app()->runningUnitTests()) {
         //     Sleep::fake();
         // }
+
+        RateLimiter::for('api', function (Request $request): Limit {
+            /** @var string $key */
+            $key = $request->user()?->getAuthIdentifier() ?? $request->ip();
+
+            return Limit::perMinute(60)->by($key);
+        });
+
+        RateLimiter::for('api-auth', fn (Request $request): Limit => Limit::perMinute(5)->by($request->ip()));
     }
 }
