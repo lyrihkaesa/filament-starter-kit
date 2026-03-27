@@ -16,22 +16,21 @@ beforeEach(function (): void {
     config(['session.driver' => 'database']);
 });
 
-it('can see the browser sessions on the consolidated profile page', function (): void {
+it('can see the active devices section on the consolidated profile page', function (): void {
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
     $this->get(EditProfile::getUrl())
         ->assertStatus(200)
-        ->assertSee(__('Browser Sessions'));
+        ->assertSee(__('Active Devices & Sessions'));
 });
 
-it('can logout other browser sessions from the consolidated profile page', function (): void {
+it('can revoke other sessions from the consolidated profile page', function (): void {
     $user = User::factory()->create(['password' => bcrypt('password')]);
 
     $this->actingAs($user);
 
-    // Simulate another session in database
     DB::table('sessions')->insert([
         'id' => 'another-session-id',
         'user_id' => $user->id,
@@ -42,8 +41,10 @@ it('can logout other browser sessions from the consolidated profile page', funct
     ]);
 
     Livewire::test(EditProfile::class)
-        ->call('logoutOtherBrowserSessions', 'password')
+        ->call('revokeOtherDevices', 'password')
         ->assertNotified();
 
-    expect(DB::table('sessions')->where('user_id', $user->id)->where('id', 'another-session-id')->count())->toBe(0);
+    expect(
+        DB::table('sessions')->where('user_id', $user->id)->where('id', 'another-session-id')->count()
+    )->toBe(0);
 });

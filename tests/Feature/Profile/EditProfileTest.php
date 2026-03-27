@@ -8,6 +8,7 @@ use App\Filament\Pages\Auth\EditProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -21,7 +22,7 @@ it('can see the consolidated profile page', function (): void {
         ->assertStatus(200)
         ->assertSee(__('Profile Information'))
         ->assertSee(__('Update Password'))
-        ->assertSee(__('Browser Sessions'));
+        ->assertSee(__('Active Devices & Sessions'));
 });
 
 it('can update profile information', function (): void {
@@ -43,27 +44,43 @@ it('can update profile information', function (): void {
         ->email->toBe('new@example.com');
 });
 
-it('can logout a single browser session', function (): void {
+it('can revoke a single web session', function (): void {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    // Mock another session in the database
     config(['session.driver' => 'database']);
     DB::table('sessions')->insert([
         'id' => 'other_session_id',
         'user_id' => $user->id,
         'ip_address' => '127.0.0.1',
-        'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'last_activity' => now()->timestamp,
-        'payload' => 'payload',
+        'payload' => '',
     ]);
 
     expect(DB::table('sessions')->where('id', 'other_session_id')->exists())->toBeTrue();
 
     Livewire::test(EditProfile::class)
-        ->call('logoutSession', 'other_session_id')
+        ->call('revokeDevice', 'session:other_session_id')
         ->assertHasNoErrors()
         ->assertNotified();
 
     expect(DB::table('sessions')->where('id', 'other_session_id')->exists())->toBeFalse();
+});
+
+it('can revoke a sanctum api token', function (): void {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $token = $user->createToken('mobile:Android:Pixel 8');
+    $tokenId = $token->accessToken->id;
+
+    expect(PersonalAccessToken::find($tokenId))->not->toBeNull();
+
+    Livewire::test(EditProfile::class)
+        ->call('revokeDevice', "token:{$tokenId}")
+        ->assertHasNoErrors()
+        ->assertNotified();
+
+    expect(PersonalAccessToken::find($tokenId))->toBeNull();
 });

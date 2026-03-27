@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Filament;
 
-use App\Actions\Profile\LogoutOtherBrowserSessionsAction;
-use App\Actions\Profile\LogoutSessionAction;
+use App\Actions\Profile\RevokeDeviceAction;
+use App\Actions\Profile\RevokeOtherDevicesAction;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Models\User;
 use Exception;
@@ -15,37 +15,56 @@ use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
-it('returns empty collection for browser sessions when driver is not database', function (): void {
+it('returns empty collection for active devices when session driver is not database', function (): void {
     config(['session.driver' => 'file']);
+
     $user = User::factory()->create();
     $this->actingAs($user);
 
     $page = new EditProfile();
 
-    // Test exception path in session ID
-    Session::shouldReceive('getId')->andThrow(new Exception());
-    $sessions = $page->getBrowserSessionsList();
-    expect($sessions)->toBeEmpty();
+    // Should not throw; tokens are returned even when sessions are unavailable
+    $devices = $page->getActiveDevicesList();
+
+    // No sessions (file driver) and no tokens created → expect empty
+    expect($devices)->toBeEmpty();
 });
 
-it('does nothing when logging out session and driver is not database', function (): void {
-    config(['session.driver' => 'file']);
+it('returns empty collection for active devices when session id throws', function (): void {
+    config(['session.driver' => 'database']);
+
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $page = new EditProfile();
-    $page->logoutSession('any-id', resolve(LogoutSessionAction::class));
+    Session::shouldReceive('getId')->andThrow(new Exception('No session'));
 
-    expect(true)->toBeTrue(); // No exception thrown
+    $page = new EditProfile();
+    $devices = $page->getActiveDevicesList();
+
+    // Sessions query throws, tokens are empty → empty list
+    expect($devices)->toBeEmpty();
 });
 
-it('can call logoutOtherBrowserSessions on the page', function (): void {
+it('does nothing when revoking a device with file session driver', function (): void {
     config(['session.driver' => 'file']);
+
     $user = User::factory()->create();
     $this->actingAs($user);
 
     $page = new EditProfile();
-    $page->logoutOtherBrowserSessions('password', resolve(LogoutOtherBrowserSessionsAction::class));
+    $page->revokeDevice('session:any-id', resolve(RevokeDeviceAction::class));
+
+    expect(true)->toBeTrue();
+});
+
+it('can call revokeOtherDevices on the page without exception', function (): void {
+    config(['session.driver' => 'file']);
+
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $page = new EditProfile();
+    $page->revokeOtherDevices('password', resolve(RevokeOtherDevicesAction::class));
 
     expect(true)->toBeTrue();
 });

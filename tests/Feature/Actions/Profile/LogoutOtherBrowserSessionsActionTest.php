@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Actions\Profile\LogoutOtherBrowserSessionsAction;
+use App\Actions\Profile\RevokeOtherDevicesAction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Laravel\Sanctum\PersonalAccessToken;
 
 uses(RefreshDatabase::class);
 
@@ -16,104 +17,79 @@ beforeEach(function (): void {
     app()->setLocale('en');
 });
 
-it('clears other database sessions when logging out other devices', function (): void {
-    // Arrange: Use database session driver
+it('clears other database sessions when revoking other devices', function (): void {
     config(['session.driver' => 'database']);
 
     $user = User::factory()->create(['password' => bcrypt('password123')]);
 
-    // Create current session
     $currentSessionId = 'current_session_id';
     Session::shouldReceive('getId')->andReturn($currentSessionId);
 
-    // Create other user for session
     $otherUser = User::factory()->create();
 
     DB::table('sessions')->insert([
-        [
-            'id' => $currentSessionId,
-            'user_id' => $user->id,
-            'ip_address' => '127.0.0.1',
-            'user_agent' => 'Mozilla/5.0',
-            'payload' => 'payload',
-            'last_activity' => time(),
-        ],
-        [
-            'id' => 'user_other_session',
-            'user_id' => $user->id,
-            'ip_address' => '127.0.0.1',
-            'user_agent' => 'Mozilla/5.0',
-            'payload' => 'payload',
-            'last_activity' => time(),
-        ],
-        [
-            'id' => 'other_user_session',
-            'user_id' => $otherUser->id,
-            'ip_address' => '127.0.0.1',
-            'user_agent' => 'Mozilla/5.0',
-            'payload' => 'payload',
-            'last_activity' => time(),
-        ],
+        ['id' => $currentSessionId, 'user_id' => $user->id, 'ip_address' => '127.0.0.1', 'user_agent' => 'Mozilla/5.0', 'payload' => '', 'last_activity' => time()],
+        ['id' => 'user_other_session', 'user_id' => $user->id, 'ip_address' => '127.0.0.1', 'user_agent' => 'Mozilla/5.0', 'payload' => '', 'last_activity' => time()],
+        ['id' => 'other_user_session', 'user_id' => $otherUser->id, 'ip_address' => '127.0.0.1', 'user_agent' => 'Mozilla/5.0', 'payload' => '', 'last_activity' => time()],
     ]);
 
-    // Mock Auth::guard()->logoutOtherDevices
     Auth::shouldReceive('guard->logoutOtherDevices')
         ->once()
         ->with('password123');
 
-    $action = resolve(LogoutOtherBrowserSessionsAction::class);
+    resolve(RevokeOtherDevicesAction::class)->handle($user, 'password123');
 
-    // Act: Logout other devices
-    $action->handle($user, 'password123');
-
-    // Assert: Only current session remains for the user, other user's session remains
     $this->assertDatabaseHas('sessions', ['id' => $currentSessionId]);
     $this->assertDatabaseMissing('sessions', ['id' => 'user_other_session']);
     $this->assertDatabaseHas('sessions', ['id' => 'other_user_session']);
 
-    // Assert: Notification is created
-    $this->assertDatabaseHas('notifications', [
-        'notifiable_id' => $user->id,
-        'notifiable_type' => $user->getMorphClass(),
-    ]);
-
-    $notification = DB::table('notifications')
-        ->where('notifiable_id', $user->id)
-        ->first();
-
-    $data = json_decode((string) $notification->data, true);
+    $data = json_decode((string) DB::table('notifications')->where('notifiable_id', $user->id)->value('data'), true);
     expect($data['title'])->toBe('Other Devices Logged Out');
 });
 
-it('does not attempt to clear database sessions if driver is not database', function (): void {
-    // Arrange: Use file session driver
+it('also revokes all sanctum tokens when revoking other devices', function (): void {
+    config(['session.driver' => 'database']);
+
+    $user = User::factory()->create(['password' => bcrypt('password123')]);
+
+    Session::shouldReceive('getId')->andReturn('current_session');
+    Auth::shouldReceive('guard->logoutOtherDevices')->once()->with('password123');
+
+    $user->createToken('mobile:Android:Pixel 8');
+    $user->createToken('mobile:iOS:iPhone 15');
+
+    expect(PersonalAccessToken::where('tokenable_id', $user->id)->count())->toBe(2);
+
+    resolve(RevokeOtherDevicesAction::class)->handle($user, 'password123');
+
+    expect(PersonalAccessToken::where('tokenable_id', $user->id)->count())->toBe(0);
+});
+
+it('still revokes tokens even when session driver is not database', function (): void {
     config(['session.driver' => 'file']);
 
     $user = User::factory()->create(['password' => bcrypt('password123')]);
 
-    // Mock Auth::guard()->logoutOtherDevices
-    Auth::shouldReceive('guard->logoutOtherDevices')
-        ->once()
-        ->with('password123');
+    Auth::shouldReceive('guard->logoutOtherDevices')->once()->with('password123');
 
-    $action = resolve(LogoutOtherBrowserSessionsAction::class);
+    $user->createToken('mobile:Android:Pixel 8');
 
-    // Act: Logout other devices
-    $action->handle($user, 'password123');
+    expect(PersonalAccessToken::where('tokenable_id', $user->id)->count())->toBe(1);
 
-    // Assert: It runs without error and DB is not touched for sessions
-    expect(true)->toBeTrue();
+    resolve(RevokeOtherDevicesAction::class)->handle($user, 'password123');
+
+    expect(PersonalAccessToken::where('tokenable_id', $user->id)->count())->toBe(0);
 });
 
 it('handles session exception when getting id', function (): void {
     config(['session.driver' => 'database']);
+
     $user = User::factory()->create(['password' => bcrypt('password123')]);
 
     Session::shouldReceive('getId')->andThrow(new Exception('No session'));
     Auth::shouldReceive('guard->logoutOtherDevices')->once();
 
-    $action = resolve(LogoutOtherBrowserSessionsAction::class);
-    $action->handle($user, 'password123');
+    resolve(RevokeOtherDevicesAction::class)->handle($user, 'password123');
 
     expect(true)->toBeTrue();
 });

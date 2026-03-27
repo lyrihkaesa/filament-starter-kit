@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use App\Actions\Profile\LogoutOtherBrowserSessionsAction;
-use App\Actions\Profile\LogoutSessionAction;
+use App\Actions\Profile\RevokeDeviceAction;
+use App\Actions\Profile\RevokeOtherDevicesAction;
 use App\Actions\Profile\UpdateUserPasswordAction;
+use App\Data\DeviceInfo;
 use App\Models\User;
+use DeviceDetector\DeviceDetector;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Facades\Filament;
@@ -27,8 +29,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Sanctum\PersonalAccessToken;
 use RuntimeException;
-use stdClass;
 use Throwable;
 
 /**
@@ -65,7 +67,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->components([
                 $this->getProfileSection(),
                 $this->getPasswordSection(),
-                $this->getBrowserSessionsSection(),
+                $this->getActiveDevicesSection(),
             ]);
     }
 
@@ -143,13 +145,18 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->send();
     }
 
-    public function logoutSession(string $sessionId, LogoutSessionAction $action): void
+    /**
+     * Revoke a single active device (web session or API token).
+     *
+     * @param  string  $prefixedDeviceId  Prefixed ID: "session:{id}" or "token:{id}"
+     */
+    public function revokeDevice(string $prefixedDeviceId, RevokeDeviceAction $action): void
     {
         $user = Auth::user();
 
         throw_unless($user instanceof User, RuntimeException::class, 'User must be authenticated.');
 
-        $action->handle($user, $sessionId);
+        $action->handle($user, $prefixedDeviceId);
 
         Notification::make()
             ->title(__('Done.'))
@@ -157,7 +164,10 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->send();
     }
 
-    public function logoutOtherBrowserSessions(string $password, LogoutOtherBrowserSessionsAction $action): void
+    /**
+     * Revoke all other active devices (other web sessions + all API tokens).
+     */
+    public function revokeOtherDevices(string $password, RevokeOtherDevicesAction $action): void
     {
         $user = Auth::user();
 
@@ -172,60 +182,18 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
     }
 
     /**
-     * @return Collection<int|string, mixed>
+     * Build a unified list of active devices from both web sessions and API tokens.
+     *
+     * @return Collection<int, DeviceInfo>
      */
-    public function getBrowserSessionsList(): Collection
+    public function getActiveDevicesList(): Collection
     {
-        if (config('session.driver') !== 'database') {
-            return collect();
-        }
+        $devices = collect();
 
-        $currentSessionIdRaw = null;
-        try {
-            $currentSessionIdRaw = session()->getId();
-        } catch (Throwable) {
-            // No session
-        }
+        $devices = $devices->merge($this->mapSessionsToDevices());
+        $devices = $devices->merge($this->mapTokensToDevices());
 
-        /** @var Collection<int, stdClass> $sessions */
-        $sessions = DB::table('sessions')
-            ->where('user_id', Auth::id())
-            ->orderBy('last_activity', 'desc')
-            ->get()
-            ->map(function (object $session) use ($currentSessionIdRaw): stdClass {
-                /** @var stdClass $session */
-                $userAgent = is_string($session->user_agent) ? $session->user_agent : '';
-                $agent = $this->createAgent($userAgent);
-
-                /** @var scalar $id */
-                $id = $session->id ?? '';
-                $sessionId = (string) $id;
-
-                /** @var scalar $ip */
-                $ip = $session->ip_address ?? '';
-                $ipAddress = (string) $ip;
-
-                /** @var scalar $activity */
-                $activity = $session->last_activity ?? 0;
-                $lastActive = Date::createFromTimestamp((int) $activity)->diffForHumans();
-
-                $sessionObj = new stdClass();
-                $sessionObj->id = $sessionId;
-                $sessionObj->agent = (object) [
-                    'is_desktop' => $agent['is_desktop'],
-                    'platform' => $agent['platform'],
-                    'browser' => $agent['browser'],
-                ];
-                $sessionObj->ip_address = $ipAddress;
-                $sessionObj->is_current_device = $currentSessionIdRaw && $sessionId === (string) $currentSessionIdRaw;
-                $sessionObj->last_active = $lastActive;
-
-                return $sessionObj;
-            })
-            ->values();
-
-        // @phpstan-ignore return.type
-        return $sessions;
+        return $devices->values();
     }
 
     /**
@@ -275,29 +243,29 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->aside();
     }
 
-    protected function getBrowserSessionsSection(): Section
+    protected function getActiveDevicesSection(): Section
     {
-        return Section::make(__('Browser Sessions'))
-            ->description(__('Manage and log out your active sessions on other browsers and devices.'))
+        return Section::make(__('Active Devices & Sessions'))
+            ->description(__('Manage and sign out your active sessions and connected devices.'))
             ->schema([
-                View::make('livewire.profile.browser-sessions-list')
-                    ->viewData(['browser_sessions_data' => $this->getBrowserSessionsList()]),
+                View::make('livewire.profile.active-devices-list')
+                    ->viewData(['active_devices' => $this->getActiveDevicesList()]),
             ])
             ->aside()
             ->footer([
-                $this->getLogoutOtherSessionsAction(),
+                $this->getRevokeOtherDevicesAction(),
             ]);
     }
 
-    protected function getLogoutOtherSessionsAction(): Action
+    protected function getRevokeOtherDevicesAction(): Action
     {
-        return Action::make('logoutOtherBrowserSessions')
-            ->label(__('Log Out Other Browser Sessions'))
+        return Action::make('revokeOtherDevices')
+            ->label(__('Sign Out Other Devices'))
             ->color('danger')
             ->requiresConfirmation()
-            ->modalHeading(__('Log Out Other Browser Sessions'))
-            ->modalDescription(__('Please enter your password to confirm you would like to log out of your other browser sessions across all of your devices.'))
-            ->modalSubmitActionLabel(__('Log Out Other Browser Sessions'))
+            ->modalHeading(__('Sign Out Other Devices'))
+            ->modalDescription(__('Please enter your password to confirm you would like to sign out from all other devices.'))
+            ->modalSubmitActionLabel(__('Sign Out Other Devices'))
             ->form([
                 TextInput::make('password')
                     ->label(__('Password'))
@@ -306,53 +274,136 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->required()
                     ->currentPassword(guard: Filament::getAuthGuard()),
             ])
-            ->action(function (array $data, LogoutOtherBrowserSessionsAction $action): void {
+            ->action(function (array $data, RevokeOtherDevicesAction $action): void {
                 $password = $data['password'] ?? '';
 
                 if (! is_string($password)) {
                     return;
                 }
 
-                $this->logoutOtherBrowserSessions($password, $action);
+                $this->revokeOtherDevices($password, $action);
             });
     }
 
     /**
-     * @return array{is_desktop: bool, browser: string, platform: string}
+     * @return Collection<int, DeviceInfo>
      */
-    protected function createAgent(string $userAgent): array
+    private function mapSessionsToDevices(): Collection
     {
-        $isMobile = (bool) preg_match('/Mobile|Android|iPhone|iPad|Phone/i', $userAgent);
-
-        $browser = 'Unknown Browser';
-        if (preg_match('/Edge|Edg/i', $userAgent)) {
-            $browser = 'Edge';
-        } elseif (preg_match('/Chrome/i', $userAgent)) {
-            $browser = 'Chrome';
-        } elseif (preg_match('/Safari/i', $userAgent)) {
-            $browser = 'Safari';
-        } elseif (preg_match('/Firefox/i', $userAgent)) {
-            $browser = 'Firefox';
+        if (config('session.driver') !== 'database') {
+            return collect();
         }
 
-        $platform = 'Unknown OS';
-        if (preg_match('/Android/i', $userAgent)) {
-            $platform = 'Android';
-        } elseif (preg_match('/iPhone|iPad/i', $userAgent)) {
-            $platform = 'iOS';
-        } elseif (preg_match('/Windows/i', $userAgent)) {
-            $platform = 'Windows';
-        } elseif (preg_match('/Mac/i', $userAgent)) {
-            $platform = 'macOS';
-        } elseif (preg_match('/Linux/i', $userAgent)) {
-            $platform = 'Linux';
+        $currentSessionId = null;
+
+        try {
+            $currentSessionId = session()->getId();
+        } catch (Throwable) {
+            // No session available
         }
 
-        return [
-            'is_desktop' => ! $isMobile,
-            'browser' => $browser,
-            'platform' => $platform,
-        ];
+        return DB::table('sessions')
+            ->where('user_id', Auth::id())
+            ->orderBy('last_activity', 'desc')
+            ->get()
+            ->map(function (object $session) use ($currentSessionId): DeviceInfo {
+                /** @var scalar $id */
+                $id = $session->id ?? '';
+                $sessionId = (string) $id;
+
+                /** @var scalar $ip */
+                $ip = $session->ip_address ?? '';
+
+                $userAgent = is_string($session->user_agent) ? $session->user_agent : '';
+                $parsed = $this->parseUserAgent($userAgent);
+
+                /** @var scalar $activity */
+                $activity = $session->last_activity ?? 0;
+
+                return new DeviceInfo(
+                    deviceId: "session:{$sessionId}",
+                    type: $parsed['type'],
+                    label: $parsed['label'],
+                    ipAddress: (string) $ip,
+                    lastActiveAt: Date::createFromTimestamp((int) $activity)->diffForHumans(),
+                    isCurrentDevice: $currentSessionId !== null && $sessionId === $currentSessionId,
+                );
+            })->values();
+    }
+
+    /**
+     * @return Collection<int, DeviceInfo>
+     */
+    private function mapTokensToDevices(): Collection
+    {
+        $user = Auth::user();
+
+        if (! ($user instanceof User)) {
+            return collect();
+        }
+
+        return PersonalAccessToken::query()
+            ->where('tokenable_id', $user->id)
+            ->where('tokenable_type', $user->getMorphClass())
+            ->orderByDesc('last_used_at')
+            ->get()
+            ->map(function (PersonalAccessToken $token): DeviceInfo {
+                $userAgent = is_string($token->user_agent) ? $token->user_agent : '';
+                $parsed = $this->parseUserAgent($userAgent);
+
+                $lastActive = $token->last_used_at
+                    ? $token->last_used_at->diffForHumans()
+                    : $token->created_at?->diffForHumans() ?? '-';
+
+                return new DeviceInfo(
+                    deviceId: "token:{$token->id}",
+                    type: $parsed['type'],
+                    label: $token->name,
+                    ipAddress: is_string($token->ip_address) ? $token->ip_address : '',
+                    lastActiveAt: $lastActive,
+                    isCurrentDevice: false,
+                );
+            })->values();
+    }
+
+    /**
+     * Parse a User-Agent string using DeviceDetector and return a normalized type and label.
+     *
+     * @return array{type: 'web_session'|'mobile_app'|'desktop_app'|'api_client', label: string}
+     */
+    private function parseUserAgent(string $userAgent): array
+    {
+        if ($userAgent === '') {
+            return ['type' => 'api_client', 'label' => 'Unknown Device'];
+        }
+
+        $detector = new DeviceDetector($userAgent);
+        $detector->parse();
+
+        $client = $detector->getClient();
+        $os = $detector->getOs();
+
+        $clientName = is_array($client) && isset($client['name']) ? (string) $client['name'] : 'Unknown';
+        $osName = is_array($os) && isset($os['name']) ? (string) $os['name'] : 'Unknown';
+
+        $isBot = $detector->isBot();
+
+        if ($isBot) {
+            return ['type' => 'api_client', 'label' => "{$clientName}"];
+        }
+
+        if ($detector->isMobile()) {
+            return ['type' => 'mobile_app', 'label' => "{$clientName} on {$osName}"];
+        }
+
+        // DeviceDetector identifies browser-based clients; non-browser clients are API clients.
+        $clientType = is_array($client) && isset($client['type']) ? (string) $client['type'] : '';
+
+        if (in_array($clientType, ['browser', ''], true)) {
+            return ['type' => 'web_session', 'label' => "{$clientName} on {$osName}"];
+        }
+
+        return ['type' => 'api_client', 'label' => "{$clientName} on {$osName}"];
     }
 
     // @codeCoverageIgnoreEnd
