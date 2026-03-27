@@ -6,6 +6,10 @@ namespace App\Filament\Pages\Auth;
 
 final class Login extends \Filament\Auth\Pages\Login
 {
+    protected static string $layout = 'layouts.auth';
+
+    protected string $view = 'filament.pages.auth.login';
+
     public function mount(): void
     {
         parent::mount();

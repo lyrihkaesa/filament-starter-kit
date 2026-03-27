@@ -6,6 +6,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\Auth\Register;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -34,7 +35,7 @@ final class AppPanelProvider extends PanelProvider
             ->path('app')
             ->favicon(asset('images/logo-128x128.png'))
             ->login(Login::class)
-            ->registration()
+            ->registration(Register::class)
             ->passwordReset()
             // ->emailVerification()
             // ->emailChangeVerification()
