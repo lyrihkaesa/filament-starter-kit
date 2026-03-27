@@ -31,6 +31,18 @@
     "Failed to log out session.": "Gagal keluar dari sesi.",
     "Log Out Successful": "Berhasil Keluar",
     "You have been logged out from :device (:ip). Last active: :last_active": "Anda telah keluar dari :device (:ip). Terakhir aktif: :last_active",
-    "Other Devices Logged Out": "Sesi Browser Lain Berhasil Keluar",
-    "All other browser sessions have been logged out successfully.": "Semua sesi browser lainnya telah berhasil dinonaktifkan."
+    "Other Devices Logged Out": "Sesi Lain Berhasil Keluar",
+    "All other browser sessions have been logged out successfully.": "Semua sesi browser lainnya telah berhasil dinonaktifkan.",
+    "Active Devices & Sessions": "Perangkat & Sesi Aktif",
+    "Manage and sign out your active sessions and connected devices.": "Kelola dan keluar dari sesi aktif dan perangkat yang terhubung.",
+    "Sign Out Other Devices": "Keluar dari Perangkat Lain",
+    "Please enter your password to confirm you would like to sign out from all other devices.": "Silakan masukkan kata sandi Anda untuk mengonfirmasi bahwa Anda ingin keluar dari semua perangkat lainnya.",
+    "Sign Out Device": "Keluar dari Perangkat",
+    "Are you sure you want to sign out from \":device\"? This will immediately terminate the session or revoke the access token.": "Apakah Anda yakin ingin keluar dari \":device\"? Ini akan segera mengakhiri sesi atau mencabut token akses.",
+    "No active devices found.": "Tidak ada perangkat aktif yang ditemukan.",
+    "Sign Out": "Keluar",
+    "Unknown Device": "Perangkat Tidak Diketahui",
+    "Device Disconnected": "Perangkat Terputus",
+    "The device \":name\" has been disconnected. Last active: :last_active": "Perangkat \":name\" telah terputus. Terakhir aktif: :last_active",
+    "All other sessions and connected devices have been signed out successfully.": "Semua sesi lain dan perangkat yang terhubung telah berhasil dikeluarkan."
 }
