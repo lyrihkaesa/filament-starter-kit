@@ -1,0 +1,32 @@
+meta {
+  name: Get Profile
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/me
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{access_token}}
+}
+
+script:pre-request {
+  // Debug to see if variable is available
+  // console.log("Current access_token: ", bru.getVar("access_token"));
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has user data", function() {
+    const body = res.getBody();
+    const data = body.data || body;
+    expect(data.email).to.be.a('string');
+  });
+}

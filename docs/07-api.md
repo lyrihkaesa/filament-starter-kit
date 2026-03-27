@@ -518,6 +518,23 @@ Supaya struktur project tetap bersih:
 
 Jadi, action tidak bertugas mengecek ability token.
 
+## Automated API Testing (Bruno)
+
+Untuk memudahkan pengembangan dan integrasi, starter kit ini menyertakan koleksi **Bruno API Client** yang terletak di folder `api-tests/bruno`.
+
+### Fitur Utama:
+- **Git-Friendly**: Disimpan dalam format `.bru` yang mudah di-tracking.
+- **Automated Auth**: Script login otomatis menyimpan token Sanctum untuk dipakai request berikutnya (`me`, `logout`, dsb).
+- **Environment Support**: Mendukung environment `local` dengan variabel `{{base_url}}`.
+
+### Cara Menjalankan:
+1. Pakai ekstensi **Bruno** di VS Code.
+2. Buka folder `api-tests/bruno`.
+3. Pilih environment `local`.
+4. Jalankan alur `Login` -> `Get Profile`.
+
+Detail lebih lanjut ada di [api-tests/README.md](../api-tests/README.md).
+
 ## Referensi
 
 - Laravel Sanctum: [https://laravel.com/docs/12.x/sanctum](https://laravel.com/docs/12.x/sanctum)

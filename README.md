@@ -89,6 +89,7 @@ Dokumen yang paling penting untuk mulai:
 ## Quality Tools
 
 - Test: `php artisan test`
+- API Test: `bru run api-tests/bruno --env local`
 - Lint: `composer lint`
 - Static analysis: `composer test:types`
 - Refactor: `composer refactor`

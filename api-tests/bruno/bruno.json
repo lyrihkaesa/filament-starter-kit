@@ -1,0 +1,9 @@
+{
+  "name": "Filament Starter Kit API",
+  "version": "1",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
