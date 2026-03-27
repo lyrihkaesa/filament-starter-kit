@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
@@ -70,37 +71,67 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->anonymized_at !== null;
     }
 
+    public function isSoftDeleted(): bool
+    {
+        return $this->deleted_at !== null && $this->anonymized_at === null;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->deleted_at === null && $this->anonymized_at === null;
+    }
+
     public function anonymize(): void
     {
-        $uuid = uuid_create();
+        DB::transaction(function (): void {
+            $uuid = Str::uuid()->toString();
 
-        $this->update([
-            'name' => 'Anonymous User',
-            'email' => 'anonymous_'.(is_scalar($uuid) ? (string) $uuid : 'unknown').'@example.com',
-            'password' => bcrypt(Str::random(40)),
-            'anonymized_at' => now(),
-        ]);
+            // Clear roles and permissions
+            if (method_exists($this, 'syncRoles')) {
+                $this->syncRoles([]);
+            }
+            if (method_exists($this, 'syncPermissions')) {
+                $this->syncPermissions([]);
+            }
+
+            // Clear avatar
+            if ($this->avatar) {
+                Storage::disk(config()->string('filament.default_filesystem_disk'))->delete($this->avatar);
+            }
+
+            $this->update([
+                'name' => 'Anonymous User',
+                'email' => "anonymous_{$uuid}@example.com",
+                'email_verified_at' => null,
+                'password' => bcrypt(Str::random(40)),
+                'avatar' => null,
+                'anonymized_at' => now(),
+            ]);
+
+            // Ensure they stay "deleted" if they were soft-deleted
+            if (! $this->trashed()) {
+                $this->delete();
+            }
+        });
     }
 
     public function canAccessPanel(Panel $panel): bool
     {
+        if ($this->isAnonymous()) {
+            return false;
+        }
+
         return true;
     }
 
     public function canImpersonate(): bool
     {
-        // Let's prevent being impersonated by other users at our own company
-        // example:
-        // return $this->email === 'member@example.com';
-        return true;
+        return ! $this->isAnonymous();
     }
 
     public function canBeImpersonated(): bool
     {
-        // Let's prevent being impersonated by other users at our own company
-        // example:
-        // return $this->email === 'member@example.com';
-        return true;
+        return ! $this->isAnonymous();
     }
 
     /**
@@ -111,8 +142,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     // @codeCoverageIgnoreStart
     public function getFilamentAvatarUrl(): ?string
     {
-        if ($this->avatar === null) {
-            // return asset('images/thumbnails/images-dark-500x500.jpg');
+        if ($this->avatar === null || $this->isAnonymous()) {
             return null;
         }
 

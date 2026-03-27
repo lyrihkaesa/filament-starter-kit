@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\Tables;
 
-use App\Actions\Users\DeleteUserAction;
+use App\Actions\Profile\DeleteUserAccountAction;
+use App\Actions\Profile\RestoreUserAccountAction;
 use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -16,7 +17,6 @@ use Filament\Actions\ViewAction;
 use Filament\Support\Enums\IconSize;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use STS\FilamentImpersonate\Actions\Impersonate;
 
@@ -41,6 +41,19 @@ final class UsersTable
                     ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('status')
+                    ->label(__('Status'))
+                    ->badge()
+                    ->state(fn (User $record): string => match (true) {
+                        $record->isAnonymous() => __('Anonymized'),
+                        $record->trashed() => __('Deleted (Pending Anonymization)'),
+                        default => __('Active'),
+                    })
+                    ->color(fn (User $record): string => match (true) {
+                        $record->isAnonymous() => 'info',
+                        $record->trashed() => 'danger',
+                        default => 'success',
+                    }),
                 TextColumn::make('created_at')
                     ->label(__('Created at'))
                     ->since()
@@ -53,7 +66,24 @@ final class UsersTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make(),
+                \Filament\Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'active' => __('Active'),
+                        'deleted' => __('Deleted (Pending Anonymization)'),
+                        'anonymized' => __('Anonymized'),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        if (empty($data['value'])) {
+                            return $query->whereNull('deleted_at');
+                        }
+
+                        return match ($data['value']) {
+                            'active' => $query->whereNull('deleted_at')->whereNull('anonymized_at'),
+                            'deleted' => $query->onlyTrashed()->whereNull('anonymized_at'),
+                            'anonymized' => $query->withTrashed()->whereNotNull('anonymized_at'),
+                            default => $query,
+                        };
+                    }),
             ])
             ->recordActions([
                 Impersonate::make()
@@ -63,7 +93,9 @@ final class UsersTable
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
-                    ->using(fn (User $record, DeleteUserAction $deleteAction) => $deleteAction->handle($record)),
+                    ->using(fn (User $record, DeleteUserAccountAction $deleteAction) => $deleteAction->handle($record)),
+                \Filament\Actions\RestoreAction::make()
+                    ->using(fn (User $record, RestoreUserAccountAction $restoreAction) => $restoreAction->handle($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

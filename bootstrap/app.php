@@ -86,4 +86,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 ],
             ], Response::HTTP_NOT_FOUND);
         });
-    })->create();
+    })
+    ->withSchedule(function (Illuminate\Console\Scheduling\Schedule $schedule): void {
+        $schedule->command('app:anonymize-deleted-users')->daily();
+    })
+    ->create();

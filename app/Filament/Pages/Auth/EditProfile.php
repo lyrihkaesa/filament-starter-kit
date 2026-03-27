@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Actions\Profile\DeleteUserAccountAction;
 use App\Actions\Profile\RevokeDeviceAction;
 use App\Actions\Profile\RevokeOtherDevicesAction;
 use App\Actions\Profile\UpdateUserPasswordAction;
@@ -28,6 +29,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\PersonalAccessToken;
 use RuntimeException;
@@ -68,6 +70,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                 $this->getProfileSection(),
                 $this->getPasswordSection(),
                 $this->getActiveDevicesSection(),
+                $this->getDeleteAccountSection(),
             ]);
     }
 
@@ -85,7 +88,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->imageEditor()
                     ->circleCropper()
                     ->directory('avatars'),
-                $this->getNameFormComponent(),
+                $this->getNameFormComponent()->autofocus(false),
                 $this->getEmailFormComponent(),
                 Select::make('roles')
                     ->label(__('Roles'))
@@ -196,6 +199,36 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         return $devices->values();
     }
 
+    public function deleteAccount(string $password, DeleteUserAccountAction $action): void
+    {
+        if (! Hash::check($password, Auth::user()->getAuthPassword())) {
+            $this->addError('password', __('The password you entered is incorrect.'));
+
+            return;
+        }
+
+        $user = Auth::user();
+
+        throw_unless($user instanceof User, RuntimeException::class, 'User must be authenticated.');
+
+        $action->handle($user);
+
+        Filament::auth()->logout();
+
+        session()->invalidate();
+        session()->regenerateToken();
+
+        Notification::make()
+            ->title(__('Account Deleted'))
+            ->body(__('Your account has been queued for deletion. It will be permanently anonymized in 30 days. You can contact support if you wish to restore it before then.'))
+            ->success()
+            ->send();
+
+        // dump('Redirecting to: ' . Filament::getLoginUrl());
+
+        $this->redirect(Filament::getLoginUrl());
+    }
+
     /**
      * @return array<int, string>
      */
@@ -282,6 +315,47 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                 }
 
                 $this->revokeOtherDevices($password, $actionRevoke);
+            });
+    }
+
+    protected function getDeleteAccountSection(): Section
+    {
+        return Section::make(__('Delete Account'))
+            ->description(__('Once your account is deleted, all of its resources and data will be permanently anonymized. Before deleting your account, please download any data or information that you wish to retain.'))
+            ->schema([
+                //
+            ])
+            ->aside()
+            ->footer([
+                $this->getDeleteAccountAction(),
+            ]);
+    }
+
+    protected function getDeleteAccountAction(): Action
+    {
+        return Action::make('deleteAccount')
+            ->label(__('Delete Account'))
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading(__('Are you sure you want to delete your account?'))
+            ->modalDescription(__('Once your account is deleted, all of its resources and data will be permanently anonymized. Please enter your password to confirm you would like to permanently delete your account.'))
+            ->modalSubmitActionLabel(__('Delete Account'))
+            ->form([
+                TextInput::make('password')
+                    ->label(__('Password'))
+                    ->password()
+                    ->revealable()
+                    ->required()
+                    ->currentPassword(guard: Filament::getAuthGuard()),
+            ])
+            ->action(function (array $data, DeleteUserAccountAction $deleteUserAccountAction): void {
+                $password = $data['password'] ?? '';
+
+                if (! is_string($password)) {
+                    return;
+                }
+
+                $this->deleteAccount($password, $deleteUserAccountAction);
             });
     }
 
