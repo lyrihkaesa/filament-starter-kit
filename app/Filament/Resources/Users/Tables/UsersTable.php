@@ -45,8 +45,8 @@ final class UsersTable
                     ->label(__('Status'))
                     ->badge()
                     ->state(fn (User $record): string => match (true) {
-                        $record->isAnonymous() => __('Anonymized'),
-                        $record->trashed() => __('Deleted (Pending Anonymization)'),
+                        $record->isAnonymous() => __('Permanently Deleted'),
+                        $record->trashed() => __('Deleted'),
                         default => __('Active'),
                     })
                     ->color(fn (User $record): string => match (true) {
@@ -69,8 +69,8 @@ final class UsersTable
                 \Filament\Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'active' => __('Active'),
-                        'deleted' => __('Deleted (Pending Anonymization)'),
-                        'anonymized' => __('Anonymized'),
+                        'deleted' => __('Deleted'),
+                        'anonymized' => __('Permanently Deleted'),
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         if (empty($data['value'])) {

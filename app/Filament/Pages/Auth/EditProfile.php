@@ -220,7 +220,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
 
         Notification::make()
             ->title(__('Account Deleted'))
-            ->body(__('Your account has been queued for deletion. It will be permanently anonymized in 30 days. You can contact support if you wish to restore it before then.'))
+            ->body(__('Your account has been scheduled for deletion. You have 30 days to restore it by contacting support.'))
             ->success()
             ->send();
 
@@ -321,7 +321,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
     protected function getDeleteAccountSection(): Section
     {
         return Section::make(__('Delete Account'))
-            ->description(__('Once your account is deleted, all of its resources and data will be permanently anonymized. Before deleting your account, please download any data or information that you wish to retain.'))
+            ->description(__('Once your account is deleted, you have 30 days to restore it. If not restored within 30 days, the account will be permanently deleted and you will no longer be able to log in.'))
             ->schema([
                 //
             ])
@@ -338,7 +338,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->color('danger')
             ->requiresConfirmation()
             ->modalHeading(__('Are you sure you want to delete your account?'))
-            ->modalDescription(__('Once your account is deleted, all of its resources and data will be permanently anonymized. Please enter your password to confirm you would like to permanently delete your account.'))
+            ->modalDescription(__('Please enter your password to confirm account deletion.'))
             ->modalSubmitActionLabel(__('Delete Account'))
             ->form([
                 TextInput::make('password')

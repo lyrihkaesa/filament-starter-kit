@@ -44,5 +44,20 @@
     "Unknown Device": "Perangkat Tidak Diketahui",
     "Device Disconnected": "Perangkat Terputus",
     "The device \":name\" has been disconnected. Last active: :last_active": "Perangkat \":name\" telah terputus. Terakhir aktif: :last_active",
-    "All other sessions and connected devices have been signed out successfully.": "Semua sesi lain dan perangkat yang terhubung telah berhasil dikeluarkan."
+    "All other sessions and connected devices have been signed out successfully.": "Semua sesi lain dan perangkat yang terhubung telah berhasil dikeluarkan.",
+    "Delete Account": "Hapus Akun",
+    "Once your account is deleted, you have 30 days to restore it. If not restored within 30 days, the account will be permanently deleted and you will no longer be able to log in.": "Setelah akun Anda dihapus, Anda memiliki waktu 30 hari untuk memulihkannya kembali. Jika tidak dipulihkan dalam 30 hari, akun akan dihapus secara permanen dan Anda tidak akan bisa login lagi.",
+    "Please enter your password to confirm account deletion.": "Silakan masukkan kata sandi Anda untuk mengonfirmasi penghapusan akun.",
+    "Account Deleted": "Akun Berhasil Dihapus",
+    "Your account has been scheduled for deletion. You have 30 days to restore it by contacting support.": "Akun Anda telah dijadwalkan untuk penghapusan. Anda memiliki waktu 30 hari untuk memulihkannya dengan menghubungi dukungan teknis.",
+    "Are you sure you want to delete your account?": "Apakah Anda yakin ingin menghapus akun Anda?",
+    "Status": "Status",
+    "Active": "Aktif",
+    "Deleted (Pending Permanent Deletion)": "Dihapus (Menunggu Penghapusan Permanen)",
+    "Deleted": "Dihapus",
+    "Permanently Deleted": "Dihapus Permanen",
+    "Roles": "Peran",
+    "The password you entered is incorrect.": "Kata sandi yang Anda masukkan salah.",
+    "The password you entered is incorrect. Please try again.": "Kata sandi yang Anda masukkan salah. Silakan coba lagi.",
+    "Current password is required.": "Kata sandi saat ini diperlukan."
 }
