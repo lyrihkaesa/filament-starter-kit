@@ -1,0 +1,33 @@
+meta {
+  name: Update User
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{base_url}}/users/{{created_user_id}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{access_token}}
+}
+
+body:json {
+  {
+    "name": "Updated Test User"
+  }
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response has updated data", function() {
+    const body = res.getBody();
+    const data = body.data;
+    expect(data.name).to.equal("Updated Test User");
+  });
+}

@@ -1,0 +1,27 @@
+meta {
+  name: Get User
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{base_url}}/users/{{created_user_id}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{access_token}}
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response has user data", function() {
+    const body = res.getBody();
+    const data = body.data;
+    expect(data.id).to.equal(bru.getVar("created_user_id"));
+  });
+}

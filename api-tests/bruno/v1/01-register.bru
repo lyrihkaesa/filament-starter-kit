@@ -1,0 +1,38 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "New API User",
+    "email": "newuser-{{$randomInt}}@example.com",
+    "password": "password",
+    "password_confirmation": "password",
+    "device_name": "Bruno API Client"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    const body = res.getBody();
+    const token = body.data ? body.data.token : body.token;
+    if (token) {
+      bru.setVar("access_token", token);
+      bru.setEnvVar("access_token", token);
+    }
+  }
+}
+
+tests {
+  test("Status code is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+}
