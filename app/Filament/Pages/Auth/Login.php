@@ -4,11 +4,25 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Models\User;
+use App\Notifications\Auth\RestoreAccountNotification;
+use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use Filament\Auth\Http\Responses\Contracts\LoginResponse;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Component;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
+use Illuminate\Validation\ValidationException;
+
 final class Login extends \Filament\Auth\Pages\Login
 {
     protected static string $layout = 'layouts.auth';
 
     protected string $view = 'filament.pages.auth.login';
+
+    public bool $showRestoreAccountHint = false;
 
     public function mount(): void
     {
@@ -22,5 +36,73 @@ final class Login extends \Filament\Auth\Pages\Login
                 'remember' => true,
             ]);
         }
+    }
+
+    public function authenticate(): ?LoginResponse
+    {
+        try {
+            $this->rateLimit(5);
+        } catch (TooManyRequestsException $exception) {
+            $this->getRateLimitedNotification($exception)?->send();
+
+            return null;
+        }
+
+        $data = $this->form->getState();
+
+        // Check if user is soft deleted
+        $user = User::onlyTrashed()->where('email', $data['email'])->first();
+
+        if ($user && ! $user->isAnonymous()) {
+            $this->showRestoreAccountHint = true;
+
+            throw ValidationException::withMessages([
+                'data.email' => __('auth.deleted'),
+            ]);
+        }
+
+        return parent::authenticate();
+    }
+
+    public function requestRestoreAccount(): void
+    {
+        $data = $this->form->getState();
+        $email = $data['email'] ?? null;
+
+        if (! $email) {
+            return;
+        }
+
+        $user = User::onlyTrashed()->where('email', $email)->first();
+
+        if ($user && ! $user->isAnonymous()) {
+            $user->notify(new RestoreAccountNotification);
+
+            Notification::make()
+                ->title(__('auth.restore_requested'))
+                ->success()
+                ->send();
+
+            $this->showRestoreAccountHint = false;
+        }
+    }
+
+    protected function getEmailFormComponent(): Component
+    {
+        return TextInput::make('email')
+            ->label(__('filament-panels::auth/pages/login.form.email.label'))
+            ->email()
+            ->required()
+            ->autocomplete()
+            ->autofocus()
+            ->hint(fn () => $this->showRestoreAccountHint ? new HtmlString(Blade::render('
+                <x-filament::link
+                    wire:click="requestRestoreAccount"
+                    class="cursor-pointer"
+                    tabindex="-1"
+                >
+                    {{ __(\'auth.restore\') }}
+                </x-filament::link>
+            ')) : null);
     }
 }
