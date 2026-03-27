@@ -7,11 +7,7 @@ meta {
 post {
   url: {{base_url}}/logout
   body: none
-  auth: none
-}
-
-headers {
-  Authorization: Bearer {{access_token}}
+  auth: inherit
 }
 
 tests {

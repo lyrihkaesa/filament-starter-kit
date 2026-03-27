@@ -7,11 +7,7 @@ meta {
 put {
   url: {{base_url}}/users/{{created_user_id}}
   body: json
-  auth: none
-}
-
-headers {
-  Authorization: Bearer {{access_token}}
+  auth: inherit
 }
 
 body:json {

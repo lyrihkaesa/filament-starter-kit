@@ -7,11 +7,7 @@ meta {
 get {
   url: {{base_url}}/users/{{created_user_id}}
   body: none
-  auth: none
-}
-
-headers {
-  Authorization: Bearer {{access_token}}
+  auth: inherit
 }
 
 tests {

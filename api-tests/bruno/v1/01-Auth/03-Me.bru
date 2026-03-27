@@ -7,16 +7,7 @@ meta {
 get {
   url: {{base_url}}/me
   body: none
-  auth: none
-}
-
-headers {
-  Authorization: Bearer {{access_token}}
-}
-
-script:pre-request {
-  // Debug to see if variable is available
-  // console.log("Current access_token: ", bru.getVar("access_token"));
+  auth: inherit
 }
 
 tests {
