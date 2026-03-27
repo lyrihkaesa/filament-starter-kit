@@ -274,14 +274,14 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->required()
                     ->currentPassword(guard: Filament::getAuthGuard()),
             ])
-            ->action(function (array $data, RevokeOtherDevicesAction $action): void {
+            ->action(function (array $data, RevokeOtherDevicesAction $actionRevoke): void {
                 $password = $data['password'] ?? '';
 
                 if (! is_string($password)) {
                     return;
                 }
 
-                $this->revokeOtherDevices($password, $action);
+                $this->revokeOtherDevices($password, $actionRevoke);
             });
     }
 
@@ -371,7 +371,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         $parts = explode(':', $name);
 
         if (count($parts) >= 3) {
-            return trim(implode(' ', array_slice($parts, 1)));
+            return mb_trim(implode(' ', array_slice($parts, 1)));
         }
 
         if (count($parts) === 2) {
