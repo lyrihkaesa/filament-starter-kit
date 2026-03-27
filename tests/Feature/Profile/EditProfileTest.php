@@ -84,3 +84,21 @@ it('can revoke a sanctum api token', function (): void {
 
     expect(PersonalAccessToken::find($tokenId))->toBeNull();
 });
+
+it('formats sanctum token names for display', function (): void {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $user->createToken('mobile:Android:Pixel 8');
+    $user->createToken('desktop:Windows:PC');
+    $user->createToken('pat:My-Token');
+    $user->createToken('Simple Token');
+
+    $this->get(EditProfile::getUrl())
+        ->assertStatus(200)
+        ->assertSee('Android Pixel 8')
+        ->assertSee('Windows PC')
+        ->assertSee('My-Token')
+        ->assertSee('Simple Token')
+        ->assertDontSee('mobile:Android:Pixel 8');
+});

@@ -358,12 +358,27 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                 return new DeviceInfo(
                     deviceId: "token:{$token->id}",
                     type: $parsed['type'],
-                    label: $token->name,
+                    label: $this->formatTokenName($token->name),
                     ipAddress: is_string($token->ip_address) ? $token->ip_address : '',
                     lastActiveAt: $lastActive,
                     isCurrentDevice: false,
                 );
             })->values();
+    }
+
+    private function formatTokenName(string $name): string
+    {
+        $parts = explode(':', $name);
+
+        if (count($parts) >= 3) {
+            return trim(implode(' ', array_slice($parts, 1)));
+        }
+
+        if (count($parts) === 2) {
+            return $parts[1];
+        }
+
+        return $name;
     }
 
     /**
