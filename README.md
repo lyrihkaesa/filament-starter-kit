@@ -1,99 +1,93 @@
+<p align="center">
+    <img src="public/images/logo-128x128.png" width="128" height="128" alt="Filament Starter Kit Logo">
+</p>
+
 # Filament Starter Kit
 
-Starter kit untuk membangun admin panel dengan [Laravel 12](https://laravel.com/) dan [Filament v5](https://filamentphp.com/).
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/lyrihkaesa/filament-starter-kit.svg?style=flat-square)](https://packagist.org/packages/lyrihkaesa/filament-starter-kit)
+[![Total Downloads](https://img.shields.io/packagist/dt/lyrihkaesa/filament-starter-kit.svg?style=flat-square)](https://packagist.org/packages/lyrihkaesa/filament-starter-kit)
+[![PHP Version](https://img.shields.io/badge/php-8.4-blue.svg?style=flat-square)](https://php.net)
+[![Laravel Version](https://img.shields.io/badge/laravel-12.x-red.svg?style=flat-square)](https://laravel.com)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
 
-Fokus starter kit ini adalah struktur yang rapi, strict typing, dan pola kode yang enak dirawat untuk project jangka panjang. Cocok untuk developer yang suka pendekatan ketat seperti saat memakai TypeScript, tetapi di ekosistem Laravel.
+Starter kit modern untuk membangun admin panel tangguh menggunakan **Laravel 12** dan **Filament v5**. 
 
-## Highlight
+Fokus utama kit ini adalah **Developer Experience (DX)** dengan struktur yang sangat rapi, *strict typing*, dan pola kode yang *maintainable* untuk project jangka panjang. Cocok untuk developer yang menginginkan standar kualitas tinggi seperti ekosistem TypeScript di dalam Laravel.
 
-- Filament v5 ready
-- Laravel 12 + Livewire 4
-- Action Pattern dengan `handle()`
-- Strict type friendly
-- API ready dengan Laravel Sanctum
-- RBAC dengan Filament Shield
-- UUID-first untuk tabel baru
-- Laravel Boost ready
-- Pest, Pint, Larastan, dan Rector sudah siap
+## ✨ Highlight Fitur
 
-## Kenapa Pakai Starter Kit Ini
+- **Modern Stack**: Laravel 12, Filament v5, Livewire 4, dan Tailwind CSS v4.
+- **Architectural Excellence**: Menggunakan **Action Pattern** (`handle()`) untuk memisahkan business logic dari Controller/Page.
+- **Strict Typing**: Codebase yang bersahabat dengan *strict types* untuk keamanan kode yang lebih baik.
+- **API Ready**: Integrasi **Laravel Sanctum** yang siap digunakan untuk aplikasi mobile atau frontend terpisah.
+- **Security & RBAC**: Manajemen akses canggih menggunakan **Filament Shield**.
+- **Privacy Focused**: Sistem **Anonymization** otomatis untuk user yang dihapus (GDPR-friendly).
+- **UUID First**: Standar penggunaan UUID untuk tabel baru guna skalabilitas dan keamanan.
+- **Quality Assurance**: Terintegrasi penuh dengan **Pest 4**, **Pint**, **Larastan**, dan **Rector**.
 
-- Business logic tidak menumpuk di controller atau Filament page
-- Cocok untuk developer yang suka kode lebih strict dan lebih terstruktur
-- Lebih nyaman untuk scaling fitur daripada setup CRUD cepat yang serba campur
-- Sudah ada pondasi untuk testing, static analysis, dan refactor
+## 🚀 Quick Start
 
-## Cocok Untuk
-
-- developer Laravel yang suka strict type
-- developer yang terbiasa dengan pola pikir TypeScript
-- admin panel internal
-- dashboard operasional
-- project yang ingin mulai rapi dari awal
-
-## Quick Start
-
-### Install dengan Laravel Installer
+### Install via Laravel Installer
 
 ```bash
 laravel new my-app --using=lyrihkaesa/filament-starter-kit
 cd my-app
 composer install
 npm install
-npm run build
 cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed
+npm run build
 composer dev
 ```
 
-### Login Default
+### Akun Admin Default
 
-- Email: `admin@example.com`
-- Password: `password`
+- **Email**: `admin@example.com`
+- **Password**: `password`
 
-## Stack
+## 🛠️ Tech Stack & Tools
 
-- Laravel 12
-- Filament 5
-- Livewire 4
-- Sanctum
-- Filament Shield
-- Pest 4
-- Pint
-- Larastan
-- Rector
-- Laravel Boost
+| Kategori | Teknologi |
+| --- | --- |
+| **Framework** | Laravel 12, Filament 5, Livewire 4 |
+| **Auth** | Sanctum (API), Shield (RBAC) |
+| **Styling** | Tailwind CSS 4 |
+| **Testing** | Pest 4 |
+| **Code Quality** | Pint (Linting), Larastan (Static Analysis), Rector (Refactoring) |
+| **Utilities** | Laravel Boost, Matomo Device Detector |
 
-## Pendekatan Utama
+## 📖 Prinsip Pengembangan
 
-- **Action Pattern** untuk business logic
-- **Sanctum** sebagai default API auth, bukan JWT
-- **UUID** sebagai rekomendasi default untuk tabel baru
-- **Strict typing** sebagai arah utama codebase
+1.  **Action Pattern**: Logic bisnis harus berada di kelas Action, bukan di Controller atau Filament Page.
+2.  **API Versioning**: Endpoint API terstruktur di bawah `/api/v1` dengan *Eloquent Resources*.
+3.  **Soft Deletes & Anonymize**: User yang dihapus akan di-anonymize datanya sebelum benar-benar dihapus permanen.
+4.  **No N+1 Queries**: Selalu memprioritaskan *eager loading* untuk performa database.
 
-## Dokumentasi
+## 📚 Dokumentasi Lengkap
 
-Dokumentasi lengkap ada di folder [`docs`](./docs) dan otomatis ter-publish ke:
+Dokumentasi detail dapat ditemukan di folder [`docs`](./docs) atau melalui:
 
-- [Dokumentasi Kaesa Filament Starter Kit](https://kaesa.charapon.my.id/filament-starter-kit)
+👉 **[Dokumentasi Online Filament Starter Kit](https://kaesa.charapon.my.id/filament-starter-kit)**
 
-Dokumen yang paling penting untuk mulai:
+### Panduan Penting:
+- [00 - Intro & Filosofi](./docs/00-intro.md)
+- [02 - Menggunakan Action Pattern](./docs/02-action-pattern.md)
+- [07 - Integrasi API & Sanctum](./docs/07-api.md)
+- [14 - Manajemen Role & Permission](./docs/14-filament-shield.md)
+- [18 - Implementasi UUID](./docs/18-uuid-primary-keys.md)
 
-- [`00-intro.md`](./docs/00-intro.md)
-- [`02-action-pattern.md`](./docs/02-action-pattern.md)
-- [`07-api.md`](./docs/07-api.md)
-- [`08-user-resource.md`](./docs/08-user-resource.md)
-- [`18-uuid-primary-keys.md`](./docs/18-uuid-primary-keys.md)
+## ✅ Quality Control
 
-## Quality Tools
+Jalankan perintah berikut untuk menjaga kualitas codebase:
 
-- Test: `php artisan test`
-- API Test: `bru run api-tests/bruno --env local`
-- Lint: `composer lint`
-- Static analysis: `composer test:types`
-- Refactor: `composer refactor`
+- **Semua Tes**: `composer test-full`
+- **Unit & Feature Test**: `php artisan test`
+- **API Testing**: `bru run api-tests/bruno --env local`
+- **Auto Format**: `composer lint`
+- **Static Analysis**: `composer test:types`
+- **Auto Refactor**: `composer refactor`
 
-## Lisensi
+## 📄 Lisensi
 
-[MIT License](LICENSE)
+Proyek ini menggunakan lisensi [MIT](LICENSE).
