@@ -21,7 +21,6 @@ final class UserForm
                     ->avatar()
                     ->imageEditor()
                     ->automaticallyOpenImageEditorForAspectRatio()
-                    ->circleCropper()
                     ->imageEditorViewportWidth(320)
                     ->imageEditorViewportHeight(320)
                     ->placeholder(__('Upload avatar'))
@@ -29,7 +28,7 @@ final class UserForm
                     ->maxSize(2048)
                     ->disk(config()->string('curator.default_disk'))
                     ->directory('avatars')
-                    ->visibility(config()->string('curator.default_visibility'))
+                    ->visibility('public')
                     ->storeFileNamesIn('avatar_upload_file_name'),
                 TextInput::make('name')
                     ->label(__('Name'))

@@ -67,6 +67,7 @@ it('can create users with direct avatar upload that becomes curator media', func
         'email' => 'curator@example.com',
         'avatar_curator_id' => $media->getKey(),
     ]);
+    expect($media->visibility)->toBe('public');
     Storage::disk($avatarDisk)->assertExists($media->path);
 });
 
@@ -103,7 +104,8 @@ it('can update users with direct avatar upload that becomes curator media', func
     $updatedUser = $user->refresh();
     $media = CuratorMedia::query()->findOrFail($updatedUser->avatar_curator_id);
 
-    expect($updatedUser->avatar_curator_id)->toBe($media->getKey());
+    expect($updatedUser->avatar_curator_id)->toBe($media->getKey())
+        ->and($media->visibility)->toBe('public');
     Storage::disk($avatarDisk)->assertExists($media->path);
 });
 

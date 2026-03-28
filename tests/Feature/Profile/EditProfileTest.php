@@ -64,7 +64,8 @@ it('can upload avatar directly from the profile form', function (): void {
     $updatedUser = $user->refresh();
     $media = CuratorMedia::query()->findOrFail($updatedUser->avatar_curator_id);
 
-    expect($updatedUser->avatar_curator_id)->toBeInt();
+    expect($updatedUser->avatar_curator_id)->toBeInt()
+        ->and($media->visibility)->toBe('public');
     Storage::disk($avatarDisk)->assertExists($media->path);
 });
 
