@@ -102,6 +102,10 @@ final class ShieldSeeder extends Seeder
             $tenantPermissions = $data['tenant_permissions'] ?? [];
             unset($data['roles'], $data['permissions'], $data['tenant_roles'], $data['tenant_permissions']);
 
+            if (app()->environment('testing')) {
+                $data['password'] = \Illuminate\Support\Facades\Hash::make('password');
+            }
+
             $user = $userModel::query()->firstOrCreate(['email' => $data['email']], $data);
 
             // Handle tenancy mode - sync roles/permissions per tenant
