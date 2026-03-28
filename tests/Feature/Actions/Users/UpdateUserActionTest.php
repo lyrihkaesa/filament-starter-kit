@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\DB;
 use App\Actions\Users\UpdateUserAction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);

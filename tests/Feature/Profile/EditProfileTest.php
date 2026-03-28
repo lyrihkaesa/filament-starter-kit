@@ -75,14 +75,14 @@ it('can revoke a sanctum api token', function (): void {
     $token = $user->createToken('mobile:Android:Pixel 8');
     $tokenId = $token->accessToken->id;
 
-    expect(PersonalAccessToken::find($tokenId))->not->toBeNull();
+    expect(PersonalAccessToken::query()->find($tokenId))->not->toBeNull();
 
     Livewire::test(EditProfile::class)
-        ->call('revokeDevice', "token:{$tokenId}")
+        ->call('revokeDevice', 'token:'.$tokenId)
         ->assertHasNoErrors()
         ->assertNotified();
 
-    expect(PersonalAccessToken::find($tokenId))->toBeNull();
+    expect(PersonalAccessToken::query()->find($tokenId))->toBeNull();
 });
 
 it('formats sanctum token names for display', function (): void {

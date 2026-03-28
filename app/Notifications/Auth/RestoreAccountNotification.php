@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Auth;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -14,8 +15,9 @@ final class RestoreAccountNotification extends Notification implements ShouldQue
 {
     use Queueable;
 
-    public function __construct() {}
-
+    /**
+     * @return array<int, string>
+     */
     public function via(object $notifiable): array
     {
         return ['mail'];
@@ -23,16 +25,20 @@ final class RestoreAccountNotification extends Notification implements ShouldQue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $restoreUrl = URL::temporarySignedRoute(
-            'restore-account',
-            now()->addMinutes(60),
+        if (! ($notifiable instanceof User)) {
+            return new MailMessage;
+        }
+
+        $url = URL::temporarySignedRoute(
+            'account.restore',
+            now()->addDays(7),
             ['id' => $notifiable->getKey()]
         );
 
         return (new MailMessage)
             ->subject('Permohonan Pemulihan Akun')
             ->line('Anda menerima email ini karena kami menerima permintaan pemulihan akun untuk akun Anda.')
-            ->action('Pulihkan Akun', $restoreUrl)
+            ->action('Pulihkan Akun', (string) $url)
             ->line('Tautan pemulihan ini akan kedaluwarsa dalam 60 menit.')
             ->line('Jika Anda tidak merasa meminta pemulihan akun, abaikan email ini.');
     }

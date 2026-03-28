@@ -10,7 +10,6 @@ use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Component;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
@@ -41,8 +40,8 @@ final class Login extends \Filament\Auth\Pages\Login
     {
         try {
             $this->rateLimit(5);
-        } catch (TooManyRequestsException $exception) {
-            $this->getRateLimitedNotification($exception)?->send();
+        } catch (TooManyRequestsException $tooManyRequestsException) {
+            $this->getRateLimitedNotification($tooManyRequestsException)?->send();
 
             return null;
         }
@@ -68,7 +67,7 @@ final class Login extends \Filament\Auth\Pages\Login
         $data = $this->form->getState();
         $email = $data['email'] ?? null;
 
-        if (! $email) {
+        if (! is_string($email)) {
             return;
         }
 
@@ -82,7 +81,7 @@ final class Login extends \Filament\Auth\Pages\Login
         }
     }
 
-    protected function getEmailFormComponent(): Component
+    protected function getEmailFormComponent(): TextInput
     {
         return TextInput::make('email')
             ->label(__('filament-panels::auth/pages/login.form.email.label'))
@@ -90,7 +89,7 @@ final class Login extends \Filament\Auth\Pages\Login
             ->required()
             ->autocomplete()
             ->autofocus()
-            ->hint(fn () => $this->showRestoreAccountHint ? new HtmlString(Blade::render('
+            ->hint(fn (): ?HtmlString => $this->showRestoreAccountHint ? new HtmlString(Blade::render('
                 <x-filament::link
                     wire:click="requestRestoreAccount"
                     class="cursor-pointer"

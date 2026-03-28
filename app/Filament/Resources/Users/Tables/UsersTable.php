@@ -12,12 +12,15 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Enums\IconSize;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use STS\FilamentImpersonate\Actions\Impersonate;
 
 final class UsersTable
@@ -66,13 +69,14 @@ final class UsersTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                \Filament\Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->options([
                         'active' => __('Active'),
                         'deleted' => __('Deleted'),
                         'anonymized' => __('Permanently Deleted'),
                     ])
-                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                    ->query(function (Builder $query, array $data): Builder {
+                        /** @var Builder<User> $query */
                         if (empty($data['value'])) {
                             return $query->whereNull('deleted_at');
                         }
@@ -94,7 +98,7 @@ final class UsersTable
                 EditAction::make(),
                 DeleteAction::make()
                     ->using(fn (User $record, DeleteUserAccountAction $deleteAction) => $deleteAction->handle($record)),
-                \Filament\Actions\RestoreAction::make()
+                RestoreAction::make()
                     ->using(fn (User $record, RestoreUserAccountAction $restoreAction) => $restoreAction->handle($record)),
             ])
             ->toolbarActions([

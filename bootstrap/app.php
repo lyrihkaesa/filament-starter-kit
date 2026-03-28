@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -87,7 +88,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ], Response::HTTP_NOT_FOUND);
         });
     })
-    ->withSchedule(function (Illuminate\Console\Scheduling\Schedule $schedule): void {
+    ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('app:anonymize-deleted-users')->daily();
     })
     ->create();

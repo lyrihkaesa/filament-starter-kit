@@ -85,11 +85,11 @@ it('revokes a sanctum token by prefixed id', function (): void {
 
     $tokenId = $token->accessToken->id;
 
-    expect(PersonalAccessToken::find($tokenId))->not->toBeNull();
+    expect(PersonalAccessToken::query()->find($tokenId))->not->toBeNull();
 
-    resolve(RevokeDeviceAction::class)->handle($user, "token:{$tokenId}");
+    resolve(RevokeDeviceAction::class)->handle($user, 'token:'.$tokenId);
 
-    expect(PersonalAccessToken::find($tokenId))->toBeNull();
+    expect(PersonalAccessToken::query()->find($tokenId))->toBeNull();
 
     $data = json_decode((string) DB::table('notifications')->where('notifiable_id', $user->id)->value('data'), true);
     expect($data['title'])->toBe('Device Disconnected');
@@ -102,10 +102,10 @@ it('does nothing when revoking a token not owned by the user', function (): void
     $token = $otherUser->createToken('mobile:Android:Other Device');
     $tokenId = $token->accessToken->id;
 
-    resolve(RevokeDeviceAction::class)->handle($user, "token:{$tokenId}");
+    resolve(RevokeDeviceAction::class)->handle($user, 'token:'.$tokenId);
 
     // Token should still exist
-    expect(PersonalAccessToken::find($tokenId))->not->toBeNull();
+    expect(PersonalAccessToken::query()->find($tokenId))->not->toBeNull();
 });
 
 it('does nothing when revoking a token that does not exist', function (): void {

@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -60,8 +61,7 @@ final class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(app()->isProduction());
 
         // 🛡️ Database: Jamin integritas transaksi (Laravel 11.10+)
-    
-        /** @var \Illuminate\Database\Connection $connection */
+        /** @var Connection $connection */
         $connection = DB::connection();
         if (method_exists($connection, 'handlePotentiallyLostTransactions')) {
             $connection->handlePotentiallyLostTransactions();

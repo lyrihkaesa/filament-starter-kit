@@ -88,7 +88,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->imageEditor()
                     ->circleCropper()
                     ->directory('avatars'),
-                $this->getNameFormComponent()->autofocus(false),
+                $this->getNameFormComponent(),
                 $this->getEmailFormComponent(),
                 Select::make('roles')
                     ->label(__('Roles'))
@@ -96,7 +96,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->multiple()
                     ->preload()
                     ->searchable()
-                    ->disabled(fn (): bool => ! auth()->user()?->can('Update:Role')),
+                    ->disabled(fn (): bool => ! (Auth::user()?->can('Update:Role') ?? false)),
             ])
             ->statePath('data');
     }
@@ -191,6 +191,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
      */
     public function getActiveDevicesList(): Collection
     {
+        /** @var Collection<int, DeviceInfo> $devices */
         $devices = collect();
 
         $devices = $devices->merge($this->mapSessionsToDevices());
@@ -201,15 +202,17 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
 
     public function deleteAccount(string $password, DeleteUserAccountAction $action): void
     {
-        if (! Hash::check($password, Auth::user()->getAuthPassword())) {
+        $user = Auth::user();
+
+        if (! ($user instanceof User)) {
+            return;
+        }
+
+        if (! Hash::check($password, $user->getAuthPassword())) {
             $this->addError('password', __('The password you entered is incorrect.'));
 
             return;
         }
-
-        $user = Auth::user();
-
-        throw_unless($user instanceof User, RuntimeException::class, 'User must be authenticated.');
 
         $action->handle($user);
 
@@ -227,6 +230,22 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         // dump('Redirecting to: ' . Filament::getLoginUrl());
 
         $this->redirect(Filament::getLoginUrl());
+    }
+
+    protected function getNameFormComponent(): TextInput
+    {
+        /** @var TextInput $component */
+        $component = parent::getNameFormComponent();
+
+        return $component->autofocus(false);
+    }
+
+    protected function getEmailFormComponent(): TextInput
+    {
+        /** @var TextInput $component */
+        $component = parent::getEmailFormComponent();
+
+        return $component;
     }
 
     /**
@@ -365,7 +384,10 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
     private function mapSessionsToDevices(): Collection
     {
         if (config('session.driver') !== 'database') {
-            return collect();
+            /** @var Collection<int, DeviceInfo> $emptyCollection */
+            $emptyCollection = collect();
+
+            return $emptyCollection;
         }
 
         $currentSessionId = null;
@@ -395,7 +417,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                 $activity = $session->last_activity ?? 0;
 
                 return new DeviceInfo(
-                    deviceId: "session:{$sessionId}",
+                    deviceId: 'session:'.$sessionId,
                     type: $parsed['type'],
                     label: $parsed['label'],
                     ipAddress: (string) $ip,
@@ -413,13 +435,16 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         $user = Auth::user();
 
         if (! ($user instanceof User)) {
-            return collect();
+            /** @var Collection<int, DeviceInfo> $emptyCollection */
+            $emptyCollection = collect();
+
+            return $emptyCollection;
         }
 
         return PersonalAccessToken::query()
             ->where('tokenable_id', $user->id)
             ->where('tokenable_type', $user->getMorphClass())
-            ->orderByDesc('last_used_at')
+            ->latest('last_used_at')
             ->get()
             ->map(function (PersonalAccessToken $token): DeviceInfo {
                 $userAgent = is_string($token->user_agent) ? $token->user_agent : '';
@@ -430,7 +455,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     : $token->created_at?->diffForHumans() ?? '-';
 
                 return new DeviceInfo(
-                    deviceId: "token:{$token->id}",
+                    deviceId: 'token:'.$token->id,
                     type: $parsed['type'],
                     label: $this->formatTokenName($token->name),
                     ipAddress: is_string($token->ip_address) ? $token->ip_address : '',
@@ -472,27 +497,27 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         $client = $detector->getClient();
         $os = $detector->getOs();
 
-        $clientName = is_array($client) && isset($client['name']) ? (string) $client['name'] : 'Unknown';
-        $osName = is_array($os) && isset($os['name']) ? (string) $os['name'] : 'Unknown';
+        $clientName = is_array($client) && is_string($client['name'] ?? null) ? $client['name'] : 'Unknown';
+        $osName = is_array($os) && is_string($os['name'] ?? null) ? $os['name'] : 'Unknown';
 
         $isBot = $detector->isBot();
 
         if ($isBot) {
-            return ['type' => 'api_client', 'label' => "{$clientName}"];
+            return ['type' => 'api_client', 'label' => $clientName];
         }
 
         if ($detector->isMobile()) {
-            return ['type' => 'mobile_app', 'label' => "{$clientName} on {$osName}"];
+            return ['type' => 'mobile_app', 'label' => sprintf('%s on %s', $clientName, $osName)];
         }
 
         // DeviceDetector identifies browser-based clients; non-browser clients are API clients.
-        $clientType = is_array($client) && isset($client['type']) ? (string) $client['type'] : '';
+        $clientType = is_array($client) && is_string($client['type'] ?? null) ? $client['type'] : '';
 
         if (in_array($clientType, ['browser', ''], true)) {
-            return ['type' => 'web_session', 'label' => "{$clientName} on {$osName}"];
+            return ['type' => 'web_session', 'label' => sprintf('%s on %s', $clientName, $osName)];
         }
 
-        return ['type' => 'api_client', 'label' => "{$clientName} on {$osName}"];
+        return ['type' => 'api_client', 'label' => sprintf('%s on %s', $clientName, $osName)];
     }
 
     // @codeCoverageIgnoreEnd

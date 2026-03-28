@@ -32,7 +32,7 @@ it('revokes other sessions and all api tokens, keeping the current session', fun
     $user->createToken('mobile:Android:Pixel 8');
     $user->createToken('mobile:iOS:iPhone 15');
 
-    expect(PersonalAccessToken::where('tokenable_id', $user->id)->count())->toBe(2);
+    expect(PersonalAccessToken::query()->where('tokenable_id', $user->id)->count())->toBe(2);
 
     // Simulate a current session by setting "current" session ID
     session()->setId($currentSessionId);
@@ -44,12 +44,12 @@ it('revokes other sessions and all api tokens, keeping the current session', fun
         ->and(DB::table('sessions')->where('id', 'other_session_2')->exists())->toBeFalse();
 
     // All API tokens are always revoked in a web context
-    expect(PersonalAccessToken::where('tokenable_id', $user->id)->count())->toBe(0);
+    expect(PersonalAccessToken::query()->where('tokenable_id', $user->id)->count())->toBe(0);
 
     // Notification was sent
     $data = json_decode((string) DB::table('notifications')->where('notifiable_id', $user->id)->value('data'), true);
     expect($data['title'])->toBe('Other Devices Logged Out');
-})->skip(fn () => ! hash_equals(hash('sha256', 'password'), hash('sha256', User::factory()->make()->getAuthPassword() ?? '')), 'Skipped: password hashing mismatch in test environment');
+})->skip(fn (): bool => ! hash_equals(hash('sha256', 'password'), hash('sha256', User::factory()->make()->getAuthPassword() ?? '')), 'Skipped: password hashing mismatch in test environment');
 
 it('only revokes api tokens when session driver is not database', function (): void {
     config(['session.driver' => 'file']);
@@ -57,10 +57,10 @@ it('only revokes api tokens when session driver is not database', function (): v
     $user = User::factory()->create();
     $user->createToken('mobile:Android:Pixel 8');
 
-    expect(PersonalAccessToken::where('tokenable_id', $user->id)->count())->toBe(1);
+    expect(PersonalAccessToken::query()->where('tokenable_id', $user->id)->count())->toBe(1);
 
     resolve(RevokeOtherDevicesAction::class)->handle($user, 'password');
 
     // Token should be revoked even without database sessions
-    expect(PersonalAccessToken::where('tokenable_id', $user->id)->count())->toBe(0);
+    expect(PersonalAccessToken::query()->where('tokenable_id', $user->id)->count())->toBe(0);
 });

@@ -19,7 +19,7 @@ beforeEach(function (): void {
 it('can filter active users', function (): void {
     $activeUser = User::factory()->create();
     $activeUser->assignRole('super_admin');
-    
+
     $deletedUser = User::factory()->create(['deleted_at' => now()]);
     $anonymizedUser = User::factory()->create(['anonymized_at' => now(), 'deleted_at' => now()]);
 

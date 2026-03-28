@@ -7,15 +7,16 @@ namespace Tests\Feature\Auth;
 use App\Filament\Pages\Auth\Register;
 use App\Models\User;
 use Filament\Facades\Filament;
+
 use function Pest\Livewire\livewire;
 
-it('can render register page', function () {
+it('can render register page', function (): void {
     $this->get(Filament::getRegistrationUrl())
         ->assertSuccessful()
         ->assertSee(__('filament-panels::auth/pages/register.heading'));
 });
 
-it('can register new user', function () {
+it('can register new user', function (): void {
     livewire(Register::class)
         ->set('data.name', 'Test User')
         ->set('data.email', 'test@example.com')
@@ -32,9 +33,9 @@ it('can register new user', function () {
     ]);
 });
 
-it('can validate registration data', function () {
+it('can validate registration data', function (): void {
     livewire(Register::class)
-        ->set('data.name', null)
+        ->set('data.name')
         ->set('data.email', 'not-an-email')
         ->set('data.password', 'short')
         ->set('data.passwordConfirmation', 'different')

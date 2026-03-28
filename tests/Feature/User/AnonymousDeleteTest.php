@@ -25,7 +25,7 @@ it('force delete should anonymize user instead of removing record', function ():
 
     $user->forceDelete();
 
-    $fresh = $user->fresh();
+    $fresh = User::withTrashed()->find($user->id);
 
     expect($fresh)->not()->toBeNull()
         ->and($fresh->anonymized_at)->not->toBeNull()

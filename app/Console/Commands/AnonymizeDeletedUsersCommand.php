@@ -40,11 +40,11 @@ final class AnonymizeDeletedUsersCommand extends Command
             return;
         }
 
-        $this->info("Anonymizing {$users->count()} users...");
+        $this->info(sprintf('Anonymizing %d users...', $users->count()));
 
         foreach ($users as $user) {
             $anonymizeAction->handle($user);
-            $this->line("Anonymized user: {$user->id}");
+            $this->line('Anonymized user: '.$user->id);
         }
 
         $this->info('Anonymization complete.');

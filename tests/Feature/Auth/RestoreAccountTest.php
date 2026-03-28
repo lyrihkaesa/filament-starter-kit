@@ -10,9 +10,10 @@ use App\Notifications\Auth\RestoreAccountNotification;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+
 use function Pest\Livewire\livewire;
 
-it('shows restore hint when attempting to login with soft-deleted account', function () {
+it('shows restore hint when attempting to login with soft-deleted account', function (): void {
     $user = User::factory()->create();
     $user->delete();
 
@@ -25,7 +26,7 @@ it('shows restore hint when attempting to login with soft-deleted account', func
         ->assertSet('showRestoreAccountHint', true);
 });
 
-it('can request account restoration', function () {
+it('can request account restoration', function (): void {
     Notification::fake();
 
     $user = User::factory()->create();
@@ -42,7 +43,7 @@ it('can request account restoration', function () {
     Notification::assertSentTo($user, RestoreAccountNotification::class);
 });
 
-it('can restore account via signed url', function () {
+it('can restore account via signed url', function (): void {
     $user = User::factory()->create();
     $user->delete();
 
@@ -62,7 +63,7 @@ it('can restore account via signed url', function () {
     ]);
 });
 
-it('cannot restore account with invalid signature', function () {
+it('cannot restore account with invalid signature', function (): void {
     $user = User::factory()->create();
     $user->delete();
 

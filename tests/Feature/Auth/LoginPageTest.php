@@ -8,17 +8,16 @@ use App\Filament\Pages\Auth\Login;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Config;
-use Livewire\Livewire;
 
 use function Pest\Livewire\livewire;
 
-it('can render login page', function () {
+it('can render login page', function (): void {
     $this->get(Filament::getLoginUrl())
         ->assertSuccessful()
         ->assertSee(__('filament-panels::auth/pages/login.heading'));
 });
 
-it('can authenticate', function () {
+it('can authenticate', function (): void {
     $user = User::factory()->create();
 
     livewire(Login::class)
@@ -31,7 +30,7 @@ it('can authenticate', function () {
     $this->assertAuthenticatedAs($user);
 });
 
-it('can validate login credentials', function () {
+it('can validate login credentials', function (): void {
     livewire(Login::class)
         ->set('data.email', 'wrong@example.com')
         ->set('data.password', 'wrong-password')

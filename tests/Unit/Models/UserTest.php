@@ -67,9 +67,9 @@ it('anonymizes instead of force deleting', function (): void {
 
     $user->forceDelete();
 
-    // Record still exists but is anonymized
-    $user->refresh();
-    expect($user->exists)->toBeTrue()
+    // Record still exists but is anonymized (must use withTrashed() to see soft-deleted records)
+    $user = User::withTrashed()->find($user->id);
+    expect($user)->not->toBeNull()
         ->and($user->name)->not->toBe('Should Be Anonymized')
         ->and($user->isAnonymous())->toBeTrue();
 });

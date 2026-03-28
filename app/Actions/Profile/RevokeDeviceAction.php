@@ -88,9 +88,6 @@ final readonly class RevokeDeviceAction
             ? $token->last_used_at->diffForHumans()
             : $token->created_at?->diffForHumans() ?? '-';
 
-        /** @var string $userAgent */
-        $userAgent = $token->user_agent ?? '';
-
         $token->delete();
 
         Notification::make()
@@ -115,9 +112,9 @@ final readonly class RevokeDeviceAction
         $client = $detector->getClient();
         $os = $detector->getOs();
 
-        $browserName = is_array($client) && isset($client['name']) ? (string) $client['name'] : 'Unknown Browser';
-        $osName = is_array($os) && isset($os['name']) ? (string) $os['name'] : 'Unknown OS';
+        $browserName = is_array($client) && is_string($client['name'] ?? null) ? $client['name'] : 'Unknown Browser';
+        $osName = is_array($os) && is_string($os['name'] ?? null) ? $os['name'] : 'Unknown OS';
 
-        return "{$browserName} on {$osName}";
+        return sprintf('%s on %s', $browserName, $osName);
     }
 }

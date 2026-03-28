@@ -87,41 +87,33 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             $uuid = Str::uuid()->toString();
 
             // Clear roles and permissions
-            if (method_exists($this, 'syncRoles')) {
-                $this->syncRoles([]);
-            }
-            if (method_exists($this, 'syncPermissions')) {
-                $this->syncPermissions([]);
-            }
+            $this->syncRoles([]);
+            $this->syncPermissions([]);
 
             // Clear avatar
             if ($this->avatar) {
                 Storage::disk(config()->string('filament.default_filesystem_disk'))->delete($this->avatar);
             }
 
-            $this->update([
+            $this->forceFill([
                 'name' => 'Anonymous User',
-                'email' => "anonymous_{$uuid}@example.com",
+                'email' => sprintf('anonymous_%s@example.com', $uuid),
                 'email_verified_at' => null,
                 'password' => bcrypt(Str::random(40)),
                 'avatar' => null,
                 'anonymized_at' => now(),
-            ]);
+            ])->saveQuietly();
 
             // Ensure they stay "deleted" if they were soft-deleted
             if (! $this->trashed()) {
-                $this->delete();
+                $this->deleteQuietly();
             }
         });
     }
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if ($this->isAnonymous()) {
-            return false;
-        }
-
-        return true;
+        return ! $this->isAnonymous();
     }
 
     public function canImpersonate(): bool
@@ -161,12 +153,10 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     // @codeCoverageIgnoreStart
     protected static function booted(): void
     {
-        self::deleting(function (self $user) {
-            if ($user->isForceDeleting()) {
-                $user->anonymize();
+        self::forceDeleting(function (self $user) {
+            $user->anonymize();
 
-                return false; // batalin force delete, karena diganti anonymize
-            }
+            return false;
         });
     }
 
