@@ -57,7 +57,7 @@ it('can upload avatar directly from the profile form', function (): void {
     $this->actingAs($user);
 
     Livewire::test(EditProfile::class)
-        ->set('data.avatar_upload', UploadedFile::fake()->image('avatar.jpg', 500, 500))
+        ->set('data.avatar_curator_id', UploadedFile::fake()->image('avatar.jpg', 500, 500))
         ->call('save')
         ->assertHasNoErrors();
 

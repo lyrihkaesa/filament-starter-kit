@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Filament\Forms\Components\CuratorFileUpload;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -16,8 +16,9 @@ final class UserForm
     {
         return $schema
             ->components([
-                FileUpload::make('avatar_upload')
+                CuratorFileUpload::make('avatar_curator_id')
                     ->label(__('Avatar'))
+                    ->relationship('avatarMedia', 'id')
                     ->avatar()
                     ->imageEditor()
                     ->automaticallyOpenImageEditorForAspectRatio()
@@ -26,10 +27,8 @@ final class UserForm
                     ->placeholder(__('Upload avatar'))
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                     ->maxSize(2048)
-                    ->disk(config()->string('curator.default_disk'))
                     ->directory('avatars')
-                    ->visibility('public')
-                    ->storeFileNamesIn('avatar_upload_file_name'),
+                    ->visibility('public'),
                 TextInput::make('name')
                     ->label(__('Name'))
                     ->required(),

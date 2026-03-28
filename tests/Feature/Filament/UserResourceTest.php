@@ -56,7 +56,7 @@ it('can create users with direct avatar upload that becomes curator media', func
         ->set('data.name', 'Curator User')
         ->set('data.email', 'curator@example.com')
         ->set('data.password', 'password')
-        ->set('data.avatar_upload', $avatar)
+        ->set('data.avatar_curator_id', $avatar)
         ->call('create')
         ->assertHasNoFormErrors();
 
@@ -96,7 +96,7 @@ it('can update users with direct avatar upload that becomes curator media', func
     Livewire::test(EditUser::class, [
         'record' => $user->getRouteKey(),
     ])
-        ->set('data.avatar_upload', $avatar)
+        ->set('data.avatar_curator_id', $avatar)
         ->set('data.password', 'password')
         ->call('save')
         ->assertHasNoFormErrors();
