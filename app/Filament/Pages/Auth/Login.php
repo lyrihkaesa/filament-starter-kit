@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Actions\Auth\RequestRestoreAccountAction;
 use App\Models\User;
-use App\Notifications\Auth\RestoreAccountNotification;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
@@ -18,11 +17,11 @@ use Illuminate\Validation\ValidationException;
 
 final class Login extends \Filament\Auth\Pages\Login
 {
+    public bool $showRestoreAccountHint = false;
+
     protected static string $layout = 'layouts.auth';
 
     protected string $view = 'filament.pages.auth.login';
-
-    public bool $showRestoreAccountHint = false;
 
     public function mount(): void
     {
@@ -64,7 +63,7 @@ final class Login extends \Filament\Auth\Pages\Login
         return parent::authenticate();
     }
 
-    public function requestRestoreAccount(): void
+    public function requestRestoreAccount(RequestRestoreAccountAction $action): void
     {
         $data = $this->form->getState();
         $email = $data['email'] ?? null;
@@ -73,11 +72,7 @@ final class Login extends \Filament\Auth\Pages\Login
             return;
         }
 
-        $user = User::onlyTrashed()->where('email', $email)->first();
-
-        if ($user && ! $user->isAnonymous()) {
-            $user->notify(new RestoreAccountNotification);
-
+        if ($action->handle($email)) {
             Notification::make()
                 ->title(__('auth.restore_requested'))
                 ->success()
