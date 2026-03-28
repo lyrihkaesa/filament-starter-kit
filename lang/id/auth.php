@@ -23,4 +23,6 @@ return [
     'restore_requested' => 'Tautan pemulihan akun telah dikirim ke alamat email Anda.',
     'restore_success' => 'Akun Anda telah berhasil dipulihkan. Silakan login kembali.',
     'restore_failed' => 'Tautan pemulihan tidak valid atau sudah kedaluwarsa.',
+    'restoring_heading' => 'Memulihkan Akun...',
+    'restoring_subheading' => 'Harap tunggu sementara kami memulihkan akun Anda.',
 ];

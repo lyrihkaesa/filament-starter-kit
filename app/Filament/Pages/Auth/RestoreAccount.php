@@ -55,6 +55,6 @@ final class RestoreAccount extends SimplePage
 
     public function getHeading(): string
     {
-        return 'Memulihkan Akun...';
+        return __('auth.restoring_heading');
     }
 }
