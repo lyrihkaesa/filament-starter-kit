@@ -49,6 +49,14 @@ final class Post extends Model
     }
 
     /**
+     * @return BelongsTo<CuratorMedia, $this>
+     */
+    public function thumbnailCurator(): BelongsTo
+    {
+        return $this->belongsTo(CuratorMedia::class, 'thumbnail_curator_id');
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

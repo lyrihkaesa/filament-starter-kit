@@ -9,6 +9,7 @@ use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Models\Post;
 use App\Models\User;
+use Awcodes\Curator\Models\Media;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -51,6 +52,35 @@ it('can create posts', function (): void {
     ]);
 });
 
+it('can create posts with curator thumbnail', function (): void {
+    $user = User::factory()->create();
+    $media = Media::query()->create([
+        'disk' => 'public',
+        'directory' => 'posts/thumbnails',
+        'visibility' => 'public',
+        'name' => 'post-thumbnail',
+        'path' => 'posts/thumbnails/post-thumbnail.jpg',
+        'size' => 2048,
+        'type' => 'image/jpeg',
+        'ext' => 'jpg',
+    ]);
+
+    Livewire::test(CreatePost::class)
+        ->set('data.title', 'Post with Curator Thumbnail')
+        ->set('data.slug', 'post-with-curator-thumbnail')
+        ->set('data.content', 'Post content')
+        ->set('data.is_published', true)
+        ->set('data.author_id', $user->id)
+        ->set('data.thumbnail_curator_id', [$media->fresh()->toArray()])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas('posts', [
+        'slug' => 'post-with-curator-thumbnail',
+        'thumbnail_curator_id' => $media->getKey(),
+    ]);
+});
+
 it('can update posts', function (): void {
     $post = Post::factory()->create();
     $updatedTitle = 'Updated Title';
@@ -63,6 +93,29 @@ it('can update posts', function (): void {
         ->assertHasNoFormErrors();
 
     expect($post->refresh()->title)->toBe($updatedTitle);
+});
+
+it('can update posts with curator thumbnail', function (): void {
+    $post = Post::factory()->create();
+    $media = Media::query()->create([
+        'disk' => 'public',
+        'directory' => 'posts/thumbnails',
+        'visibility' => 'public',
+        'name' => 'updated-thumbnail',
+        'path' => 'posts/thumbnails/updated-thumbnail.jpg',
+        'size' => 2048,
+        'type' => 'image/jpeg',
+        'ext' => 'jpg',
+    ]);
+
+    Livewire::test(EditPost::class, [
+        'record' => $post->getRouteKey(),
+    ])
+        ->set('data.thumbnail_curator_id', [$media->fresh()->toArray()])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($post->refresh()->thumbnail_curator_id)->toBe($media->getKey());
 });
 
 it('can delete posts from table', function (): void {

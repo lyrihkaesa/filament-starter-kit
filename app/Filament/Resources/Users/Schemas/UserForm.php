@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -16,12 +16,14 @@ final class UserForm
     {
         return $schema
             ->components([
-                FileUpload::make('avatar')
+                CuratorPicker::make('avatar_curator_id')
                     ->label(__('Avatar'))
-                    ->image()
-                    ->avatar()
-                    ->imageEditor()
-                    ->circleCropper(),
+                    ->relationship('avatarMedia', 'id')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                    ->maxSize(2048)
+                    ->disk('public')
+                    ->directory('avatars')
+                    ->visibility('public'),
                 TextInput::make('name')
                     ->label(__('Name'))
                     ->required(),

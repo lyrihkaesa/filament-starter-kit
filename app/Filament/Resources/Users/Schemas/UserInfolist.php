@@ -14,7 +14,7 @@ final class UserInfolist
     {
         return $schema
             ->components([
-                ImageEntry::make('avatar')
+                ImageEntry::make('avatarMedia.url')
                     ->label(__('Avatar'))
                     ->circular(),
                 TextEntry::make('name')

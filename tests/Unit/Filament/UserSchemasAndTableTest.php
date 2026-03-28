@@ -27,6 +27,7 @@ it('configures UserInfolist schema', function (): void {
 
 it('configures UsersTable', function (): void {
     $table = mock(Table::class);
+    $table->shouldReceive('modifyQueryUsing')->once()->andReturnSelf();
     $table->shouldReceive('columns')->once()->andReturnSelf();
     $table->shouldReceive('filters')->once()->andReturnSelf();
     $table->shouldReceive('recordActions')->once()->andReturnSelf();

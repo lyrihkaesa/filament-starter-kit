@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Posts\Tables;
 
+use Awcodes\Curator\Components\Tables\CuratorColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 final class PostsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('thumbnailCurator'))
             ->columns([
-                ImageColumn::make('thumbnail')
+                CuratorColumn::make('thumbnailCurator')
                     ->circular(),
                 TextColumn::make('title')
                     ->searchable()

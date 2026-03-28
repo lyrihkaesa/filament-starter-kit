@@ -8,6 +8,7 @@ use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\User;
+use Awcodes\Curator\Models\Media;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -43,6 +44,32 @@ it('can create users using action class', function (): void {
     ]);
 });
 
+it('can create users with curator avatar', function (): void {
+    $media = Media::query()->create([
+        'disk' => 'public',
+        'directory' => 'avatars',
+        'visibility' => 'public',
+        'name' => 'user-avatar',
+        'path' => 'avatars/user-avatar.jpg',
+        'size' => 1024,
+        'type' => 'image/jpeg',
+        'ext' => 'jpg',
+    ]);
+
+    Livewire::test(CreateUser::class)
+        ->set('data.name', 'Curator User')
+        ->set('data.email', 'curator@example.com')
+        ->set('data.password', 'password')
+        ->set('data.avatar_curator_id', [$media->fresh()->toArray()])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas('users', [
+        'email' => 'curator@example.com',
+        'avatar_curator_id' => $media->getKey(),
+    ]);
+});
+
 it('can update users using action class', function (): void {
     $user = User::factory()->create();
     $updatedName = 'Updated Name';
@@ -56,6 +83,30 @@ it('can update users using action class', function (): void {
         ->assertHasNoFormErrors();
 
     expect($user->refresh()->name)->toBe($updatedName);
+});
+
+it('can update users with curator avatar', function (): void {
+    $user = User::factory()->create();
+    $media = Media::query()->create([
+        'disk' => 'public',
+        'directory' => 'avatars',
+        'visibility' => 'public',
+        'name' => 'updated-avatar',
+        'path' => 'avatars/updated-avatar.jpg',
+        'size' => 1024,
+        'type' => 'image/jpeg',
+        'ext' => 'jpg',
+    ]);
+
+    Livewire::test(EditUser::class, [
+        'record' => $user->getRouteKey(),
+    ])
+        ->set('data.avatar_curator_id', [$media->fresh()->toArray()])
+        ->set('data.password', 'password')
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($user->refresh()->avatar_curator_id)->toBe($media->getKey());
 });
 
 it('can delete users using action class from table', function (): void {

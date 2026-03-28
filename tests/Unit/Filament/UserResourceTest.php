@@ -25,6 +25,7 @@ it('configures UserResource form, infolist, table, relations, pages, and query',
 
     // Mock Table for table()
     $table = mock(Table::class);
+    $table->shouldReceive('modifyQueryUsing')->once()->andReturnSelf();
     $table->shouldReceive('columns')->once()->andReturnSelf();
     $table->shouldReceive('filters')->once()->andReturnSelf();
     $table->shouldReceive('recordActions')->once()->andReturnSelf();

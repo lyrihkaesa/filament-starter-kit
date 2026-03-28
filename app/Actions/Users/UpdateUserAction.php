@@ -14,7 +14,7 @@ final readonly class UpdateUserAction
      *     name?: string,
      *     email?: string,
      *     password?: string,
-     *     avatar?: string|null,
+     *     avatar_curator_id?: int|null,
      *     email_verified_at?: string|null,
      *     roles?: array<int, string>,
      * } $data

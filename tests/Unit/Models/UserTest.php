@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\CuratorMedia;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -40,6 +41,44 @@ it('returns null filament avatar url when avatar is null', function (): void {
     $user = User::factory()->create(['avatar' => null]);
 
     expect($user->getFilamentAvatarUrl())->toBeNull();
+});
+
+it('prefers curator avatar url when avatar media is attached', function (): void {
+    Storage::fake('public');
+
+    $media = CuratorMedia::query()->create([
+        'disk' => 'public',
+        'directory' => 'avatars',
+        'visibility' => 'public',
+        'name' => 'test-avatar',
+        'path' => 'avatars/test-avatar.jpg',
+        'size' => 1234,
+        'type' => 'image/jpeg',
+        'ext' => 'jpg',
+    ]);
+
+    $user = User::factory()->create([
+        'avatar' => 'avatars/legacy-avatar.jpg',
+        'avatar_curator_id' => $media->getKey(),
+    ]);
+
+    expect($user->fresh()->getFilamentAvatarUrl())->toBe($media->url);
+});
+
+it('uses direct media urls for curator image derivatives across disks', function (): void {
+    $media = new CuratorMedia([
+        'disk' => 'public',
+        'directory' => 'avatars',
+        'visibility' => 'public',
+        'name' => 'test-avatar',
+        'path' => 'avatars/test-avatar.jpg',
+        'type' => 'image/jpeg',
+        'ext' => 'jpg',
+    ]);
+
+    expect($media->thumbnail_url)->toBe($media->url)
+        ->and($media->medium_url)->toBe($media->url)
+        ->and($media->large_url)->toBe($media->url);
 });
 
 it('returns temporary filament avatar url when using local disk', function (): void {

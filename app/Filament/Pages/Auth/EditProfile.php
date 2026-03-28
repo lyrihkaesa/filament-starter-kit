@@ -10,11 +10,11 @@ use App\Actions\Profile\RevokeOtherDevicesAction;
 use App\Actions\Profile\UpdateUserPasswordAction;
 use App\Data\DeviceInfo;
 use App\Models\User;
+use Awcodes\Curator\Components\Forms\CuratorPicker;
 use DeviceDetector\DeviceDetector;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -81,13 +81,14 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
     {
         return $schema
             ->components([
-                FileUpload::make('avatar')
+                CuratorPicker::make('avatar_curator_id')
                     ->label(__('Avatar'))
-                    ->image()
-                    ->avatar()
-                    ->imageEditor()
-                    ->circleCropper()
-                    ->directory('avatars'),
+                    ->relationship('avatarMedia', 'id')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                    ->maxSize(2048)
+                    ->disk('public')
+                    ->directory('avatars')
+                    ->visibility('public'),
                 $this->getNameFormComponent(),
                 $this->getEmailFormComponent(),
                 Select::make('roles')

@@ -15,7 +15,7 @@ final class CreateUser extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        /** @var array{name: string, email: string, password: string, avatar?: string|null, email_verified_at?: string|null} $data */
+        /** @var array{name: string, email: string, password: string, avatar_curator_id?: int|null, email_verified_at?: string|null} $data */
         return resolve(CreateUserAction::class)->handle($data);
     }
 }

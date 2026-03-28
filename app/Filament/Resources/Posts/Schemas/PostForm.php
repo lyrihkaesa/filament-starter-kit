@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Posts\Schemas;
 
-use Filament\Forms\Components\FileUpload;
+use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -40,10 +40,14 @@ final class PostForm
                         Section::make()
                             ->columnSpan(1)
                             ->components([
-                                FileUpload::make('thumbnail')
-                                    ->image()
-                                    ->imageEditor()
-                                    ->directory('posts/thumbnails'),
+                                CuratorPicker::make('thumbnail_curator_id')
+                                    ->label(__('Thumbnail'))
+                                    ->relationship('thumbnailCurator', 'id')
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->maxSize(3072)
+                                    ->disk('public')
+                                    ->directory('posts/thumbnails')
+                                    ->visibility('public'),
                                 Toggle::make('is_published')
                                     ->required()
                                     ->default(false),

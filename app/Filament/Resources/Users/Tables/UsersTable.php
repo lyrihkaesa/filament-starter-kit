@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Users\Tables;
 use App\Actions\Profile\DeleteUserAccountAction;
 use App\Actions\Profile\RestoreUserAccountAction;
 use App\Models\User;
+use Awcodes\Curator\Components\Tables\CuratorColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -16,7 +17,6 @@ use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Enums\IconSize;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -28,8 +28,9 @@ final class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('avatarMedia'))
             ->columns([
-                ImageColumn::make('avatar')
+                CuratorColumn::make('avatarMedia')
                     ->label(__('Avatar'))
                     ->circular()
                     ->defaultImageUrl(asset('images/thumbnails/images-dark-500x500.jpg')),

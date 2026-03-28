@@ -12,6 +12,7 @@ use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -98,6 +99,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             $this->forceFill([
                 'name' => 'Anonymous User',
                 'email' => sprintf('anonymous_%s@example.com', $uuid),
+                'avatar_curator_id' => null,
                 'email_verified_at' => null,
                 'password' => bcrypt(Str::random(40)),
                 'avatar' => null,
@@ -127,6 +129,14 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     }
 
     /**
+     * @return BelongsTo<CuratorMedia, $this>
+     */
+    public function avatarMedia(): BelongsTo
+    {
+        return $this->belongsTo(CuratorMedia::class, 'avatar_curator_id');
+    }
+
+    /**
      * Filament override implements HasAvatar
      *
      * @see HasAvatar
@@ -134,7 +144,15 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     // @codeCoverageIgnoreStart
     public function getFilamentAvatarUrl(): ?string
     {
-        if ($this->avatar === null || $this->isAnonymous()) {
+        if ($this->isAnonymous()) {
+            return null;
+        }
+
+        if ($this->avatarMedia !== null) {
+            return $this->avatarMedia->url;
+        }
+
+        if ($this->avatar === null) {
             return null;
         }
 
@@ -153,7 +171,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     // @codeCoverageIgnoreStart
     protected static function booted(): void
     {
-        self::forceDeleting(function (self $user) {
+        self::forceDeleting(function (self $user): false {
             $user->anonymize();
 
             return false;
@@ -170,6 +188,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     protected function casts(): array
     {
         return [
+            'avatar_curator_id' => 'integer',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'anonymized_at' => 'datetime',

@@ -7,6 +7,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
+use Awcodes\Curator\CuratorPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -69,6 +70,16 @@ final class AppPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
+                CuratorPlugin::make()
+                    ->label('Media')
+                    ->pluralLabel('Media')
+                    ->navigationIcon('heroicon-o-photo')
+                    ->navigationGroup('Content')
+                    ->navigationSort(2)
+                    ->showBadge(false)
+                    ->registerNavigation(true)
+                    ->curations(true)
+                    ->fileSwap(true),
                 FilamentShieldPlugin::make(),
             ])
             ->viteTheme('resources/css/filament/app/theme.css');

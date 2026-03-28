@@ -18,7 +18,7 @@ final class PostInfolist
             ->components([
                 Section::make()
                     ->components([
-                        ImageEntry::make('thumbnail')
+                        ImageEntry::make('thumbnailCurator.url')
                             ->circular(),
                         TextEntry::make('title'),
                         TextEntry::make('slug'),
