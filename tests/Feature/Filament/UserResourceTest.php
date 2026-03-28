@@ -47,7 +47,9 @@ it('can create users using action class', function (): void {
 });
 
 it('can create users with direct avatar upload that becomes curator media', function (): void {
-    Storage::fake('public');
+    $avatarDisk = config()->string('curator.default_disk');
+
+    Storage::fake($avatarDisk);
     $avatar = UploadedFile::fake()->image('avatar.jpg', 500, 500);
 
     Livewire::test(CreateUser::class)
@@ -65,7 +67,7 @@ it('can create users with direct avatar upload that becomes curator media', func
         'email' => 'curator@example.com',
         'avatar_curator_id' => $media->getKey(),
     ]);
-    Storage::disk('public')->assertExists($media->path);
+    Storage::disk($avatarDisk)->assertExists($media->path);
 });
 
 it('can update users using action class', function (): void {
@@ -84,7 +86,9 @@ it('can update users using action class', function (): void {
 });
 
 it('can update users with direct avatar upload that becomes curator media', function (): void {
-    Storage::fake('public');
+    $avatarDisk = config()->string('curator.default_disk');
+
+    Storage::fake($avatarDisk);
     $user = User::factory()->create();
     $avatar = UploadedFile::fake()->image('updated-avatar.jpg', 500, 500);
 
@@ -100,7 +104,7 @@ it('can update users with direct avatar upload that becomes curator media', func
     $media = CuratorMedia::query()->findOrFail($updatedUser->avatar_curator_id);
 
     expect($updatedUser->avatar_curator_id)->toBe($media->getKey());
-    Storage::disk('public')->assertExists($media->path);
+    Storage::disk($avatarDisk)->assertExists($media->path);
 });
 
 it('can delete users using action class from table', function (): void {

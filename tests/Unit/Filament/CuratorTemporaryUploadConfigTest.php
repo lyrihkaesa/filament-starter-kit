@@ -17,8 +17,16 @@ it('keeps livewire temporary uploads on a different disk than curator by default
 });
 
 it('stores livewire temporary uploads outside the final curator root directory', function (): void {
-    $temporaryRoot = Config::string('filesystems.disks.'.Config::string('livewire.temporary_file_upload.disk').'.root');
-    $curatorRoot = Config::string('filesystems.disks.'.Config::string('curator.default_disk').'.root');
+    $temporaryDisk = Config::string('livewire.temporary_file_upload.disk');
+    $curatorDisk = Config::string('curator.default_disk');
+    $temporaryRoot = Config::get('filesystems.disks.'.$temporaryDisk.'.root');
+    $curatorRoot = Config::get('filesystems.disks.'.$curatorDisk.'.root');
 
-    expect($temporaryRoot)->not->toBe($curatorRoot);
+    if (is_string($temporaryRoot) && is_string($curatorRoot)) {
+        expect($temporaryRoot)->not->toBe($curatorRoot);
+
+        return;
+    }
+
+    expect($temporaryDisk)->not->toBe($curatorDisk);
 });

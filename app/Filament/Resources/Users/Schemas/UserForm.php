@@ -27,9 +27,9 @@ final class UserForm
                     ->placeholder(__('Upload avatar'))
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                     ->maxSize(2048)
-                    ->disk('public')
+                    ->disk(config()->string('curator.default_disk'))
                     ->directory('avatars')
-                    ->visibility('public')
+                    ->visibility(config()->string('curator.default_visibility'))
                     ->storeFileNamesIn('avatar_upload_file_name'),
                 TextInput::make('name')
                     ->label(__('Name'))

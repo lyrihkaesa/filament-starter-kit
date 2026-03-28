@@ -48,7 +48,9 @@ it('can update profile information', function (): void {
 });
 
 it('can upload avatar directly from the profile form', function (): void {
-    Storage::fake('public');
+    $avatarDisk = config()->string('curator.default_disk');
+
+    Storage::fake($avatarDisk);
 
     $user = User::factory()->create();
 
@@ -63,7 +65,7 @@ it('can upload avatar directly from the profile form', function (): void {
     $media = CuratorMedia::query()->findOrFail($updatedUser->avatar_curator_id);
 
     expect($updatedUser->avatar_curator_id)->toBeInt();
-    Storage::disk('public')->assertExists($media->path);
+    Storage::disk($avatarDisk)->assertExists($media->path);
 });
 
 it('can revoke a single web session', function (): void {

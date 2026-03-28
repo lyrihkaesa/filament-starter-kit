@@ -36,8 +36,8 @@ trait InteractsWithCuratorAvatarUpload
         $media = resolve(UpsertCuratorMediaFromPathAction::class)->handle(
             path: isset($data['avatar_upload']) && is_string($data['avatar_upload']) ? $data['avatar_upload'] : null,
             originalFileName: isset($data['avatar_upload_file_name']) && is_string($data['avatar_upload_file_name']) ? $data['avatar_upload_file_name'] : null,
-            disk: 'public',
-            visibility: 'public',
+            disk: config()->string('curator.default_disk'),
+            visibility: config()->string('curator.default_visibility'),
         );
 
         $data['avatar_curator_id'] = $media?->getKey();
