@@ -42,7 +42,7 @@ it('returns paginated users by default with typed metadata and can flags', funct
         ->and($meta['can']['create'])->toBeTrue()
         ->and($firstUser['id'])->toBeString()
         ->and($firstUser['name'])->toBeString()
-        ->and($firstUser['avatar'])->toBeNull()
+        ->and($firstUser['avatar_url'])->toBeNull()
         ->and($firstUser['can']['view'])->toBeTrue()
         ->and($firstUser['can']['update'])->toBeFalse()
         ->and($firstUser['can']['delete'])->toBeFalse();

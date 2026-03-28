@@ -47,7 +47,7 @@ final class UserResource extends JsonResource
             'id' => is_scalar($routeKey) ? (string) $routeKey : '',
             'name' => is_scalar($user->name) ? (string) $user->name : '',
             'email' => is_scalar($user->email) ? (string) $user->email : '',
-            'avatar' => is_scalar($user->avatar) ? (string) $user->avatar : null,
+            'avatar_url' => $user->avatarMedia?->url,
             'email_verified_at' => $user->email_verified_at instanceof CarbonInterface ? $user->email_verified_at->toISOString() : null,
             'created_at' => $user->created_at instanceof CarbonInterface ? $user->created_at->toISOString() : null,
             'updated_at' => $user->updated_at instanceof CarbonInterface ? $user->updated_at->toISOString() : null,

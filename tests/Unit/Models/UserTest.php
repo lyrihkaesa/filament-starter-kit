@@ -37,8 +37,8 @@ it('can anonymize a user', function (): void {
         ->and($user->isAnonymous())->toBeTrue();
 });
 
-it('returns null filament avatar url when avatar is null', function (): void {
-    $user = User::factory()->create(['avatar' => null]);
+it('returns null filament avatar url when avatar media is missing', function (): void {
+    $user = User::factory()->create();
 
     expect($user->getFilamentAvatarUrl())->toBeNull();
 });
@@ -58,7 +58,6 @@ it('prefers curator avatar url when avatar media is attached', function (): void
     ]);
 
     $user = User::factory()->create([
-        'avatar' => 'avatars/legacy-avatar.jpg',
         'avatar_curator_id' => $media->getKey(),
     ]);
 
@@ -79,24 +78,6 @@ it('uses direct media urls for curator image derivatives across disks', function
     expect($media->thumbnail_url)->toBe($media->url)
         ->and($media->medium_url)->toBe($media->url)
         ->and($media->large_url)->toBe($media->url);
-});
-
-it('returns temporary filament avatar url when using local disk', function (): void {
-    Storage::fake('local');
-    config(['filament.default_filesystem_disk' => 'local']);
-
-    $user = User::factory()->create(['avatar' => 'avatars/test.jpg']);
-
-    expect($user->getFilamentAvatarUrl())->toContain('avatars/test.jpg');
-});
-
-it('returns direct filament avatar url when not using local disk', function (): void {
-    Storage::fake('s3');
-    config(['filament.default_filesystem_disk' => 's3']);
-
-    $user = User::factory()->create(['avatar' => 'avatars/test.jpg']);
-
-    expect($user->getFilamentAvatarUrl())->toBe(Storage::disk('s3')->url('avatars/test.jpg'));
 });
 
 it('anonymizes instead of force deleting', function (): void {

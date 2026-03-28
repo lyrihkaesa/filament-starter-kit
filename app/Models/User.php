@@ -14,11 +14,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
@@ -91,18 +89,12 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             $this->syncRoles([]);
             $this->syncPermissions([]);
 
-            // Clear avatar
-            if ($this->avatar) {
-                Storage::disk(config()->string('filament.default_filesystem_disk'))->delete($this->avatar);
-            }
-
             $this->forceFill([
                 'name' => 'Anonymous User',
                 'email' => sprintf('anonymous_%s@example.com', $uuid),
                 'avatar_curator_id' => null,
                 'email_verified_at' => null,
                 'password' => bcrypt(Str::random(40)),
-                'avatar' => null,
                 'anonymized_at' => now(),
             ])->saveQuietly();
 
@@ -152,18 +144,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             return $this->avatarMedia->url;
         }
 
-        if ($this->avatar === null) {
-            return null;
-        }
-
-        /** @var FilesystemAdapter $disk */
-        $disk = Storage::disk(config()->string('filament.default_filesystem_disk'));
-
-        if (config('filament.default_filesystem_disk') === 'local') {
-            return $disk->temporaryUrl($this->avatar, now()->addMinutes(5));
-        }
-
-        return $disk->url($this->avatar);
+        return null;
     }
 
     // @codeCoverageIgnoreEnd

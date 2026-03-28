@@ -58,7 +58,7 @@ final class UserController
     {
         $this->ensureAbility($request, 'users:create');
 
-        /** @var array{name: string, email: string, password: string, avatar?: string|null, email_verified_at?: string|null, roles?: array<int, string>} $payload */
+        /** @var array{name: string, email: string, password: string, email_verified_at?: string|null, roles?: array<int, string>} $payload */
         $payload = $request->validated();
         $user = $createUserAction->handle($payload);
 
@@ -76,7 +76,7 @@ final class UserController
     {
         $this->ensureAbility($request, 'users:update');
 
-        /** @var array{name?: string, email?: string, password?: string, avatar?: string|null, email_verified_at?: string|null, roles?: array<int, string>} $payload */
+        /** @var array{name?: string, email?: string, password?: string, email_verified_at?: string|null, roles?: array<int, string>} $payload */
         $payload = $request->validated();
         $updatedUser = $updateUserAction->handle($user, $payload);
 

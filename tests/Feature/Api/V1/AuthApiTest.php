@@ -41,7 +41,7 @@ it('registers a user and returns a typed api token payload', function (): void {
         ->and($payload['data']['abilities'])->toBe(['profile:read'])
         ->and($payload['data']['user']['id'])->toBeString()
         ->and($payload['data']['user']['name'])->toBe('Flutter User')
-        ->and($payload['data']['user']['avatar'])->toBeNull()
+        ->and($payload['data']['user']['avatar_url'])->toBeNull()
         ->and(array_key_exists('errors', $payload))->toBeFalse();
 
     expect(User::query()->where('email', 'flutter@example.com')->firstOrFail()->hasRole('member'))->toBeTrue();
