@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use App\Models\User;
+use App\Actions\Auth\RestoreAccountAction;
 use Filament\Notifications\Notification;
 use Filament\Pages\SimplePage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 final class RestoreAccount extends SimplePage
 {
@@ -16,7 +15,7 @@ final class RestoreAccount extends SimplePage
 
     protected string $view = 'filament.pages.auth.restore-account';
 
-    public function mount(Request $request): void
+    public function mount(Request $request, RestoreAccountAction $action): void
     {
         if (! $request->hasValidSignature()) {
             Notification::make()
@@ -30,25 +29,18 @@ final class RestoreAccount extends SimplePage
         }
 
         $userId = $request->route('id');
-        $user = User::onlyTrashed()->find($userId);
 
-        if (! $user) {
+        if ($action->handle($userId)) {
+            Notification::make()
+                ->title(__('auth.restore_success'))
+                ->success()
+                ->send();
+        } else {
             Notification::make()
                 ->title(__('auth.restore_failed'))
                 ->danger()
                 ->send();
-
-            $this->redirect(filament()->getLoginUrl());
-
-            return;
         }
-
-        $user->restore();
-
-        Notification::make()
-            ->title(__('auth.restore_success'))
-            ->success()
-            ->send();
 
         $this->redirect(filament()->getLoginUrl());
     }
