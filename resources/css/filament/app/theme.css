@@ -4,3 +4,12 @@
 @source '../../../../vendor/awcodes/filament-curator/resources/**/*.blade.php';
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/**/*.blade.php';
+
+.fi-fo-file-upload-avatar .filepond--drop-label,
+.fi-fo-file-upload-avatar .filepond--drop-label *,
+.fi-fo-file-upload-avatar .filepond--label-action,
+.fi-fo-file-upload-avatar .filepond--label-action *,
+.fi-fo-file-upload-avatar .filepond--panel-root,
+.fi-fo-file-upload-avatar .filepond--panel {
+    cursor: pointer;
+}

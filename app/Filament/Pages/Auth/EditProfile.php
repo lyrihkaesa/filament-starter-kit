@@ -9,12 +9,13 @@ use App\Actions\Profile\RevokeDeviceAction;
 use App\Actions\Profile\RevokeOtherDevicesAction;
 use App\Actions\Profile\UpdateUserPasswordAction;
 use App\Data\DeviceInfo;
+use App\Filament\Concerns\InteractsWithCuratorAvatarUpload;
 use App\Models\User;
-use Awcodes\Curator\Components\Forms\CuratorPicker;
 use DeviceDetector\DeviceDetector;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -41,6 +42,7 @@ use Throwable;
 final class EditProfile extends BaseEditProfile implements HasSchemas
 {
     // @codeCoverageIgnoreStart
+    use InteractsWithCuratorAvatarUpload;
     use InteractsWithSchemas;
 
     /**
@@ -81,14 +83,21 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
     {
         return $schema
             ->components([
-                CuratorPicker::make('avatar_curator_id')
+                FileUpload::make('avatar_upload')
                     ->label(__('Avatar'))
-                    ->relationship('avatarMedia', 'id')
+                    ->avatar()
+                    ->imageEditor()
+                    ->automaticallyOpenImageEditorForAspectRatio()
+                    ->circleCropper()
+                    ->imageEditorViewportWidth(320)
+                    ->imageEditorViewportHeight(320)
+                    ->placeholder(__('Upload avatar'))
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                     ->maxSize(2048)
                     ->disk('public')
                     ->directory('avatars')
-                    ->visibility('public'),
+                    ->visibility('public')
+                    ->storeFileNamesIn('avatar_upload_file_name'),
                 $this->getNameFormComponent(),
                 $this->getEmailFormComponent(),
                 Select::make('roles')
@@ -231,6 +240,28 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         // dump('Redirecting to: ' . Filament::getLoginUrl());
 
         $this->redirect(Filament::getLoginUrl());
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $user = $this->getUser();
+
+        throw_unless($user instanceof User, RuntimeException::class, 'User must be authenticated.');
+
+        return $this->fillAvatarUploadState($data, $user->avatarMedia);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $this->resolveAvatarUploadData($data);
     }
 
     protected function getNameFormComponent(): TextInput

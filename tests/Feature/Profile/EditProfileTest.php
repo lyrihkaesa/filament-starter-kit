@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Tests\Feature\Profile;
 
 use App\Filament\Pages\Auth\EditProfile;
+use App\Models\CuratorMedia;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\PersonalAccessToken;
 use Livewire\Livewire;
 
@@ -42,6 +45,25 @@ it('can update profile information', function (): void {
     expect($user->refresh())
         ->name->toBe('New Name')
         ->email->toBe('new@example.com');
+});
+
+it('can upload avatar directly from the profile form', function (): void {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(EditProfile::class)
+        ->set('data.avatar_upload', UploadedFile::fake()->image('avatar.jpg', 500, 500))
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $updatedUser = $user->refresh();
+    $media = CuratorMedia::query()->findOrFail($updatedUser->avatar_curator_id);
+
+    expect($updatedUser->avatar_curator_id)->toBeInt();
+    Storage::disk('public')->assertExists($media->path);
 });
 
 it('can revoke a single web session', function (): void {

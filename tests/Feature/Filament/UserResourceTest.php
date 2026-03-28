@@ -7,10 +7,12 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Models\CuratorMedia;
 use App\Models\User;
-use Awcodes\Curator\Models\Media;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 
@@ -44,30 +46,26 @@ it('can create users using action class', function (): void {
     ]);
 });
 
-it('can create users with curator avatar', function (): void {
-    $media = Media::query()->create([
-        'disk' => 'public',
-        'directory' => 'avatars',
-        'visibility' => 'public',
-        'name' => 'user-avatar',
-        'path' => 'avatars/user-avatar.jpg',
-        'size' => 1024,
-        'type' => 'image/jpeg',
-        'ext' => 'jpg',
-    ]);
+it('can create users with direct avatar upload that becomes curator media', function (): void {
+    Storage::fake('public');
+    $avatar = UploadedFile::fake()->image('avatar.jpg', 500, 500);
 
     Livewire::test(CreateUser::class)
         ->set('data.name', 'Curator User')
         ->set('data.email', 'curator@example.com')
         ->set('data.password', 'password')
-        ->set('data.avatar_curator_id', [$media->fresh()->toArray()])
+        ->set('data.avatar_upload', $avatar)
         ->call('create')
         ->assertHasNoFormErrors();
+
+    $createdUser = User::query()->where('email', 'curator@example.com')->firstOrFail();
+    $media = CuratorMedia::query()->findOrFail($createdUser->avatar_curator_id);
 
     $this->assertDatabaseHas('users', [
         'email' => 'curator@example.com',
         'avatar_curator_id' => $media->getKey(),
     ]);
+    Storage::disk('public')->assertExists($media->path);
 });
 
 it('can update users using action class', function (): void {
@@ -85,28 +83,24 @@ it('can update users using action class', function (): void {
     expect($user->refresh()->name)->toBe($updatedName);
 });
 
-it('can update users with curator avatar', function (): void {
+it('can update users with direct avatar upload that becomes curator media', function (): void {
+    Storage::fake('public');
     $user = User::factory()->create();
-    $media = Media::query()->create([
-        'disk' => 'public',
-        'directory' => 'avatars',
-        'visibility' => 'public',
-        'name' => 'updated-avatar',
-        'path' => 'avatars/updated-avatar.jpg',
-        'size' => 1024,
-        'type' => 'image/jpeg',
-        'ext' => 'jpg',
-    ]);
+    $avatar = UploadedFile::fake()->image('updated-avatar.jpg', 500, 500);
 
     Livewire::test(EditUser::class, [
         'record' => $user->getRouteKey(),
     ])
-        ->set('data.avatar_curator_id', [$media->fresh()->toArray()])
+        ->set('data.avatar_upload', $avatar)
         ->set('data.password', 'password')
         ->call('save')
         ->assertHasNoFormErrors();
 
-    expect($user->refresh()->avatar_curator_id)->toBe($media->getKey());
+    $updatedUser = $user->refresh();
+    $media = CuratorMedia::query()->findOrFail($updatedUser->avatar_curator_id);
+
+    expect($updatedUser->avatar_curator_id)->toBe($media->getKey());
+    Storage::disk('public')->assertExists($media->path);
 });
 
 it('can delete users using action class from table', function (): void {
