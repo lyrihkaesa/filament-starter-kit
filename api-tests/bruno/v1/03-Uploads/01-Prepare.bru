@@ -1,0 +1,43 @@
+meta {
+  name: 01-Prepare
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/uploads/prepare
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "purpose": "user_avatar",
+    "file_name": "logo-500x500.png",
+    "content_type": "image/png",
+    "size": 75000,
+    "requested_visibility": "public"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    const body = res.getBody();
+    if (body.data && body.data.upload_id) {
+      bru.setEnvVar("upload_id", body.data.upload_id);
+      bru.setEnvVar("upload_url", body.data.upload_url);
+    }
+  }
+}
+
+tests {
+  test("Prepare successful and URL is signed", function() {
+    expect(res.getStatus()).to.equal(201);
+    const body = res.getBody();
+    expect(body.data.upload_url).to.include("signature=");
+  });
+}

@@ -18,9 +18,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::prefix('uploads')->as('uploads.')->group(function (): void {
         Route::post('/prepare', [App\Http\Controllers\Api\V1\UploadController::class, 'prepare'])->name('prepare');
-        Route::put('/{upload}/file', [App\Http\Controllers\Api\V1\UploadController::class, 'file'])->name('file');
         Route::post('/{upload}/mark-uploaded', [App\Http\Controllers\Api\V1\UploadController::class, 'markUploaded'])->name('mark-uploaded');
         Route::get('/{upload}', [App\Http\Controllers\Api\V1\UploadController::class, 'show'])->name('show');
         Route::delete('/{upload}', [App\Http\Controllers\Api\V1\UploadController::class, 'destroy'])->name('destroy');
     });
 });
+
+Route::put('/uploads/{upload}/file', [App\Http\Controllers\Api\V1\UploadController::class, 'file'])
+    ->middleware('signed')
+    ->name('uploads.file');

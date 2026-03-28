@@ -105,10 +105,19 @@ Jadi mobile cukup fokus ke UX form, bukan ke detail internal media lifecycle.
 
 ```text
 POST /api/v1/uploads/prepare
+PUT /api/v1/uploads/{upload}/file
 POST /api/v1/uploads/{upload}/mark-uploaded
 GET /api/v1/uploads/{upload}
 DELETE /api/v1/uploads/{upload}
 ```
+
+> **Catatan Uji Coba (Bruno API Client)**
+> Kami telah menyediakan koleksi Bruno API di folder `api-tests/bruno/v1/03-Uploads` agar Anda dapat langsung menguji flow ini tanpa menulis kode klien. 
+> 
+> Flow pengujian di Bruno:
+> 1. Jalankan `01-Prepare` (upload_id akan otomatis tersimpan di environment)
+> 2. Jalankan `02-UploadFileLocal` (pilih file Binary di tab Body)
+> 3. Jalankan `03-MarkUploaded` (file akan difinalisasi)
 
 ### Curator / media library
 

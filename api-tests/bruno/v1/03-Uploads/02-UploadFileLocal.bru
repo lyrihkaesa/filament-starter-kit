@@ -1,0 +1,25 @@
+meta {
+  name: 02-UploadFileLocal
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{upload_url}}
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: image/png
+}
+
+body:text {
+  [Simulated Binary PNG Data for testing API without fs access]
+}
+
+tests {
+  test("Upload successful via signed url", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

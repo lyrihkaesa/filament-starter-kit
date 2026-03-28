@@ -48,7 +48,7 @@ final class UploadController
         if ($diskName === 's3' && method_exists($disk, 'temporaryUploadUrl')) {
             $uploadUrl = $disk->temporaryUploadUrl($path, now()->addMinutes(30));
         } else {
-            $uploadUrl = route('v1.uploads.file', $upload);
+            $uploadUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute('v1.uploads.file', now()->addMinutes(30), ['upload' => $upload->id]);
         }
 
         return response()->json([
@@ -75,7 +75,7 @@ final class UploadController
 
     public function file(Request $request, TemporaryUpload $upload): JsonResponse
     {
-        if ($upload->user_id !== $request->user()->id || $upload->status !== 'prepared') {
+        if ($upload->status !== 'prepared') {
             abort(Response::HTTP_FORBIDDEN, 'Invalid upload session.');
         }
 

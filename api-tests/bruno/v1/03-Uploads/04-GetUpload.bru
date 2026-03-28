@@ -1,0 +1,24 @@
+meta {
+  name: 04-GetUpload
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/uploads/{{upload_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+tests {
+  test("Can fetch temporary upload with uploaded status", function() {
+    expect(res.getStatus()).to.equal(200);
+    const body = res.getBody();
+    expect(body.data.id).to.equal(bru.getEnvVar("upload_id"));
+    expect(body.data.status).to.equal("uploaded");
+  });
+}

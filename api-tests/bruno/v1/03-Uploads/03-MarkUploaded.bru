@@ -1,0 +1,23 @@
+meta {
+  name: 03-MarkUploaded
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/uploads/{{upload_id}}/mark-uploaded
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+tests {
+  test("Mark uploaded successful, status is uploaded", function() {
+    expect(res.getStatus()).to.equal(200);
+    const body = res.getBody();
+    expect(body.data.status).to.equal("uploaded");
+  });
+}
