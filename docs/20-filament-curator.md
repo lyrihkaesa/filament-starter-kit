@@ -76,6 +76,8 @@ Ini keputusan yang disengaja supaya:
 
 Saat ini pengecualiannya adalah field yang memang wajar public, misalnya avatar user. Untuk kasus seperti itu, field dapat override visibility langsung di komponen upload tanpa mengubah default global Curator.
 
+Untuk API mobile nantinya, client juga boleh mengirim `requested_visibility`, tetapi backend tetap harus memutuskan `final_visibility` berdasarkan `purpose`, permission, dan policy server.
+
 ## Model Curator Kustom
 
 Starter kit mengarahkan model Curator ke [app/Models/CuratorMedia.php](E:/Projects/Laravel/filament-starter-kit/app/Models/CuratorMedia.php).
@@ -182,6 +184,8 @@ Pola yang akan dipakai:
 - mobile upload baru -> pegang `upload_id`
 - endpoint domain menerima `*_upload_id` atau `*_curator_id`
 - backend otomatis resolve hasil akhir ke record Curator
+- `prepare upload` akan membaca rule per `purpose`
+- client boleh mengusulkan visibility, tetapi server menetapkan hasil akhirnya
 
 Dengan pola itu:
 
