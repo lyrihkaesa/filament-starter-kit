@@ -238,7 +238,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         $this->redirect(Filament::getLoginUrl());
     }
 
-    protected function getNameFormComponent(): TextInput
+    public function getNameFormComponent(): TextInput
     {
         /** @var TextInput $component */
         $component = parent::getNameFormComponent();
@@ -246,7 +246,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         return $component->autofocus(false);
     }
 
-    protected function getEmailFormComponent(): TextInput
+    public function getEmailFormComponent(): TextInput
     {
         /** @var TextInput $component */
         $component = parent::getEmailFormComponent();
@@ -257,7 +257,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
     /**
      * @return array<int, string>
      */
-    protected function getSchemas(): array
+    public function getSchemas(): array
     {
         return [
             'form',
@@ -265,7 +265,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         ];
     }
 
-    protected function getProfileSection(): Section
+    public function getProfileSection(): Section
     {
         return Section::make(__('Profile Information'))
             ->description(__("Update your account's profile information and email address."))
@@ -283,7 +283,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->aside();
     }
 
-    protected function getPasswordSection(): Section
+    public function getPasswordSection(): Section
     {
         return Section::make(__('Update Password'))
             ->description(__('Ensure your account is using a long, random password to stay secure.'))
@@ -301,7 +301,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ->aside();
     }
 
-    protected function getActiveDevicesSection(): Section
+    public function getActiveDevicesSection(): Section
     {
         return Section::make(__('Active Devices & Sessions'))
             ->description(__('Manage and sign out your active sessions and connected devices.'))
@@ -315,7 +315,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ]);
     }
 
-    protected function getRevokeOtherDevicesAction(): Action
+    public function getRevokeOtherDevicesAction(): Action
     {
         return Action::make('revokeOtherDevices')
             ->label(__('Sign Out Other Devices'))
@@ -343,7 +343,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             });
     }
 
-    protected function getDeleteAccountSection(): Section
+    public function getDeleteAccountSection(): Section
     {
         return Section::make(__('Delete Account'))
             ->description(__('Once your account is deleted, you have 30 days to restore it. If not restored within 30 days, the account will be permanently deleted and you will no longer be able to log in.'))
@@ -356,7 +356,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             ]);
     }
 
-    protected function getDeleteAccountAction(): Action
+    public function getDeleteAccountAction(): Action
     {
         return Action::make('deleteAccount')
             ->label(__('Delete Account'))

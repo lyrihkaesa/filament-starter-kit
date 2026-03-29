@@ -14,11 +14,11 @@ final class ResolveMediaAction
     public function execute(?string $uploadId, ?string $curatorId, string $purpose): ?CuratorMedia
     {
         if ($curatorId) {
-            return CuratorMedia::where('id', $curatorId)->first();
+            return CuratorMedia::query()->where('id', $curatorId)->first();
         }
 
         if ($uploadId) {
-            $upload = TemporaryUpload::where('id', $uploadId)
+            $upload = TemporaryUpload::query()->where('id', $uploadId)
                 ->where('purpose', $purpose)
                 ->where('status', 'uploaded')
                 ->first();
@@ -27,17 +27,33 @@ final class ResolveMediaAction
                 return null;
             }
 
-            $config = config("api-uploads.purposes.{$purpose}");
-            $finalDisk = config('curator.disk', 'public');
-            $finalDirectory = $config['final_directory'] ?? 'media';
-            $finalVisibility = $upload->final_visibility;
+            $config = config('api-uploads.purposes.'.$purpose);
+            assert(is_array($config));
 
-            $extension = pathinfo($upload->file_name, PATHINFO_EXTENSION);
-            $finalFileName = Str::uuid()->toString().($extension ? ".{$extension}" : '');
-            $finalPath = "{$finalDirectory}/{$finalFileName}";
+            $finalDiskConfig = config('curator.disk', 'public');
+            assert(is_string($finalDiskConfig));
+            $finalDisk = $finalDiskConfig;
 
-            $tempDisk = Storage::disk($upload->disk);
+            $finalDirectoryConfig = $config['final_directory'] ?? 'media';
+            assert(is_string($finalDirectoryConfig));
+            $finalDirectory = $finalDirectoryConfig;
+
+            $finalVisibility = (string) $upload->final_visibility;
+
+            $fileName = $upload->file_name;
+            assert(is_string($fileName));
+            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+            $finalFileName = Str::uuid()->toString().($extension !== '' ? '.'.$extension : '');
+            $finalPath = sprintf('%s/%s', $finalDirectory, $finalFileName);
+
+            $uploadDisk = $upload->disk;
+            assert(is_string($uploadDisk));
+            $tempDisk = Storage::disk($uploadDisk);
             $fileContents = $tempDisk->get($upload->path);
+
+            if (! $fileContents) {
+                return null;
+            }
 
             Storage::disk($finalDisk)->put($finalPath, $fileContents, $finalVisibility);
 
@@ -46,7 +62,8 @@ final class ResolveMediaAction
             $width = null;
             $height = null;
 
-            if (str_starts_with($upload->mime_type, 'image/')) {
+            if (str_starts_with((string) $upload->mime_type, 'image/')) {
+                /** @var string $fileContents */
                 $sizes = @getimagesizefromstring($fileContents);
                 if ($sizes) {
                     $width = $sizes[0];
@@ -54,11 +71,11 @@ final class ResolveMediaAction
                 }
             }
 
-            $media = CuratorMedia::create([
+            $media = CuratorMedia::query()->create([
                 'disk' => $finalDisk,
                 'directory' => $finalDirectory,
                 'visibility' => $finalVisibility,
-                'name' => pathinfo($upload->file_name, PATHINFO_FILENAME),
+                'name' => pathinfo((string) $upload->file_name, PATHINFO_FILENAME),
                 'path' => $finalPath,
                 'width' => $width,
                 'height' => $height,

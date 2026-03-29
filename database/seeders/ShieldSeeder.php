@@ -9,6 +9,7 @@ use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\PermissionRegistrar;
 
 final class ShieldSeeder extends Seeder
@@ -103,7 +104,7 @@ final class ShieldSeeder extends Seeder
             unset($data['roles'], $data['permissions'], $data['tenant_roles'], $data['tenant_permissions']);
 
             if (app()->environment('testing')) {
-                $data['password'] = \Illuminate\Support\Facades\Hash::make('password');
+                $data['password'] = Hash::make('password');
             }
 
             $user = $userModel::query()->firstOrCreate(['email' => $data['email']], $data);

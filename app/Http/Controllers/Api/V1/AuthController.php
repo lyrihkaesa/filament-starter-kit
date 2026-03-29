@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AuthController
 {
-    public function register(RegisterRequest $request, RegisterUserAction $registerUserAction, LoginUserAction $loginUserAction): JsonResponse
+    public function store(RegisterRequest $request, RegisterUserAction $registerUserAction, LoginUserAction $loginUserAction): JsonResponse
     {
         $validated = $request->validated();
         $deviceName = isset($validated['device_name']) && is_scalar($validated['device_name']) ? (string) $validated['device_name'] : 'flutter-mobile';
@@ -43,7 +43,7 @@ final class AuthController
         ])->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
-    public function login(LoginRequest $request, LoginUserAction $loginUserAction): JsonResponse
+    public function create(LoginRequest $request, LoginUserAction $loginUserAction): JsonResponse
     {
         $validated = $request->validated();
         $deviceName = isset($validated['device_name']) && is_scalar($validated['device_name']) ? (string) $validated['device_name'] : 'flutter-mobile';
@@ -81,7 +81,7 @@ final class AuthController
         ])->response();
     }
 
-    public function me(): JsonResponse
+    public function show(): JsonResponse
     {
         /** @var User $user */
         $user = request()->user();
@@ -95,7 +95,7 @@ final class AuthController
             ->response();
     }
 
-    public function logout(LogoutCurrentTokenAction $logoutCurrentTokenAction): JsonResponse
+    public function destroy(LogoutCurrentTokenAction $logoutCurrentTokenAction): JsonResponse
     {
         /** @var User $user */
         $user = request()->user();

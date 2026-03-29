@@ -20,7 +20,7 @@ it('shows restore hint when user deleted themselves', function (): void {
     ]);
 
     // Simulate self-deletion
-    app(DeleteUserAccountAction::class)->handle($user, $user);
+    resolve(DeleteUserAccountAction::class)->handle($user, $user);
 
     expect($user->fresh()->isDeletedBySelf())->toBeTrue();
 
@@ -42,7 +42,7 @@ it('does not show restore hint when admin deleted the user', function (): void {
     ]);
 
     // Simulate admin-deletion
-    app(DeleteUserAccountAction::class)->handle($user, $admin);
+    resolve(DeleteUserAccountAction::class)->handle($user, $admin);
 
     expect($user->fresh()->isDeletedByAdmin())->toBeTrue();
 

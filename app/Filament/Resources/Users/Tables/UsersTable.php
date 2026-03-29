@@ -21,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use STS\FilamentImpersonate\Actions\Impersonate;
 
 final class UsersTable
@@ -98,7 +99,7 @@ final class UsersTable
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
-                    ->using(fn (User $record, DeleteUserAccountAction $deleteAction) => $deleteAction->handle($record, \Illuminate\Support\Facades\Auth::user())),
+                    ->using(fn (User $record, DeleteUserAccountAction $deleteAction) => $deleteAction->handle($record, Auth::user())),
                 RestoreAction::make()
                     ->using(fn (User $record, RestoreUserAccountAction $restoreAction) => $restoreAction->handle($record)),
             ])

@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Actions\Profile\AnonymizeUserAction;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 
 final class AnonymizeDeletedUsersCommand extends Command
 {
@@ -31,8 +32,7 @@ final class AnonymizeDeletedUsersCommand extends Command
     {
         $users = User::onlyTrashed()
             ->where('deleted_at', '<=', now()->subDays(30))
-            ->where(function ($query) {
-                /** @var \Illuminate\Database\Eloquent\Builder $query */
+            ->where(function (Builder $query): void {
                 $query->whereColumn('deleted_by', 'id')
                     ->orWhereNull('deleted_by');
             })

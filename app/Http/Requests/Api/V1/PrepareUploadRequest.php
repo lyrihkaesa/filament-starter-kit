@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1;
 
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 final class PrepareUploadRequest extends FormRequest
 {
@@ -14,44 +15,52 @@ final class PrepareUploadRequest extends FormRequest
         return true;
     }
 
+    /**
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
-        $purposes = array_keys(config('api-uploads.purposes', []));
+        $purposes = config('api-uploads.purposes');
+        assert(is_array($purposes));
 
         return [
-            'purpose' => ['required', 'string', Rule::in($purposes)],
-            'file_name' => ['required', 'string', 'max:255'],
-            'content_type' => ['required', 'string', 'max:255'],
-            'size' => ['required', 'integer', 'min:1'],
-            'requested_visibility' => ['nullable', 'string', Rule::in(['public', 'private'])],
+            'file_name' => ['required', 'string'],
+            'content_type' => ['required', 'string'],
+            'file_size' => ['required', 'integer'],
+            'purpose' => ['required', 'string', 'in:'.implode(',', array_keys($purposes))],
+            'requested_visibility' => ['nullable', 'string'],
         ];
     }
 
-    public function withValidator($validator): void
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator) {
+        $validator->after(function (Validator $validator): void {
             if ($this->has('purpose') && ! $validator->errors()->has('purpose')) {
-                $purpose = $this->input('purpose');
-                $config = config("api-uploads.purposes.{$purpose}");
+                $purposeInput = $this->input('purpose');
+                assert(is_string($purposeInput));
+                $purpose = $purposeInput;
+                $config = config('api-uploads.purposes.'.$purpose);
 
-                if (! $config) {
+                if (! is_array($config)) {
                     return;
                 }
 
-                if (! in_array($this->input('content_type'), $config['allowed_mimes'], true)) {
-                    $validator->errors()->add('content_type', 'The provided content type is not allowed for this purpose.');
+                $fileSize = $this->input('file_size');
+                $maxSizeConfig = $config['max_size'] ?? 0;
+                if (is_numeric($fileSize) && is_numeric($maxSizeConfig) && (int) $fileSize > ((int) $maxSizeConfig * 1024)) {
+                    $validator->errors()->add('file_size', 'The file size exceeds the maximum allowed size for this purpose.');
                 }
 
-                // size is in bytes from client, max_size in config is in KB
-                $maxSizeBytes = $config['max_size'] * 1024;
-                if ($this->input('size') > $maxSizeBytes) {
-                    $validator->errors()->add('size', 'The file size exceeds the maximum allowed size for this purpose.');
+                $contentType = $this->input('content_type');
+                if (is_string($contentType) && in_array($contentType, (array) $config['allowed_mimes'], true)) {
+                    // Valid
+                } elseif (is_string($contentType)) {
+                    $validator->errors()->add('content_type', 'The file type is not allowed for this purpose.');
                 }
 
-                if ($this->has('requested_visibility')) {
-                    if (! in_array($this->input('requested_visibility'), $config['allowed_visibilities'], true)) {
-                        $validator->errors()->add('requested_visibility', 'The requested visibility is not allowed for this purpose.');
-                    }
+                $requestedVisibility = $this->input('requested_visibility');
+                if ($this->has('requested_visibility') && is_string($requestedVisibility) && ! in_array($requestedVisibility, (array) ($config['allowed_visibilities'] ?? []), true)) {
+                    $validator->errors()->add('requested_visibility', 'The requested visibility is not allowed for this purpose.');
                 }
             }
         });
@@ -59,13 +68,23 @@ final class PrepareUploadRequest extends FormRequest
 
     public function getFinalVisibility(): string
     {
-        $purpose = $this->input('purpose');
-        $config = config("api-uploads.purposes.{$purpose}");
+        $purposeInput = $this->input('purpose');
+        assert(is_string($purposeInput));
+        $purpose = $purposeInput;
+        $config = config('api-uploads.purposes.'.$purpose);
 
-        if ($this->has('requested_visibility') && in_array($this->input('requested_visibility'), $config['allowed_visibilities'] ?? [], true)) {
-            return $this->input('requested_visibility');
+        if (! is_array($config)) {
+            return 'public';
         }
 
-        return $config['default_visibility'] ?? 'private';
+        $requestedVisibility = $this->input('requested_visibility');
+        if (is_string($requestedVisibility) && in_array($requestedVisibility, (array) ($config['allowed_visibilities'] ?? []), true)) {
+            return $requestedVisibility;
+        }
+
+        $defaultVisibility = $config['default_visibility'] ?? 'public';
+        assert(is_string($defaultVisibility));
+
+        return $defaultVisibility;
     }
 }

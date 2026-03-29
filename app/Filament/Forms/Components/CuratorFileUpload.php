@@ -14,9 +14,9 @@ use Illuminate\Support\Arr;
 
 final class CuratorFileUpload extends FileUpload
 {
-    protected string|Closure|null $relationship = null;
+    private string|Closure|null $relationship = null;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -73,7 +73,7 @@ final class CuratorFileUpload extends FileUpload
 
     private function hydrateFromCuratorState(mixed $state): void
     {
-        $ids = array_values(array_filter(Arr::wrap($state), static fn (mixed $id): bool => filled($id)));
+        $ids = array_values(array_filter(Arr::wrap($state), filled(...)));
 
         if ($ids === []) {
             $this->state(null);

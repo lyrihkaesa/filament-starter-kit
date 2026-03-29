@@ -29,16 +29,17 @@ final class CleanupTemporaryUploadsCommand extends Command
      */
     public function handle(): int
     {
-        $expiredUploads = TemporaryUpload::where('status', '!=', 'finalized')
+        $expiredUploads = TemporaryUpload::query()->where('status', '!=', 'finalized')
             ->where('created_at', '<', now()->subHours(24))
             ->get();
 
+        /** @var TemporaryUpload $upload */
         foreach ($expiredUploads as $upload) {
-            Storage::disk($upload->disk)->delete($upload->path);
+            Storage::disk((string) $upload->disk)->delete((string) $upload->path);
             $upload->delete();
         }
 
-        $this->info("Cleaned up {$expiredUploads->count()} expired temporary uploads.");
+        $this->info(sprintf('Cleaned up %d expired temporary uploads.', $expiredUploads->count()));
 
         return self::SUCCESS;
     }

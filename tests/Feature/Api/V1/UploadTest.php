@@ -6,15 +6,16 @@ use App\Actions\ResolveMediaAction;
 use App\Models\TemporaryUpload;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
-it('can prepare an upload session', function () {
+it('can prepare an upload session', function (): void {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->postJson(route('v1.uploads.prepare'), [
         'purpose' => 'user_avatar',
         'file_name' => 'avatar.jpg',
         'content_type' => 'image/jpeg',
-        'size' => 1024,
+        'file_size' => 1024,
         'requested_visibility' => 'public',
     ]);
 
@@ -36,25 +37,25 @@ it('can prepare an upload session', function () {
     ]);
 });
 
-it('cannot prepare an upload with invalid mime type', function () {
+it('cannot prepare an upload with invalid mime type', function (): void {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->postJson(route('v1.uploads.prepare'), [
         'purpose' => 'user_avatar',
         'file_name' => 'avatar.pdf',
         'content_type' => 'application/pdf',
-        'size' => 1024,
+        'file_size' => 1024,
     ]);
 
     $response->assertUnprocessable();
     $response->assertJsonValidationErrors(['content_type']);
 });
 
-it('can upload file to local fallback and mark it as uploaded', function () {
+it('can upload file to local fallback and mark it as uploaded', function (): void {
     Storage::fake('uploads_tmp');
 
     $user = User::factory()->create();
-    $upload = TemporaryUpload::create([
+    $upload = TemporaryUpload::query()->create([
         'user_id' => $user->id,
         'session_id' => (string) str()->uuid(),
         'disk' => 'uploads_tmp',
@@ -71,7 +72,7 @@ it('can upload file to local fallback and mark it as uploaded', function () {
 
     $response = $this->actingAs($user)->call(
         'PUT',
-        route('v1.uploads.file', $upload),
+        URL::signedRoute('v1.uploads.file', ['upload' => $upload->id]),
         [],
         [],
         [],
@@ -91,12 +92,12 @@ it('can upload file to local fallback and mark it as uploaded', function () {
     ]);
 });
 
-it('can resolve a temporary upload into curator media', function () {
+it('can resolve a temporary upload into curator media', function (): void {
     Storage::fake('uploads_tmp');
     Storage::fake('public');
 
     $user = User::factory()->create();
-    $upload = TemporaryUpload::create([
+    $upload = TemporaryUpload::query()->create([
         'user_id' => $user->id,
         'session_id' => (string) str()->uuid(),
         'disk' => 'uploads_tmp',
