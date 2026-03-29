@@ -98,7 +98,7 @@ final class UsersTable
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
-                    ->using(fn (User $record, DeleteUserAccountAction $deleteAction) => $deleteAction->handle($record)),
+                    ->using(fn (User $record, DeleteUserAccountAction $deleteAction) => $deleteAction->handle($record, \Illuminate\Support\Facades\Auth::user())),
                 RestoreAction::make()
                     ->using(fn (User $record, RestoreUserAccountAction $restoreAction) => $restoreAction->handle($record)),
             ])

@@ -19,6 +19,7 @@ return [
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'deleted' => 'Your account has been deleted. You have 30 days to restore it before it is permanently deleted.',
+    'deleted_by_admin' => 'This account has been suspended or deleted by an administrator. Please contact support.',
     'restore' => 'Restore account?',
     'restore_requested' => 'An account restoration link has been sent to your email address.',
     'restore_success' => 'Your account has been successfully restored. Please login again.',

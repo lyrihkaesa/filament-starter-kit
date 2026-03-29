@@ -220,7 +220,7 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
             return;
         }
 
-        $action->handle($user);
+        $action->handle($user, $user);
 
         Filament::auth()->logout();
 

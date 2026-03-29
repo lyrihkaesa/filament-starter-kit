@@ -52,6 +52,21 @@ final class Login extends \Filament\Auth\Pages\Login
         $user = User::onlyTrashed()->where('email', $data['email'])->first();
 
         if ($user && ! $user->isAnonymous()) {
+            if ($user->isDeletedBySelf()) {
+                $this->showRestoreAccountHint = true;
+
+                throw ValidationException::withMessages([
+                    'data.email' => __('auth.deleted'),
+                ]);
+            }
+
+            if ($user->isDeletedByAdmin()) {
+                throw ValidationException::withMessages([
+                    'data.email' => __('auth.deleted_by_admin'),
+                ]);
+            }
+
+            // Fallback for old records without deleted_by
             $this->showRestoreAccountHint = true;
 
             throw ValidationException::withMessages([

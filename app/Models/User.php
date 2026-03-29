@@ -65,6 +65,17 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
         'remember_token',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function deletedBy(): BelongsTo
+    {
+        /** @var BelongsTo<User, $this> $relation */
+        $relation = $this->belongsTo(self::class, 'deleted_by');
+
+        return $relation->withTrashed();
+    }
+
     public function isAnonymous(): bool
     {
         return $this->anonymized_at !== null;
@@ -73,6 +84,16 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     public function isSoftDeleted(): bool
     {
         return $this->deleted_at !== null && $this->anonymized_at === null;
+    }
+
+    public function isDeletedBySelf(): bool
+    {
+        return $this->deleted_at !== null && $this->deleted_by === $this->id;
+    }
+
+    public function isDeletedByAdmin(): bool
+    {
+        return $this->deleted_at !== null && $this->deleted_by !== null && $this->deleted_by !== $this->id;
     }
 
     public function isActive(): bool

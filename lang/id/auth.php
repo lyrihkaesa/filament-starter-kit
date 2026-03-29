@@ -19,6 +19,7 @@ return [
     'password' => 'Kata sandi yang diberikan salah.',
     'throttle' => 'Terlalu banyak percobaan login. Silakan coba lagi dalam :seconds detik.',
     'deleted' => 'Akun Anda telah dihapus. Anda memiliki waktu 30 hari untuk memulihkannya sebelum dihapus secara permanen.',
+    'deleted_by_admin' => 'Akun ini telah ditangguhkan atau dihapus oleh administrator. Silakan hubungi dukungan.',
     'restore' => 'Pulihkan akun?',
     'restore_requested' => 'Tautan pemulihan akun telah dikirim ke alamat email Anda.',
     'restore_success' => 'Akun Anda telah berhasil dipulihkan. Silakan login kembali.',
