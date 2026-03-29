@@ -201,7 +201,6 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     protected function casts(): array
     {
         return [
-            'avatar_curator_id' => 'integer',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'anonymized_at' => 'datetime',

@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('curator', function (Blueprint $table): void {
-            $table->id();
+            $table->uuid('id')->primary();
 
             $table->string('disk');
             $table->string('directory')->nullable();

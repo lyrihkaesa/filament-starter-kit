@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_published')->default(false);
             $table->foreignUuid('author_id')->constrained('users')->cascadeOnDelete();
             $table->string('thumbnail')->nullable();
-            $table->unsignedBigInteger('thumbnail_curator_id')->nullable();
+            $table->foreignUuid('thumbnail_curator_id')->nullable();
             $table->timestamps();
         });
     }

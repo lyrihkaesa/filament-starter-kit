@@ -30,7 +30,7 @@ final class CuratorFileUpload extends FileUpload
             $component->hydrateFromCuratorState($state);
         });
 
-        $this->dehydrateStateUsing(fn (): array|int|null => $this->dehydrateToCuratorState());
+        $this->dehydrateStateUsing(fn (): array|int|string|null => $this->dehydrateToCuratorState());
     }
 
     public static function make(?string $name = null): static
@@ -101,9 +101,9 @@ final class CuratorFileUpload extends FileUpload
     }
 
     /**
-     * @return array<int, int>|int|null
+     * @return array<int, int|string>|int|string|null
      */
-    private function dehydrateToCuratorState(): array|int|null
+    private function dehydrateToCuratorState(): array|int|string|null
     {
         $paths = array_values(array_filter(
             Arr::wrap($this->getRawState()),
@@ -128,17 +128,7 @@ final class CuratorFileUpload extends FileUpload
                 continue;
             }
 
-            $mediaKey = $media->getKey();
-
-            if (is_int($mediaKey)) {
-                $mediaIds[] = $mediaKey;
-
-                continue;
-            }
-
-            if (is_string($mediaKey) && is_numeric($mediaKey)) {
-                $mediaIds[] = (int) $mediaKey;
-            }
+            $mediaIds[] = $media->getKey();
         }
 
         if ($mediaIds === []) {

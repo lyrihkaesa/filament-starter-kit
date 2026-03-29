@@ -7,9 +7,9 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
+use App\Models\CuratorMedia;
 use App\Models\Post;
 use App\Models\User;
-use Awcodes\Curator\Models\Media;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -54,7 +54,7 @@ it('can create posts', function (): void {
 
 it('can create posts with curator thumbnail', function (): void {
     $user = User::factory()->create();
-    $media = Media::query()->create([
+    $media = CuratorMedia::query()->create([
         'disk' => 'public',
         'directory' => 'posts/thumbnails',
         'visibility' => 'public',
@@ -97,7 +97,7 @@ it('can update posts', function (): void {
 
 it('can update posts with curator thumbnail', function (): void {
     $post = Post::factory()->create();
-    $media = Media::query()->create([
+    $media = CuratorMedia::query()->create([
         'disk' => 'public',
         'directory' => 'posts/thumbnails',
         'visibility' => 'public',
