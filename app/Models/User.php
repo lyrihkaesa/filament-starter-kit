@@ -173,10 +173,21 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     // @codeCoverageIgnoreStart
     protected static function booted(): void
     {
-        self::forceDeleting(function (self $user): false {
-            $user->anonymize();
+        self::forceDeleting(function (self $user): bool {
+            if ($user->isDeletedBySelf()) {
+                $user->anonymize();
 
-            return false;
+                return false;
+            }
+
+            // Fallback for null deleted_by (treat as self-deleted for legacy compatibility)
+            if ($user->deleted_by === null) {
+                $user->anonymize();
+
+                return false;
+            }
+
+            return true;
         });
     }
 

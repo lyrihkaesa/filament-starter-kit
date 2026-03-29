@@ -31,6 +31,11 @@ final class AnonymizeDeletedUsersCommand extends Command
     {
         $users = User::onlyTrashed()
             ->where('deleted_at', '<=', now()->subDays(30))
+            ->where(function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->whereColumn('deleted_by', 'id')
+                    ->orWhereNull('deleted_by');
+            })
             ->whereNull('anonymized_at')
             ->get();
 
@@ -42,6 +47,7 @@ final class AnonymizeDeletedUsersCommand extends Command
 
         $this->info(sprintf('Anonymizing %d users...', $users->count()));
 
+        /** @var User $user */
         foreach ($users as $user) {
             $anonymizeAction->handle($user);
             $this->line('Anonymized user: '.$user->id);
