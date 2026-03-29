@@ -30,7 +30,7 @@ final class RestoreAccountNotification extends Notification implements ShouldQue
         }
 
         $url = URL::temporarySignedRoute(
-            'account.restore',
+            'restore-account',
             now()->addDays(7),
             ['id' => $notifiable->getKey()]
         );
