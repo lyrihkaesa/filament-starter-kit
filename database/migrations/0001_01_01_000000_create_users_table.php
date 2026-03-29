@@ -23,6 +23,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+            $table->uuid('deleted_by')->nullable();
             $table->datetime('anonymized_at')->nullable();
         });
 
