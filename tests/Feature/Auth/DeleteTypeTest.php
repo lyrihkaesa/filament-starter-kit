@@ -25,10 +25,8 @@ it('shows restore hint when user deleted themselves', function (): void {
     expect($user->fresh()->isDeletedBySelf())->toBeTrue();
 
     Livewire::test(Login::class)
-        ->fillForm([
-            'email' => 'self-deleted@example.com',
-            'password' => 'password',
-        ])
+        ->set('data.email', 'self-deleted@example.com')
+        ->set('data.password', 'password')
         ->call('authenticate')
         ->assertHasErrors(['data.email' => __('auth.deleted')])
         ->assertSet('showRestoreAccountHint', true);
@@ -47,10 +45,8 @@ it('does not show restore hint when admin deleted the user', function (): void {
     expect($user->fresh()->isDeletedByAdmin())->toBeTrue();
 
     Livewire::test(Login::class)
-        ->fillForm([
-            'email' => 'admin-deleted@example.com',
-            'password' => 'password',
-        ])
+        ->set('data.email', 'admin-deleted@example.com')
+        ->set('data.password', 'password')
         ->call('authenticate')
         ->assertHasErrors(['data.email' => __('auth.deleted_by_admin')])
         ->assertSet('showRestoreAccountHint', false);

@@ -9,6 +9,7 @@ use Database\Factories\CuratorMediaFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 final class CuratorMedia extends Media
 {
@@ -55,7 +56,7 @@ final class CuratorMedia extends Media
     {
         self::creating(function (self $media): void {
             if (empty($media->{$media->getKeyName()})) {
-                $media->{$media->getKeyName()} = (string) str()->uuid();
+                $media->{$media->getKeyName()} = Str::uuid()->toString();
             }
         });
     }

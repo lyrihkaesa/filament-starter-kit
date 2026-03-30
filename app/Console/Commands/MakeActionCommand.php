@@ -76,7 +76,7 @@ final class MakeActionCommand extends GeneratorCommand
         return parent::handle();
     }
 
-    public function getStub(): string
+    protected function getStub(): string
     {
         if ($this->option('create')) {
             return $this->resolveStub('create-action');
@@ -96,7 +96,7 @@ final class MakeActionCommand extends GeneratorCommand
     /**
      * @param  string  $rootNamespace
      */
-    public function getDefaultNamespace(mixed $rootNamespace): string
+    protected function getDefaultNamespace(mixed $rootNamespace): string
     {
         $rootNamespace = (string) $rootNamespace;
         if ($this->option('model')) {
@@ -109,7 +109,7 @@ final class MakeActionCommand extends GeneratorCommand
     /**
      * @param  string  $name
      */
-    public function buildClass(mixed $name): string
+    protected function buildClass(mixed $name): string
     {
         $name = (string) $name;
         $replace = [];
@@ -134,7 +134,7 @@ final class MakeActionCommand extends GeneratorCommand
      *
      * @return array<int, array{0: string, 1: int, 2: string}>
      */
-    public function getArguments(): array
+    protected function getArguments(): array
     {
         return [
             ['name', InputArgument::OPTIONAL, 'The name of the action class'],
@@ -146,7 +146,7 @@ final class MakeActionCommand extends GeneratorCommand
      *
      * @return array<int, array{0: string, 1: ?string, 2: int, 3: string}>
      */
-    public function getOptions(): array
+    protected function getOptions(): array
     {
         return [
             ['model', 'm', InputOption::VALUE_REQUIRED, 'The model name (e.g. Post)'],

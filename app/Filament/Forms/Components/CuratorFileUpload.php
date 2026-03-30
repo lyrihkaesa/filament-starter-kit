@@ -16,7 +16,7 @@ final class CuratorFileUpload extends FileUpload
 {
     private string|Closure|null $relationship = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -114,6 +114,7 @@ final class CuratorFileUpload extends FileUpload
             return null;
         }
 
+        /** @var array<int, int|string> $mediaIds */
         $mediaIds = [];
 
         foreach ($paths as $path) {
@@ -128,14 +129,22 @@ final class CuratorFileUpload extends FileUpload
                 continue;
             }
 
-            $mediaIds[] = $media->getKey();
+            $key = $media->getKey();
+
+            if (is_int($key) || is_string($key)) {
+                $mediaIds[] = $key;
+            }
         }
 
         if ($mediaIds === []) {
             return null;
         }
 
-        return $this->isMultiple() ? $mediaIds : $mediaIds[0];
+        if ($this->isMultiple()) {
+            return $mediaIds;
+        }
+
+        return $mediaIds[0];
     }
 
     /**

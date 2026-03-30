@@ -34,6 +34,7 @@ final class UsersTable
                 CuratorColumn::make('avatarMedia')
                     ->label(__('Avatar'))
                     ->circular()
+                    ->imageSize(50)
                     ->defaultImageUrl(asset('images/thumbnails/images-dark-500x500.jpg')),
                 TextColumn::make('name')
                     ->label(__('Name'))

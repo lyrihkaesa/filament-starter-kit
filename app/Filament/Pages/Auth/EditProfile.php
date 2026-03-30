@@ -238,22 +238,6 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         $this->redirect(Filament::getLoginUrl());
     }
 
-    public function getNameFormComponent(): TextInput
-    {
-        /** @var TextInput $component */
-        $component = parent::getNameFormComponent();
-
-        return $component->autofocus(false);
-    }
-
-    public function getEmailFormComponent(): TextInput
-    {
-        /** @var TextInput $component */
-        $component = parent::getEmailFormComponent();
-
-        return $component;
-    }
-
     /**
      * @return array<int, string>
      */
@@ -382,6 +366,22 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
 
                 $this->deleteAccount($password, $deleteUserAccountAction);
             });
+    }
+
+    protected function getNameFormComponent(): TextInput
+    {
+        /** @var TextInput $component */
+        $component = parent::getNameFormComponent();
+
+        return $component->autofocus(false);
+    }
+
+    protected function getEmailFormComponent(): TextInput
+    {
+        /** @var TextInput $component */
+        $component = parent::getEmailFormComponent();
+
+        return $component;
     }
 
     /**

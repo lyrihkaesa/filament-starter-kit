@@ -6,7 +6,7 @@ namespace App\Actions\Media;
 
 use App\Models\CuratorMedia;
 use Illuminate\Support\Facades\Storage;
-use RuntimeException;
+use Throwable;
 
 final readonly class UpsertCuratorMediaFromPathAction
 {
@@ -31,11 +31,15 @@ final readonly class UpsertCuratorMediaFromPathAction
 
         $storage = Storage::disk($disk);
 
-        throw_unless(
-            $storage->exists($path),
-            RuntimeException::class,
-            sprintf('Uploaded file [%s] was not found on disk [%s].', $path, $disk),
-        );
+        try {
+            $exists = $storage->exists($path);
+        } catch (Throwable) {
+            $exists = false;
+        }
+
+        if (! $exists) {
+            return null;
+        }
 
         $extension = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
         $directory = pathinfo($path, PATHINFO_DIRNAME);

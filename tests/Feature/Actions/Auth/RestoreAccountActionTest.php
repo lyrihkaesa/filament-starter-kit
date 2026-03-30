@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Actions\Auth\RestoreAccountAction;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 it('can restore a soft-deleted user', function (): void {
     $user = User::factory()->create();
@@ -27,7 +28,7 @@ it('returns false for non-deleted user', function (): void {
 
 it('returns false for non-existent user id', function (): void {
     $action = resolve(RestoreAccountAction::class);
-    $result = $action->handle('non-existent-uuid');
+    $result = $action->handle(Str::uuid()->toString());
 
     expect($result)->toBeFalse();
 });
