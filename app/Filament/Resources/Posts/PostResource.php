@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Posts;
 
+use App\Actions\Media\DeleteAllMediaUsagesAction;
+use App\Actions\Media\SyncMediaUsageAction;
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
@@ -17,6 +19,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 final class PostResource extends Resource
 {
@@ -54,5 +57,30 @@ final class PostResource extends Resource
             'view' => ViewPost::route('/{record}'),
             'edit' => EditPost::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @param  array{thumbnail_curator_id?: string|null}  $data
+     */
+    private static function afterCreate(Model $record, array $data): void
+    {
+        if (! empty($data['thumbnail_curator_id'])) {
+            resolve(SyncMediaUsageAction::class)->handle($record, 'thumbnail_curator_id', $data['thumbnail_curator_id']);
+        }
+    }
+
+    /**
+     * @param  array{thumbnail_curator_id?: string|null}  $data
+     */
+    private static function afterSave(Model $record, array $data): void
+    {
+        if (array_key_exists('thumbnail_curator_id', $data)) {
+            resolve(SyncMediaUsageAction::class)->handle($record, 'thumbnail_curator_id', $data['thumbnail_curator_id'] ?: null);
+        }
+    }
+
+    private static function afterDelete(Model $record): void
+    {
+        resolve(DeleteAllMediaUsagesAction::class)->handle($record);
     }
 }

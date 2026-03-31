@@ -2,15 +2,22 @@
 
 declare(strict_types=1);
 
+use App\Actions\Media\DeleteCuratorMediaAction;
 use App\Enums\Privacy;
 use App\Models\CuratorMedia;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 beforeEach(function (): void {
-    $this->adminRole = Role::create(['name' => 'admin']);
-    $this->superAdminRole = Role::create(['name' => 'super_admin']);
+    // Create necessary permissions for testing (Following Project Convention Action:Model)
+    Permission::create(['name' => 'ViewAny:CuratorMedia']);
+    Permission::create(['name' => 'View:CuratorMedia']);
+    Permission::create(['name' => 'ViewOwn:CuratorMedia']);
+    Permission::create(['name' => 'Update:CuratorMedia']);
+    Permission::create(['name' => 'UpdateOwn:CuratorMedia']);
+    Permission::create(['name' => 'Delete:CuratorMedia']);
+    Permission::create(['name' => 'DeleteOwn:CuratorMedia']);
 });
 
 it('sets created_by and privacy on creation', function (): void {
@@ -54,14 +61,14 @@ it('allows only logged in users to view member media', function (): void {
     expect(Gate::allows('view', $media))->toBeTrue();
 });
 
-it('restricts private media to creator, admin, or super_admin', function (): void {
+it('restricts private media based on permissions', function (): void {
     $creator = User::factory()->create();
-    $otherUser = User::factory()->create();
-    $admin = User::factory()->create();
-    $admin->assignRole($this->adminRole);
+    $creator->givePermissionTo('ViewOwn:CuratorMedia');
 
-    $superAdmin = User::factory()->create();
-    $superAdmin->assignRole($this->superAdminRole);
+    $otherUser = User::factory()->create();
+
+    $adminUser = User::factory()->create();
+    $adminUser->givePermissionTo('View:CuratorMedia');
 
     $media = CuratorMedia::factory()->create([
         'created_by' => $creator->id,
@@ -71,52 +78,46 @@ it('restricts private media to creator, admin, or super_admin', function (): voi
     // Guest
     expect(Gate::allows('view', $media))->toBeFalse();
 
-    // Other user
+    // Other user (no permission)
     $this->actingAs($otherUser);
     expect(Gate::allows('view', $media))->toBeFalse();
 
-    // Creator
+    // Creator (has view_own permission)
     $this->actingAs($creator);
     expect(Gate::allows('view', $media))->toBeTrue();
 
-    // Admin
-    $this->actingAs($admin);
-    expect(Gate::allows('view', $media))->toBeTrue();
-
-    // Super Admin
-    $this->actingAs($superAdmin);
+    // Admin (has view_any permission)
+    $this->actingAs($adminUser);
     expect(Gate::allows('view', $media))->toBeTrue();
 });
 
-it('restricts update and delete to creator, admin, or super_admin', function (): void {
+it('restricts update and delete based on any/own permissions', function (): void {
     $creator = User::factory()->create();
-    $otherUser = User::factory()->create();
-    $admin = User::factory()->create();
-    $admin->assignRole($this->adminRole);
+    $creator->givePermissionTo(['UpdateOwn:CuratorMedia', 'DeleteOwn:CuratorMedia']);
 
-    $superAdmin = User::factory()->create();
-    $superAdmin->assignRole($this->superAdminRole);
+    $otherUser = User::factory()->create();
+
+    $adminUser = User::factory()->create();
+    $adminUser->givePermissionTo(['Update:CuratorMedia', 'Delete:CuratorMedia']);
 
     $media = CuratorMedia::factory()->create([
         'created_by' => $creator->id,
     ]);
 
-    foreach (['update', 'delete'] as $action) {
+    foreach (['Update', 'Delete'] as $action) {
+        $policyAction = mb_strtolower($action);
+
         // Other user
         $this->actingAs($otherUser);
-        expect(Gate::allows($action, $media))->toBeFalse();
+        expect(Gate::allows($policyAction, $media))->toBeFalse();
 
         // Creator
         $this->actingAs($creator);
-        expect(Gate::allows($action, $media))->toBeTrue();
+        expect(Gate::allows($policyAction, $media))->toBeTrue();
 
         // Admin
-        $this->actingAs($admin);
-        expect(Gate::allows($action, $media))->toBeTrue();
-
-        // Super Admin
-        $this->actingAs($superAdmin);
-        expect(Gate::allows($action, $media))->toBeTrue();
+        $this->actingAs($adminUser);
+        expect(Gate::allows($policyAction, $media))->toBeTrue();
     }
 });
 
@@ -132,11 +133,20 @@ it('syncs privacy with physical visibility', function (): void {
     // MEMBER privacy should be private visibility
     $memberMedia = CuratorMedia::factory()->create(['privacy' => Privacy::MEMBER]);
     expect($memberMedia->visibility)->toBe('private');
+});
 
-    // Updating privacy should update visibility
-    $privateMedia->update(['privacy' => Privacy::PUBLIC]);
-    expect($privateMedia->visibility)->toBe('public');
+it('supports soft deletes and tracks who deleted it', function (): void {
+    $user = User::factory()->create();
+    $media = CuratorMedia::factory()->create();
 
-    $publicMedia->update(['privacy' => Privacy::MEMBER]);
-    expect($publicMedia->visibility)->toBe('private');
+    $this->actingAs($user);
+
+    resolve(DeleteCuratorMediaAction::class)->handle($media);
+
+    $media->refresh();
+    expect($media->trashed())->toBeTrue()
+        ->and($media->deleted_by)->toBe($user->id);
+
+    expect($media->deletedBy)->toBeInstanceOf(User::class)
+        ->and($media->deletedBy->id)->toBe($user->id);
 });

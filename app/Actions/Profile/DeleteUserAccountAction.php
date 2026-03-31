@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Profile;
 
+use App\Actions\Media\DeleteAllMediaUsagesAction;
 use App\Models\User;
 
 final readonly class DeleteUserAccountAction
@@ -19,6 +20,9 @@ final readonly class DeleteUserAccountAction
         $user->forceFill([
             'deleted_by' => $deleterId,
         ])->saveQuietly();
+
+        // Track media removal
+        resolve(DeleteAllMediaUsagesAction::class)->handle($user);
 
         $user->delete();
     }

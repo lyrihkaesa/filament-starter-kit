@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Actions\Media\DeleteAllMediaUsagesAction;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -188,6 +189,11 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             }
 
             return true;
+        });
+
+        self::deleting(function (self $user): void {
+            // Track media usage removal
+            resolve(DeleteAllMediaUsagesAction::class)->handle($user);
         });
     }
 

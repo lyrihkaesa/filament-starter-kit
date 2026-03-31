@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -20,6 +21,7 @@ final class CuratorMedia extends Media
     use HasFactory;
 
     use HasUuids;
+    use SoftDeletes;
 
     public $incrementing = false;
 
@@ -46,6 +48,7 @@ final class CuratorMedia extends Media
         'tenant_id',
         'created_by',
         'privacy',
+        'deleted_by',
     ];
 
     /**
@@ -54,6 +57,14 @@ final class CuratorMedia extends Media
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function deletedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 
     /**
@@ -98,13 +109,23 @@ final class CuratorMedia extends Media
             }
 
             if (empty($media->privacy)) {
-                $media->privacy = Privacy::PRIVATE->value;
+                $media->privacy = Privacy::PRIVATE;
             }
         });
 
         self::saving(function (self $media): void {
-            // Sync physical visibility with logical privacy
-            $media->visibility = $media->privacy === Privacy::PUBLIC ? 'public' : 'private';
+            // Priority 1: If privacy is changed, visibility must follow.
+            if ($media->isDirty('privacy')) {
+                $media->visibility = $media->privacy === Privacy::PUBLIC ? 'public' : 'private';
+            }
+            // Priority 2: If visibility is changed, privacy must follow (to stay in sync).
+            elseif ($media->isDirty('visibility')) {
+                $media->privacy = $media->visibility === 'public' ? Privacy::PUBLIC : Privacy::PRIVATE;
+            }
+            // Priority 3: Always ensure they match based on privacy source of truth.
+            else {
+                $media->visibility = $media->privacy === Privacy::PUBLIC ? 'public' : 'private';
+            }
         });
     }
 

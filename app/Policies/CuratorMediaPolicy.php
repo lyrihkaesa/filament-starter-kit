@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Actions\Media\CheckMediaUsageAction;
 use App\Enums\Privacy;
 use App\Models\CuratorMedia;
 use App\Models\User;
@@ -15,138 +16,91 @@ final class CuratorMediaPolicy
 
     public function viewAny(User $user): bool
     {
-        if ($user->can('view_any_curator::media')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->can('ViewAny:CuratorMedia');
     }
 
     public function view(?User $user, CuratorMedia $media): bool
     {
-        // Public visibility: everyone can view
+        // 1. Public privacy: everyone can view
         if ($media->privacy === Privacy::PUBLIC) {
             return true;
         }
 
-        // Member visibility: only logged in users can view
+        // 2. Member privacy: only logged in users can view
         if ($media->privacy === Privacy::MEMBER && $user instanceof User) {
             return true;
         }
 
-        // If user is null (guest) and not public, deny
-        if (! $user instanceof User) {
+        // If guest and not public, deny
+        if (!$user instanceof User) {
             return false;
         }
 
-        // Private visibility: only creator, admin, or super_admin
-        if ($user->id === $media->created_by) {
+        // 3. Private access based on permissions
+        if ($user->can('View:CuratorMedia')) {
             return true;
         }
 
-        if ($user->can('view_curator::media')) {
-            return true;
-        }
-
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->id === $media->created_by && $user->can('ViewOwn:CuratorMedia');
     }
 
     public function create(User $user): bool
     {
-        if ($user->can('create_curator::media')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->can('Create:CuratorMedia');
     }
 
     public function update(User $user, CuratorMedia $media): bool
     {
-        if ($user->id === $media->created_by) {
+        if ($user->can('Update:CuratorMedia')) {
             return true;
         }
 
-        if ($user->can('update_curator::media')) {
-            return true;
-        }
-
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->id === $media->created_by && $user->can('UpdateOwn:CuratorMedia');
     }
 
     public function delete(User $user, CuratorMedia $media): bool
     {
-        if ($user->id === $media->created_by) {
+        // INDUSTRIAL BEST PRACTICE: Physical protection first
+        if (resolve(CheckMediaUsageAction::class)->handle((string) $media->id)) {
+            return false;
+        }
+
+        if ($user->can('Delete:CuratorMedia')) {
             return true;
         }
 
-        if ($user->can('delete_curator::media')) {
-            return true;
-        }
-
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->id === $media->created_by && $user->can('DeleteOwn:CuratorMedia');
     }
 
     public function restore(User $user, CuratorMedia $media): bool
     {
-        if ($user->id === $media->created_by) {
+        if ($user->can('Restore:CuratorMedia')) {
             return true;
         }
 
-        if ($user->can('restore_curator::media')) {
-            return true;
-        }
-
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->id === $media->created_by && $user->can('RestoreOwn:CuratorMedia');
     }
 
     public function forceDelete(User $user, CuratorMedia $media): bool
     {
-        if ($user->id === $media->created_by) {
+        if (resolve(CheckMediaUsageAction::class)->handle((string) $media->id)) {
+            return false;
+        }
+
+        if ($user->can('ForceDelete:CuratorMedia')) {
             return true;
         }
 
-        if ($user->can('force_delete_curator::media')) {
-            return true;
-        }
-
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->id === $media->created_by && $user->can('ForceDeleteOwn:CuratorMedia');
     }
 
     public function replicate(User $user): bool
     {
-        if ($user->can('replicate_curator::media')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->can('Replicate:CuratorMedia');
     }
 
     public function reorder(User $user): bool
     {
-        if ($user->can('reorder_curator::media')) {
-            return true;
-        }
-
-        return $user->hasRole('super_admin');
+        return $user->can('Reorder:CuratorMedia');
     }
 }

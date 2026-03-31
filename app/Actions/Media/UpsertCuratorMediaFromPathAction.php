@@ -15,6 +15,7 @@ final readonly class UpsertCuratorMediaFromPathAction
         ?string $originalFileName = null,
         string $disk = 'public',
         string $visibility = 'public',
+        ?\App\Enums\Privacy $privacy = null,
     ): ?CuratorMedia {
         if (blank($path)) {
             return null;
@@ -56,11 +57,16 @@ final readonly class UpsertCuratorMediaFromPathAction
             ? @getimagesizefromstring((string) $storage->get($path))
             : false;
 
+        $privacy ??= ($visibility === 'public')
+            ? \App\Enums\Privacy::PUBLIC
+            : \App\Enums\Privacy::PRIVATE;
+
         /** @var CuratorMedia $media */
         $media = CuratorMedia::query()->create([
             'disk' => $disk,
             'directory' => $directory,
             'visibility' => $visibility,
+            'privacy' => $privacy,
             'name' => $fileName,
             'path' => $path,
             'title' => $title,

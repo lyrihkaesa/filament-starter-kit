@@ -50,14 +50,22 @@ Enum `App\Enums\Privacy` mendefinisikan tiga level akses:
 2.  **MEMBER:** Dapat dilihat oleh semua user yang sudah login. Physical visibility di storage adalah `private`.
 3.  **PUBLIC:** Dapat dilihat oleh siapa saja. Physical visibility di storage akan otomatis menjadi `public` (memungkinkan akses langsung tanpa signed URL pada S3).
 
-## Security Policy
+## Security Policy (Permission-Only)
 
-`App\Policies\CuratorMediaPolicy` menangani otorisasi untuk semua tindakan media:
+`App\Policies\CuratorMediaPolicy` menangani otorisasi menggunakan sistem **Permission** secara ketat (Best Practice Spatie & Filament Shield). Policy mengikuti konvensi penamaan `{Action}:{Model}` yang digunakan di proyek ini.
 
-- **View:** Mengikuti aturan privasi yang dijelaskan di atas.
-- **Update/Delete:** Hanya diizinkan jika user adalah pembuat (`created_by`), memiliki role `admin`, atau `super_admin`.
+### Logika Akses
+1.  **View:** 
+    - Public/Member privacy diizinkan otomatis.
+    - Private diizinkan jika punya permission `View:CuratorMedia` atau (pemilik dan punya `ViewOwn:CuratorMedia`).
+2.  **Update/Delete/Restore:** 
+    - Diizinkan jika punya permission `{Action}:CuratorMedia` (Global).
+    - Diizinkan jika pemilik (`created_by`) dan punya permission `{Action}Own:CuratorMedia` (Ownership).
 
-## Integrasi UI Filament
+Hal ini memungkinkan Admin untuk memiliki semua permission (misal: `Update:CuratorMedia`), sedangkan Member hanya diberikan permission `*Own` (misal: `UpdateOwn:CuratorMedia`) saja.
+
+### Proteksi Integritas
+Aksi **Delete** dan **Force Delete** akan selalu diblokir jika media tersebut masih tercatat digunakan oleh model lain, meskipun user memiliki permission lengkap. Hal ini dijamin melalui `CheckMediaUsageAction`.
 
 Untuk mendukung pemilihan privasi saat mengunggah atau mengedit media, starter kit menggunakan `CustomMediaForm` di `app/Filament/Curator/CustomMediaForm.php`.
 
@@ -70,6 +78,10 @@ Select::make('privacy')
     ->default(Privacy::PUBLIC)
     ->required()
 ```
+
+## Integritas & Pelacakan Penggunaan
+
+Selain privasi, media juga dilacak penggunaannya untuk mencegah penghapusan aset yang masih aktif digunakan. Detail mengenai fitur ini dapat dilihat di [docs/27-media-usage-tracking.md](27-media-usage-tracking.md).
 
 ## Pengujian (Testing)
 
