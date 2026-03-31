@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Curator;
 
-use App\Enums\ViewVisibility;
+use App\Enums\Privacy;
 use Awcodes\Curator\Resources\Media\Schemas\MediaForm;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -44,10 +44,10 @@ final class CustomMediaForm extends MediaForm
                                 ->label(__('curator::forms.fields.description'))
                                 ->rows(2)
                                 ->columnSpan('full'),
-                            Select::make('view_visibility')
-                                ->label('Visibility')
-                                ->options(ViewVisibility::class)
-                                ->default(ViewVisibility::PUBLIC)
+                            Select::make('privacy')
+                                ->label('Privacy')
+                                ->options(Privacy::class)
+                                ->default(Privacy::PUBLIC)
                                 ->required()
                                 ->columnSpan('full'),
                         ])

@@ -6,7 +6,7 @@ namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 
-enum ViewVisibility: string implements HasLabel
+enum Privacy: string implements HasLabel
 {
     case PRIVATE = 'private';
     case MEMBER = 'member';

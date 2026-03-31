@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\ViewVisibility;
+use App\Enums\Privacy;
 use Awcodes\Curator\Models\Media;
 use Database\Factories\CuratorMediaFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -45,7 +45,7 @@ final class CuratorMedia extends Media
         'curations',
         'tenant_id',
         'created_by',
-        'view_visibility',
+        'privacy',
     ];
 
     /**
@@ -97,9 +97,14 @@ final class CuratorMedia extends Media
                 $media->created_by = (string) Auth::id();
             }
 
-            if (empty($media->view_visibility)) {
-                $media->view_visibility = ViewVisibility::PUBLIC->value;
+            if (empty($media->privacy)) {
+                $media->privacy = Privacy::PRIVATE->value;
             }
+        });
+
+        self::saving(function (self $media): void {
+            // Sync physical visibility with logical privacy
+            $media->visibility = $media->privacy === Privacy::PUBLIC ? 'public' : 'private';
         });
     }
 
@@ -109,7 +114,7 @@ final class CuratorMedia extends Media
     protected function casts(): array
     {
         return [
-            'view_visibility' => ViewVisibility::class,
+            'privacy' => Privacy::class,
             'curations' => 'array',
             'exif' => 'array',
         ];

@@ -15,7 +15,7 @@ return new class extends Migration
 
             $table->string('disk');
             $table->string('directory')->nullable();
-            $table->string('visibility')->default('public');
+            $table->string('visibility')->default('private');
             $table->string('name');
             $table->string('path')->index();
             $table->unsignedInteger('width')->nullable();
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->unsignedBigInteger('tenant_id')->nullable();
 
             $table->foreignUuid('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('view_visibility')->default('public');
+            $table->string('privacy')->default('private');
 
             $table->timestamps();
         });

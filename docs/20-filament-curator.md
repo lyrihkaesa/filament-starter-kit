@@ -49,15 +49,15 @@ Jadi mental model-nya:
 - `local` = media final tetap bisa private dan dilayani via temporary URL
 - `s3` = media final bisa private atau public sesuai visibility record
 
-## Ownership & Visibility (Blameable)
+## Ownership & Privacy (Blameable)
 
-Starter kit ini telah meningkatkan fitur Curator dengan sistem kepemilikan dan visibilitas yang lebih eksplisit:
+Starter kit ini telah meningkatkan fitur Curator dengan sistem kepemilikan dan privasi yang lebih eksplisit:
 
 - **Created By:** Setiap media yang diunggah kini mencatat siapa pembuatnya melalui kolom `created_by`.
-- **View Visibility:** Setiap media memiliki status visibilitas (`PRIVATE`, `MEMBER`, atau `PUBLIC`) yang menentukan siapa yang dapat melihat media tersebut.
+- **Privacy Level:** Setiap media memiliki status privasi (`PRIVATE`, `MEMBER`, atau `PUBLIC`) yang menentukan siapa yang dapat melihat media tersebut.
 - **Security Policy:** Hanya `creator`, `admin`, dan `super_admin` yang memiliki akses penuh untuk mengedit atau menghapus media.
 
-Penjelasan mendalam mengenai fitur ini dapat dilihat di [docs/26-curator-ownership-and-visibility.md](26-curator-ownership-and-visibility.md).
+Penjelasan mendalam mengenai fitur ini dapat dilihat di [docs/26-curator-ownership-and-privacy.md](26-curator-ownership-and-privacy.md).
 
 ## Dedicated Temporary Upload Disk
 
