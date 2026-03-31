@@ -32,6 +32,9 @@ return new class extends Migration
             $table->longText('curations')->nullable();
             $table->unsignedBigInteger('tenant_id')->nullable();
 
+            $table->foreignUuid('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('view_visibility')->default('public');
+
             $table->timestamps();
         });
     }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ViewVisibility;
 use App\Models\CuratorMedia;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -33,6 +35,8 @@ final class CuratorMediaFactory extends Factory
             'caption' => null,
             'exif' => null,
             'curations' => null,
+            'created_by' => User::factory(),
+            'view_visibility' => ViewVisibility::PUBLIC,
         ];
     }
 }
