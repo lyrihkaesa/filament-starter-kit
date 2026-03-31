@@ -16,12 +16,13 @@ final class CuratorMediaPolicy
 
     public function viewAny(User $user): bool
     {
+        // To see the media list, user must have the ViewAny permission.
         return $user->can('ViewAny:CuratorMedia');
     }
 
     public function view(?User $user, CuratorMedia $media): bool
     {
-        // 1. Public privacy: everyone can view
+        // 1. Public privacy: everyone can view (even guests if applicable)
         if ($media->privacy === Privacy::PUBLIC) {
             return true;
         }
@@ -31,16 +32,17 @@ final class CuratorMediaPolicy
             return true;
         }
 
-        // If guest and not public, deny
-        if (!$user instanceof User) {
+        // If guest and not public/member, deny
+        if (! $user instanceof User) {
             return false;
         }
 
-        // 3. Private access based on permissions
+        // 3. Admin access (View All)
         if ($user->can('View:CuratorMedia')) {
             return true;
         }
 
+        // 4. Owner access (View Own)
         return $user->id === $media->created_by && $user->can('ViewOwn:CuratorMedia');
     }
 

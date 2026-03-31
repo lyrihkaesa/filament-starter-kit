@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\Privacy;
+use App\Query\CuratorMediaScope;
 use Awcodes\Curator\Models\Media;
 use Database\Factories\CuratorMediaFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -99,6 +100,9 @@ final class CuratorMedia extends Media
 
     protected static function booted(): void
     {
+        // Apply Global Scope for ownership-based filtering.
+        self::addGlobalScope(new CuratorMediaScope);
+
         self::creating(function (self $media): void {
             if (empty($media->{$media->getKeyName()})) {
                 $media->{$media->getKeyName()} = (string) Str::uuid();

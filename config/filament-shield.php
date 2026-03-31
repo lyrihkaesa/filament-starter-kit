@@ -243,7 +243,13 @@ return [
     |
     */
 
-    'custom_permissions' => [],
+    'custom_permissions' => [
+        'ViewOwn:CuratorMedia',
+        'UpdateOwn:CuratorMedia',
+        'DeleteOwn:CuratorMedia',
+        'RestoreOwn:CuratorMedia',
+        'ForceDeleteOwn:CuratorMedia',
+    ],
 
     /*
     |--------------------------------------------------------------------------
