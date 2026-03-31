@@ -239,9 +239,9 @@ Cara berpikir yang aman:
 - client boleh mengusulkan `public` atau `private`
 - backend memeriksa apakah `purpose` tersebut memang mengizinkan pilihan itu
 - backend memeriksa role atau permission user
-- backend menetapkan `final_visibility`
+- backend menetapkan `final_visibility` (yang dipetakan langsung ke status `privacy` di Curator).
 
-Jadi server tetap pemilik keputusan.
+Jadi server tetap pemilik keputusan. Keputusan `final_visibility` (logical) akan otomatis disinkronkan ke storage visibility (physical).
 
 Contoh hasil yang sehat:
 

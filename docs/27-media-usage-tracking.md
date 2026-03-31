@@ -28,19 +28,19 @@ Tabel ini mencatat relasi antara media dan model yang menggunakannya secara Poly
 Sistem ini menggunakan pola **Action Pattern** dengan method `handle()` dan `DB::transaction` untuk menjamin atomisitas data.
 
 ### 1. `SyncMediaUsageAction`
-Menyinkronkan penggunaan media saat model dibuat atau diperbarui.
+Menyinkronkan penggunaan media saat model dibuat atau diperbarui (Automated in some areas).
 ```php
 resolve(SyncMediaUsageAction::class)->handle($model, 'field_name', $curatorId);
 ```
 
 ### 2. `DeleteCuratorMediaAction`
-Melakukan Soft Delete pada media dan mencatat siapa yang melakukannya.
+Melakukan Soft Delete pada media dan mencatat siapa yang melakukan penghapusan (`deleted_by`).
 ```php
 resolve(DeleteCuratorMediaAction::class)->handle($media, $user);
 ```
 
 ### 3. `DeleteAllMediaUsagesAction`
-Membersihkan catatan penggunaan media saat model pemilik (User/Post) dihapus.
+Membersihkan catatan penggunaan media saat model pemilik (User/Post) benar-benar dihapus (Force Delete).
 
 ## Proteksi Penghapusan
 

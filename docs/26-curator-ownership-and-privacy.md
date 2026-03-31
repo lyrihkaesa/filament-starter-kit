@@ -23,9 +23,10 @@ Model `App\Models\CuratorMedia` telah diperbarui dengan:
 - **Relationship:** Method `creator()` yang merujuk ke model `User`.
 - **Casts:** Properti `privacy` di-cast ke enum `App\Enums\Privacy`.
 - **Auto-blame:** Menggunakan event `creating` untuk otomatis mengisi `created_by` dengan ID user yang sedang login.
-- **Visibility Sync:** Menggunakan event `saving` untuk sinkronisasi otomatis:
-    - Jika `privacy === PUBLIC`, maka `visibility = 'public'`.
-    - Selain itu, `visibility = 'private'`.
+- **Visibility Sync:** Menggunakan event `saving` untuk sinkronisasi dua arah otomatis antara `privacy` dan `visibility` (physical storage):
+    - Jika `privacy` diubah, `visibility` akan menyesuaikan (PUBLIC -> public, lainnya -> private).
+    - Jika `visibility` diubah manual (misal via code), `privacy` akan menyesuaikan untuk menjaga integritas.
+    - Menjamin status logical (`privacy`) selalu sinkron dengan status physical (`visibility`).
 
 ```php
 // app/Models/CuratorMedia.php
@@ -33,10 +34,17 @@ Model `App\Models\CuratorMedia` telah diperbarui dengan:
 protected static function booted(): void
 {
     self::saving(function (self $media): void {
-        if ($media->privacy === Privacy::PUBLIC) {
-            $media->visibility = 'public';
-        } else {
-            $media->visibility = 'private';
+        // Priority 1: If privacy is changed, visibility must follow.
+        if ($media->isDirty('privacy')) {
+            $media->visibility = $media->privacy === Privacy::PUBLIC ? 'public' : 'private';
+        }
+        // Priority 2: If visibility is changed, privacy must follow (to stay in sync).
+        elseif ($media->isDirty('visibility')) {
+            $media->privacy = $media->visibility === 'public' ? Privacy::PUBLIC : Privacy::PRIVATE;
+        }
+        // Priority 3: Always ensure they match based on privacy source of truth.
+        else {
+            $media->visibility = $media->privacy === Privacy::PUBLIC ? 'public' : 'private';
         }
     });
 }

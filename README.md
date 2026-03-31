@@ -76,6 +76,8 @@ Dokumentasi detail dapat ditemukan di folder [`docs`](./docs) atau melalui:
 - [07 - Integrasi API & Sanctum](./docs/07-api.md)
 - [14 - Manajemen Role & Permission](./docs/14-filament-shield.md)
 - [18 - Implementasi UUID](./docs/18-uuid-primary-keys.md)
+- [26 - Curator Ownership & Privacy](./docs/26-curator-ownership-and-privacy.md)
+- [27 - Media Tracking & Integrity](./docs/27-media-usage-tracking.md)
 
 ## ✅ Quality Control
 
