@@ -5,54 +5,75 @@ sidebar_position: 29
 
 # Laravel Debugbar
 
-[Laravel Debugbar](https://github.com/barryvdh/laravel-debugbar) adalah alat bantu debugging yang sangat berguna untuk melihat apa yang terjadi di balik layar aplikasi Laravel Anda. Alat ini menampilkan informasi seperti query database, file view yang dimuat, detail request, session, dan banyak lagi dalam sebuah toolbar di bagian bawah browser.
+[Laravel Debugbar](https://github.com/fruitcake/laravel-debugbar) (sebelumnya `barryvdh/laravel-debugbar`) adalah paket untuk mengintegrasikan [PHP Debug Bar](http://phpdebugbar.com/) dengan Laravel. Toolbar ini sangat membantu untuk melihat apa yang terjadi di balik layar aplikasi Anda.
 
 ## Instalasi
 
-Alat ini diinstal sebagai dependensi pengembangan (*development dependency*) agar tidak membebani performa di lingkungan produksi.
+Alat ini diinstal sebagai dependensi pengembangan (*development dependency*) agar tidak membebani performa atau membocorkan informasi di lingkungan produksi.
 
 ```bash
 composer require fruitcake/laravel-debugbar --dev
 ```
 
-Konfigurasi diterbitkan ke `config/debugbar.php`:
+Menerbitkan konfigurasi:
 
 ```bash
-php artisan vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider"
+php artisan vendor:publish --provider="Fruitcake\LaravelDebugbar\ServiceProvider"
 ```
 
 ## Penggunaan
 
-Debugbar akan otomatis muncul di bagian bawah browser selama variabel lingkungan `APP_DEBUG` bernilai `true` di file `.env`.
+Debugbar akan aktif secara otomatis jika `APP_DEBUG=true` dan environment bukan `production` atau `testing`.
 
 ### Fitur Utama
 
-- **Queries**: Menampilkan semua query database yang dijalankan pada request saat ini, termasuk waktu eksekusinya. Sangat membantu untuk mendeteksi masalah N+1.
-- **Timeline**: Visualisasi waktu proses aplikasi untuk melihat bagian mana yang memakan waktu lama.
-- **Models**: Menunjukkan model Eloquent mana saja yang diambil dari database.
-- **Messages**: Anda dapat mengirim pesan kustom ke Debugbar untuk debugging cepat:
-  ```php
-  \Debugbar::info($object);
-  \Debugbar::error('Error!');
-  \Debugbar::warning('Watch out..');
-  \Debugbar::addMessage('Another message', 'mylabel');
-  ```
-- **Livewire Integration**: Secara otomatis menangkap request dan event Livewire, yang sangat penting saat bekerja dengan Filament.
+- **QueryCollector**: Menampilkan semua query database, termasuk binding dan waktu eksekusinya.
+- **RouteCollector**: Menampilkan informasi tentang rute saat ini.
+- **ViewCollector**: Menampilkan daftar view yang dimuat.
+- **EventsCollector**: Menampilkan semua event yang dipicu.
+- **LaravelCollector**: Menampilkan versi Laravel dan environment (default: nonaktif).
+- **Ajax/Livewire Support**: Menangkap request Ajax dan Livewire secara otomatis (muncul di dropdown di sisi kanan).
+
+### Helper Functions
+
+Ada beberapa fungsi pembantu yang memudahkan proses debugging:
+
+```php
+// Semua argumen akan di-dump sebagai pesan debug
+debug($var1, $someString, $intValue, $object);
+
+// Dump koleksi sebagai pesan debug
+collect([$var1, $someString])->debug();
+
+// Pengukuran waktu manual
+start_measure('render', 'Time for rendering');
+stop_measure('render');
+
+// Atau menggunakan closure
+measure('My long operation', function() {
+    // Operasi yang ingin diukur...
+});
+```
+
+### Facade Interface
+
+Anda juga dapat menggunakan Facade `Debugbar` untuk mencatat pesan dengan level PSR-3:
+
+```php
+\Debugbar::info($object);
+\Debugbar::error('Error!');
+\Debugbar::warning('Watch out..');
+\Debugbar::addThrowable($exception);
+```
 
 ## Konfigurasi
 
-Anda dapat mengaktifkan atau menonaktifkan Debugbar secara manual di `.env`:
+Anda dapat menonaktifkan Debugbar secara manual di `.env`:
 
 ```env
 DEBUGBAR_ENABLED=true
 ```
 
-Secara default, jika `DEBUGBAR_ENABLED` tidak diatur, ia akan mengikuti nilai `APP_DEBUG`.
+## Keamanan
 
-## Troubleshooting
-
-### Debugbar Tidak Muncul
-1. Pastikan `APP_DEBUG=true` di file `.env`.
-2. Pastikan file CSS dan JS Debugbar dapat dimuat (cek di console browser).
-3. Jalankan `php artisan debugbar:clear` untuk membersihkan storage debugbar.
-4. Jika menggunakan API atau response JSON, Debugbar tidak akan muncul secara visual tetapi datanya dikirim melalui header (bisa dilihat di tab Network di DevTools browser atau menggunakan ekstensi browser khusus).
+> **Peringatan:** Gunakan Debugbar **hanya di lingkungan pengembangan**. Jangan aktifkan di website yang dapat diakses publik karena dapat membocorkan informasi sensitif dari request yang tersimpan (seperti query database, data session, dll).
