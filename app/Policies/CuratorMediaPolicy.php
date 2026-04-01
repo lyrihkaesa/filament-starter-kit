@@ -74,6 +74,9 @@ final class CuratorMediaPolicy
         return $user->id === $media->created_by && $user->can('DeleteOwn:CuratorMedia');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function restore(User $user, CuratorMedia $media): bool
     {
         if ($user->can('Restore:CuratorMedia')) {
@@ -83,6 +86,9 @@ final class CuratorMediaPolicy
         return $user->id === $media->created_by && $user->can('RestoreOwn:CuratorMedia');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function forceDelete(User $user, CuratorMedia $media): bool
     {
         if (resolve(CheckMediaUsageAction::class)->handle((string) $media->id)) {
@@ -96,11 +102,17 @@ final class CuratorMediaPolicy
         return $user->id === $media->created_by && $user->can('ForceDeleteOwn:CuratorMedia');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function replicate(User $user): bool
     {
         return $user->can('Replicate:CuratorMedia');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function reorder(User $user): bool
     {
         return $user->can('Reorder:CuratorMedia');

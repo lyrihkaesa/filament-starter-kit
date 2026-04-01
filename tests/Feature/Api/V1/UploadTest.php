@@ -92,6 +92,120 @@ it('can upload file to local fallback and mark it as uploaded', function (): voi
     ]);
 });
 
+it('can show an upload session', function (): void {
+    $user = User::factory()->create();
+    $upload = TemporaryUpload::query()->create([
+        'user_id' => $user->id,
+        'session_id' => (string) str()->uuid(),
+        'disk' => 'uploads_tmp',
+        'path' => 'tmp/uploads/user_avatar/test.jpg',
+        'file_name' => 'test.jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+        'purpose' => 'user_avatar',
+        'status' => 'prepared',
+        'final_visibility' => 'public',
+    ]);
+
+    $response = $this->actingAs($user)->getJson(route('v1.uploads.show', $upload));
+
+    $response->assertOk();
+    $response->assertJsonFragment(['id' => $upload->id]);
+});
+
+it('cannot show another users upload session', function (): void {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $upload = TemporaryUpload::query()->create([
+        'user_id' => $otherUser->id,
+        'session_id' => (string) str()->uuid(),
+        'disk' => 'uploads_tmp',
+        'path' => 'tmp/uploads/user_avatar/test.jpg',
+        'file_name' => 'test.jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+        'purpose' => 'user_avatar',
+        'status' => 'prepared',
+        'final_visibility' => 'public',
+    ]);
+
+    $response = $this->actingAs($user)->getJson(route('v1.uploads.show', $upload));
+
+    $response->assertForbidden();
+});
+
+it('can delete an upload session', function (): void {
+    Storage::fake('uploads_tmp');
+
+    $user = User::factory()->create();
+    $upload = TemporaryUpload::query()->create([
+        'user_id' => $user->id,
+        'session_id' => (string) str()->uuid(),
+        'disk' => 'uploads_tmp',
+        'path' => 'tmp/uploads/user_avatar/test.jpg',
+        'file_name' => 'test.jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+        'purpose' => 'user_avatar',
+        'status' => 'prepared',
+        'final_visibility' => 'public',
+    ]);
+
+    Storage::disk('uploads_tmp')->put($upload->path, 'content');
+
+    $response = $this->actingAs($user)->deleteJson(route('v1.uploads.destroy', $upload));
+
+    $response->assertOk();
+    $this->assertDatabaseMissing('temporary_uploads', ['id' => $upload->id]);
+    Storage::disk('uploads_tmp')->assertMissing($upload->path);
+});
+
+it('cannot delete another users upload session', function (): void {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $upload = TemporaryUpload::query()->create([
+        'user_id' => $otherUser->id,
+        'session_id' => (string) str()->uuid(),
+        'disk' => 'uploads_tmp',
+        'path' => 'tmp/uploads/user_avatar/test.jpg',
+        'file_name' => 'test.jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+        'purpose' => 'user_avatar',
+        'status' => 'prepared',
+        'final_visibility' => 'public',
+    ]);
+
+    $response = $this->actingAs($user)->deleteJson(route('v1.uploads.destroy', $upload));
+
+    $response->assertForbidden();
+});
+
+it('does not delete file from storage when deleting finalized upload', function (): void {
+    Storage::fake('uploads_tmp');
+
+    $user = User::factory()->create();
+    $upload = TemporaryUpload::query()->create([
+        'user_id' => $user->id,
+        'session_id' => (string) str()->uuid(),
+        'disk' => 'uploads_tmp',
+        'path' => 'tmp/uploads/user_avatar/test.jpg',
+        'file_name' => 'test.jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+        'purpose' => 'user_avatar',
+        'status' => 'finalized',
+        'final_visibility' => 'public',
+    ]);
+
+    Storage::disk('uploads_tmp')->put($upload->path, 'content');
+
+    $response = $this->actingAs($user)->deleteJson(route('v1.uploads.destroy', $upload));
+
+    $response->assertOk();
+    Storage::disk('uploads_tmp')->assertExists($upload->path);
+});
+
 it('can resolve a temporary upload into curator media', function (): void {
     Storage::fake('uploads_tmp');
     Storage::fake('public');

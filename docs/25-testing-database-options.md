@@ -1,91 +1,64 @@
 # Database Testing Options
 
-Starter kit ini mendukung dua cara utama untuk menjalankan pengujian database: **SQLite In-Memory** (cepat & mudah) dan **PostgreSQL** (disarankan untuk produksi).
+Starter kit ini mendukung dua cara utama untuk menjalankan pengujian database: **PostgreSQL** (disarankan untuk identik dengan produksi) dan **SQLite In-Memory** (paling cepat).
 
-## 1. SQLite In-Memory (Default)
+## 1. PostgreSQL (Default Environment)
 
-Secara default, pengujian akan menggunakan basis data SQLite di memori. Ini adalah cara tercepat dan tidak memerlukan konfigurasi apa pun karena semuanya terjadi di RAM saat pengujian berjalan.
+Direkomendasikan menggunakan PostgreSQL agar lingkungan pengujian sedekat mungkin dengan lingkungan produksi.
 
-### Konfigurasi
-Pengaturan ini ada di file `phpunit.xml`:
-```xml
-<php>
-    <env name="DB_CONNECTION" value="sqlite"/>
-    <env name="DB_DATABASE" value=":memory:"/>
-</php>
-```
+### Persiapan
+1. Salin file `.env.testing.example` menjadi `.env.testing`:
+   ```bash
+   cp .env.testing.example .env.testing
+   ```
+2. Pastikan database untuk pengujian sudah ada di PostgreSQL Anda.
+3. Sesuaikan kredensial di file `.env.testing`:
+   ```env
+   DB_CONNECTION=pgsql
+   DB_DATABASE=filament_starter_kit_test
+   ```
 
 ### Cara Menjalankan
 Cukup jalankan perintah:
 ```bash
 php artisan test
 ```
+Laravel akan otomatis memuat `.env.testing` sebagai prioritas.
 
 ---
 
-## 2. PostgreSQL (Production-like Testing)
+## 2. SQLite (Fast Testing)
 
-Jika Anda ingin menguji aplikasi di lingkungan yang identik dengan produksi, Anda bisa menggunakan PostgreSQL.
+Gunakan SQLite jika Anda ingin menjalankan pengujian dengan sangat cepat tanpa perlu setup database eksternal.
 
 ### Persiapan
-1.  Salin file `.env.testing.example` menjadi `.env.testing`:
-    ```bash
-    cp .env.testing.example .env.testing
-    ```
-2.  Buat database khusus untuk pengujian di PostgreSQL Anda, misalnya: `filament_starter_kit_test`.
-3.  Pastikan kredensial di file `.env.testing` sudah benar:
-    ```env
-    DB_CONNECTION=pgsql
-    DB_HOST=127.0.0.1
-    DB_PORT=5432
-    DB_DATABASE=filament_starter_kit_test
-    DB_USERNAME=postgres
-    DB_PASSWORD=
-    ```
+1. Salin file `.env.sqlite.testing.example` menjadi `.env.sqlite.testing`:
+   ```bash
+   cp .env.sqlite.testing.example .env.sqlite.testing
+   ```
 
-### Cara Mengaktifkan
-Agar `phpunit.xml` memprioritaskan konfigurasi dari `.env.testing`, Anda harus mengomentari baris `DB_DATABASE` di `phpunit.xml`:
-
-```xml
-<php>
-    <env name="DB_CONNECTION" value="sqlite"/>
-    <!-- <env name="DB_DATABASE" value=":memory:"/> -->
-</php>
+### Cara Menjalankan
+Gunakan flag `--env` untuk memberitahu Laravel agar menggunakan file konfigurasi SQLite:
+```bash
+php artisan test --env=sqlite.testing
 ```
-
-Dengan mengomentari baris di atas, Laravel akan secara otomatis mengambil nilai dari file `.env.testing` jika file tersebut ada.
 
 ---
 
-## Cara Mengetahui Database yang Sedang Digunakan
+## 3. Fallback (phpunit.xml)
 
-Anda dapat memastikan koneksi basis data mana yang sedang aktif di lingkungan pengujian dengan menggunakan perintah **Artisan Tinker** atau **About** yang diarahkan ke *environment* `testing`.
-
-### 1. Menggunakan Artisan Tinker (Paling Akurat)
-Jalankan perintah ini untuk melihat koneksi utama yang sedang aktif:
-```bash
-php artisan tinker --env=testing --execute="dump('Koneksi: ' . config('database.default'), 'Database: ' . config('database.connections.' . config('database.default') . '.database'))"
-```
-*   Jika muncul `"Koneksi: sqlite"` dan `"Database: :memory:"`, berarti Anda menggunakan **SQLite Memory**.
-*   Jika muncul `"Koneksi: pgsql"` dan `"Database: filament_starter_kit_test"`, berarti Anda menggunakan **PostgreSQL**.
-
-### 2. Menggunakan Perintah About
-Laravel menyediakan ringkasan konfigurasi yang sangat rapi. Tambahkan flag `--env=testing` untuk melihat pengaturan khusus pengujian:
-```bash
-php artisan about --env=testing
-```
-Lihat pada bagian **Database** untuk memastikan `Connection` dan `Database` yang digunakan.
+Jika Anda tidak memiliki file `.env.testing` atau `.env.sqlite.testing`, Laravel akan menggunakan konfigurasi yang ada di dalam `phpunit.xml` sebagai cadangan. Secara default, fallback ini menggunakan **SQLite In-Memory**.
 
 ---
 
-## Troubleshooting
+## Memastikan Database yang Digunakan
 
-### File `filament_starter_kit_test_*` muncul di root
-Jika Anda menjalankan tes secara paralel menggunakan perintah `php artisan test --parallel`, Pest/PHPUnit mungkin akan membuat file-file database SQLite sementara. Anda bisa menghapusnya dengan aman jika pengujian sudah selesai:
+Gunakan perintah ini untuk memverifikasi database mana yang sedang aktif di lingkungan pengujian:
+
 ```bash
-del filament_starter_kit_test*
-```
-atau (Linux/Mac):
-```bash
-rm filament_starter_kit_test*
+# Untuk melihat koneksi default di environment testing:
+php artisan tinker --env=testing --execute="dump('Koneksi: ' . config('database.default'))"
+
+# Untuk melihat koneksi saat menggunakan sqlite environment:
+php artisan tinker --env=sqlite.testing --execute="dump('Koneksi: ' . config('database.default'))"
 ```

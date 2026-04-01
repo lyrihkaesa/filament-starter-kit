@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Media;
 
+use App\Enums\Privacy;
 use App\Models\CuratorMedia;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -15,7 +16,7 @@ final readonly class UpsertCuratorMediaFromPathAction
         ?string $originalFileName = null,
         string $disk = 'public',
         string $visibility = 'public',
-        ?\App\Enums\Privacy $privacy = null,
+        ?Privacy $privacy = null,
     ): ?CuratorMedia {
         if (blank($path)) {
             return null;
@@ -58,8 +59,8 @@ final readonly class UpsertCuratorMediaFromPathAction
             : false;
 
         $privacy ??= ($visibility === 'public')
-            ? \App\Enums\Privacy::PUBLIC
-            : \App\Enums\Privacy::PRIVATE;
+            ? Privacy::PUBLIC
+            : Privacy::PRIVATE;
 
         /** @var CuratorMedia $media */
         $media = CuratorMedia::query()->create([

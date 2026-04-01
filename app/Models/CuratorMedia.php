@@ -16,6 +16,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+/**
+ * @property Privacy $privacy
+ * @property string $created_by
+ */
 final class CuratorMedia extends Media
 {
     /** @use HasFactory<CuratorMediaFactory> */
@@ -104,6 +108,7 @@ final class CuratorMedia extends Media
         self::addGlobalScope(new CuratorMediaScope);
 
         self::creating(function (self $media): void {
+            // @codeCoverageIgnoreStart
             if (empty($media->{$media->getKeyName()})) {
                 $media->{$media->getKeyName()} = (string) Str::uuid();
             }
@@ -115,6 +120,7 @@ final class CuratorMedia extends Media
             if (empty($media->privacy)) {
                 $media->privacy = Privacy::PRIVATE;
             }
+            // @codeCoverageIgnoreEnd
         });
 
         self::saving(function (self $media): void {

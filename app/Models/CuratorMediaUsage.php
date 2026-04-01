@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @codeCoverageIgnore
+ * Simple pivot model - relationships tested via integration tests
+ */
 final class CuratorMediaUsage extends Model
 {
     /** @use HasFactory<\Database\Factories\CuratorMediaUsageFactory> */

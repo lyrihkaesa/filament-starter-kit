@@ -83,13 +83,14 @@
             "pint --test",
             "npm run test:lint"
         ],
-        "test:unit": "php -d xdebug.mode=coverage ./vendor/bin/pest --parallel --coverage",
+        "test:unit": "php -d xdebug.mode=coverage ./vendor/bin/pest --coverage",
+        "test:unit:parallel": "php -d xdebug.mode=coverage ./vendor/bin/pest --parallel --coverage",
         "test:unit100": "php -d xdebug.mode=coverage ./vendor/bin/pest --coverage --exactly=100",
         "test:types": "phpstan",
         "test:refactor": "rector --dry-run",
         "test-full": [
             "@php artisan config:clear --ansi",
-            "@php artisan test",
+            "@php artisan test --compact",
             "@test:type-coverage",
             "@test:unit",
             "@test:lint",
@@ -98,7 +99,7 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@php artisan test",
+            "@php artisan test --compact",
             "@test:unit",
             "@test:lint",
             "@test:types",
