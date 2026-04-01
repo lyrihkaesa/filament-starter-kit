@@ -44,6 +44,9 @@ return [
             'journal_mode' => null,
             'synchronous' => null,
             'transaction_mode' => 'DEFERRED',
+            'dump' => array_filter([
+                'dump_binary_path' => env('SQLITE_DUMP_BINARY_PATH'),
+            ]),
         ],
 
         'mysql' => [
@@ -99,6 +102,9 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+            'dump' => array_filter([
+                'dump_binary_path' => env('PG_DUMP_BINARY_PATH'),
+            ]),
         ],
 
         'sqlsrv' => [

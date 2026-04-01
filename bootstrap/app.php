@@ -90,5 +90,23 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('app:anonymize-deleted-users')->daily();
+
+        $backupRun = $schedule->command('backup:run')->withoutOverlapping();
+        $backupFrequency = (string) config('backup.schedule.frequency', 'daily');
+        $backupTime = (string) config('backup.schedule.time', '01:00');
+
+        match ($backupFrequency) {
+            'weekly' => $backupRun->weeklyOn((int) config('backup.schedule.weekly_day', 1), $backupTime),
+            'monthly' => $backupRun->monthlyOn((int) config('backup.schedule.monthly_day', 1), $backupTime),
+            default => $backupRun->dailyAt($backupTime),
+        };
+
+        $schedule->command('backup:clean')
+            ->dailyAt((string) config('backup.schedule.cleanup_time', '01:30'))
+            ->withoutOverlapping();
+
+        $schedule->command('backup:monitor')
+            ->dailyAt((string) config('backup.schedule.monitor_time', '06:00'))
+            ->withoutOverlapping();
     })
     ->create();
