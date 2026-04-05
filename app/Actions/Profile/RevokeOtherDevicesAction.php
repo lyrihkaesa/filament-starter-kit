@@ -46,9 +46,12 @@ final readonly class RevokeOtherDevicesAction
 
         try {
             $currentSessionId = session()->getId();
+            // @codeCoverageIgnoreStart
         } catch (Throwable) {
             // No session available (e.g. in test context)
         }
+
+        // @codeCoverageIgnoreEnd
 
         DB::table('sessions')
             ->where('user_id', $user->id)

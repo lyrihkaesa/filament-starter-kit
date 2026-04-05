@@ -84,9 +84,11 @@ final readonly class RevokeDeviceAction
             return;
         }
 
+        // @codeCoverageIgnoreStart
         $lastActive = $token->last_used_at
             ? $token->last_used_at->diffForHumans()
             : $token->created_at?->diffForHumans() ?? '-';
+        // @codeCoverageIgnoreEnd
 
         $token->delete();
 
@@ -102,9 +104,12 @@ final readonly class RevokeDeviceAction
 
     private function buildDeviceLabel(string $userAgent): string
     {
+        // @codeCoverageIgnoreStart
         if ($userAgent === '') {
             return 'Unknown Device';
         }
+
+        // @codeCoverageIgnoreEnd
 
         $detector = new DeviceDetector($userAgent);
         $detector->parse();

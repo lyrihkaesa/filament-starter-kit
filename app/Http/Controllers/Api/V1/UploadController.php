@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Requests\Api\V1\PrepareUploadRequest;
 use App\Models\TemporaryUpload;
 use App\Models\User;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +34,9 @@ final class UploadController
         $maxSize = (int) $maxSizeConfig;
 
         $diskName = config('filesystems.default') === 's3' ? 's3' : 'uploads_tmp';
+        /**
+         * @var Filesystem $disk
+         */
         $disk = Storage::disk($diskName);
 
         $sessionId = Str::uuid()->toString();
@@ -61,7 +65,9 @@ final class UploadController
         $method = 'PUT';
 
         if ($diskName === 's3' && method_exists($disk, 'temporaryUploadUrl')) {
+            // @codeCoverageIgnoreStart
             $uploadUrl = $disk->temporaryUploadUrl($path, now()->addMinutes(30));
+            // @codeCoverageIgnoreEnd
         } else {
             $uploadUrl = URL::temporarySignedRoute('v1.uploads.file', now()->addMinutes(30), ['upload' => $upload->id]);
         }

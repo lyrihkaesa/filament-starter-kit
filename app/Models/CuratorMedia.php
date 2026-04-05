@@ -120,6 +120,7 @@ final class CuratorMedia extends Media
             if (empty($media->privacy)) {
                 $media->privacy = Privacy::PRIVATE;
             }
+
             // @codeCoverageIgnoreEnd
         });
 

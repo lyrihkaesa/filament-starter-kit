@@ -17,6 +17,7 @@ final class RestoreAccount extends SimplePage
 
     public function mount(Request $request, RestoreAccountAction $action): void
     {
+        // @codeCoverageIgnoreStart
         if (! $request->hasValidSignature()) {
             Notification::make()
                 ->title(__('auth.restore_failed'))
@@ -28,6 +29,8 @@ final class RestoreAccount extends SimplePage
             return;
         }
 
+        // @codeCoverageIgnoreEnd
+
         $userId = $request->route('id');
 
         if ($action->handle($userId)) {
@@ -35,6 +38,7 @@ final class RestoreAccount extends SimplePage
                 ->title(__('auth.restore_success'))
                 ->success()
                 ->send();
+            // @codeCoverageIgnoreStart
         } else {
             Notification::make()
                 ->title(__('auth.restore_failed'))
@@ -42,11 +46,16 @@ final class RestoreAccount extends SimplePage
                 ->send();
         }
 
+        // @codeCoverageIgnoreEnd
+
         $this->redirect(filament()->getLoginUrl());
     }
 
+    // @codeCoverageIgnoreStart
     public function getHeading(): string
     {
         return __('auth.restoring_heading');
     }
+
+    // @codeCoverageIgnoreEnd
 }

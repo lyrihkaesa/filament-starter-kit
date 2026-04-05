@@ -20,12 +20,12 @@ if ($applicationName === '') {
 }
 
 $destinationDisks = array_values(array_filter(array_map(
-    static fn (string $disk): string => mb_trim($disk),
+    mb_trim(...),
     explode(',', (string) env('BACKUP_DESTINATION_DISKS', 'backups,s3')),
 ), static fn (string $disk): bool => $disk !== ''));
 
 $notificationRecipients = array_values(array_filter(array_map(
-    static fn (string $recipient): string => mb_trim($recipient),
+    mb_trim(...),
     explode(',', (string) env('BACKUP_NOTIFICATION_EMAIL', (string) env('MAIL_FROM_ADDRESS', 'hello@example.com'))),
 ), static fn (string $recipient): bool => $recipient !== ''));
 

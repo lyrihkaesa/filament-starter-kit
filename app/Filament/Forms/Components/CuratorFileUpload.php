@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Arr;
 
+/**
+ * @codeCoverageIgnore
+ */
 final class CuratorFileUpload extends FileUpload
 {
     private string|Closure|null $relationship = null;

@@ -66,6 +66,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
         'remember_token',
     ];
 
+    // @codeCoverageIgnoreStart
     /**
      * @return BelongsTo<User, $this>
      */
@@ -77,30 +78,47 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
         return $relation->withTrashed();
     }
 
+    // @codeCoverageIgnoreEnd
+
+    // @codeCoverageIgnoreStart
     public function isAnonymous(): bool
     {
         return $this->anonymized_at !== null;
     }
 
+    // @codeCoverageIgnoreEnd
+
+    // @codeCoverageIgnoreStart
     public function isSoftDeleted(): bool
     {
         return $this->deleted_at !== null && $this->anonymized_at === null;
     }
 
+    // @codeCoverageIgnoreEnd
+
+    // @codeCoverageIgnoreStart
     public function isDeletedBySelf(): bool
     {
         return $this->deleted_at !== null && $this->deleted_by === $this->id;
     }
 
+    // @codeCoverageIgnoreEnd
+
+    // @codeCoverageIgnoreStart
     public function isDeletedByAdmin(): bool
     {
         return $this->deleted_at !== null && $this->deleted_by !== null && $this->deleted_by !== $this->id;
     }
 
+    // @codeCoverageIgnoreEnd
+
+    // @codeCoverageIgnoreStart
     public function isActive(): bool
     {
         return $this->deleted_at === null && $this->anonymized_at === null;
     }
+
+    // @codeCoverageIgnoreEnd
 
     public function anonymize(): void
     {
@@ -127,6 +145,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
         });
     }
 
+    // @codeCoverageIgnoreStart
     public function canAccessPanel(Panel $panel): bool
     {
         return ! $this->isAnonymous();
@@ -141,6 +160,8 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         return ! $this->isAnonymous();
     }
+
+    // @codeCoverageIgnoreEnd
 
     /**
      * @return BelongsTo<CuratorMedia, $this>

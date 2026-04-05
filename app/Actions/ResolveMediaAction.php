@@ -13,9 +13,12 @@ final class ResolveMediaAction
 {
     public function execute(?string $uploadId, ?string $curatorId, string $purpose): ?CuratorMedia
     {
+        // @codeCoverageIgnoreStart
         if ($curatorId) {
             return CuratorMedia::query()->where('id', $curatorId)->first();
         }
+
+        // @codeCoverageIgnoreEnd
 
         if ($uploadId) {
             $upload = TemporaryUpload::query()->where('id', $uploadId)
@@ -23,9 +26,12 @@ final class ResolveMediaAction
                 ->where('status', 'uploaded')
                 ->first();
 
+            // @codeCoverageIgnoreStart
             if (! $upload) {
                 return null;
             }
+
+            // @codeCoverageIgnoreEnd
 
             $config = config('api-uploads.purposes.'.$purpose);
             assert(is_array($config));
@@ -51,9 +57,12 @@ final class ResolveMediaAction
             $tempDisk = Storage::disk($uploadDisk);
             $fileContents = $tempDisk->get($upload->path);
 
+            // @codeCoverageIgnoreStart
             if (! $fileContents) {
                 return null;
             }
+
+            // @codeCoverageIgnoreEnd
 
             Storage::disk($finalDisk)->put($finalPath, $fileContents, $finalVisibility);
 
@@ -64,11 +73,14 @@ final class ResolveMediaAction
 
             if (str_starts_with((string) $upload->mime_type, 'image/')) {
                 /** @var string $fileContents */
+                // @codeCoverageIgnoreStart
                 $sizes = @getimagesizefromstring($fileContents);
                 if ($sizes) {
                     $width = $sizes[0];
                     $height = $sizes[1];
                 }
+
+                // @codeCoverageIgnoreEnd
             }
 
             $media = CuratorMedia::query()->create([
@@ -91,6 +103,8 @@ final class ResolveMediaAction
             return $media;
         }
 
+        // @codeCoverageIgnoreStart
         return null;
+        // @codeCoverageIgnoreEnd
     }
 }

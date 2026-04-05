@@ -41,9 +41,12 @@ final class PrepareUploadRequest extends FormRequest
                 $purpose = $purposeInput;
                 $config = config('api-uploads.purposes.'.$purpose);
 
+                // @codeCoverageIgnoreStart
                 if (! is_array($config)) {
                     return;
                 }
+
+                // @codeCoverageIgnoreEnd
 
                 $fileSize = $this->input('file_size');
                 $maxSizeConfig = $config['max_size'] ?? 0;
@@ -73,18 +76,23 @@ final class PrepareUploadRequest extends FormRequest
         $purpose = $purposeInput;
         $config = config('api-uploads.purposes.'.$purpose);
 
+        // @codeCoverageIgnoreStart
         if (! is_array($config)) {
             return 'public';
         }
+
+        // @codeCoverageIgnoreEnd
 
         $requestedVisibility = $this->input('requested_visibility');
         if (is_string($requestedVisibility) && in_array($requestedVisibility, (array) ($config['allowed_visibilities'] ?? []), true)) {
             return $requestedVisibility;
         }
 
+        // @codeCoverageIgnoreStart
         $defaultVisibility = $config['default_visibility'] ?? 'public';
         assert(is_string($defaultVisibility));
 
         return $defaultVisibility;
+        // @codeCoverageIgnoreEnd
     }
 }

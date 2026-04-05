@@ -51,6 +51,35 @@ it('cannot prepare an upload with invalid mime type', function (): void {
     $response->assertJsonValidationErrors(['content_type']);
 });
 
+it('cannot prepare an upload with exceeding file size', function (): void {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->postJson(route('v1.uploads.prepare'), [
+        'purpose' => 'user_avatar',
+        'file_name' => 'avatar.jpg',
+        'content_type' => 'image/jpeg',
+        'file_size' => 1024 * 1024 * 100, // Very large
+    ]);
+
+    $response->assertUnprocessable();
+    $response->assertJsonValidationErrors(['file_size']);
+});
+
+it('cannot prepare an upload with invalid visibility', function (): void {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->postJson(route('v1.uploads.prepare'), [
+        'purpose' => 'user_avatar',
+        'file_name' => 'avatar.jpg',
+        'content_type' => 'image/jpeg',
+        'file_size' => 1024,
+        'requested_visibility' => 'invalid_visibility_type',
+    ]);
+
+    $response->assertUnprocessable();
+    $response->assertJsonValidationErrors(['requested_visibility']);
+});
+
 it('can upload file to local fallback and mark it as uploaded', function (): void {
     Storage::fake('uploads_tmp');
 

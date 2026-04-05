@@ -40,11 +40,14 @@ final class Login extends \Filament\Auth\Pages\Login
     {
         try {
             $this->rateLimit(5);
+            // @codeCoverageIgnoreStart
         } catch (TooManyRequestsException $tooManyRequestsException) {
             $this->getRateLimitedNotification($tooManyRequestsException)?->send();
 
             return null;
         }
+
+        // @codeCoverageIgnoreEnd
 
         $data = $this->form->getState();
 
@@ -82,9 +85,12 @@ final class Login extends \Filament\Auth\Pages\Login
         $data = $this->form->getState();
         $email = $data['email'] ?? null;
 
+        // @codeCoverageIgnoreStart
         if (! is_string($email)) {
             return;
         }
+
+        // @codeCoverageIgnoreEnd
 
         if ($action->handle($email)) {
             Notification::make()

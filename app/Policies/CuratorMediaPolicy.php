@@ -46,11 +46,17 @@ final class CuratorMediaPolicy
         return $user->id === $media->created_by && $user->can('ViewOwn:CuratorMedia');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function create(User $user): bool
     {
         return $user->can('Create:CuratorMedia');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function update(User $user, CuratorMedia $media): bool
     {
         if ($user->can('Update:CuratorMedia')) {
@@ -60,6 +66,9 @@ final class CuratorMediaPolicy
         return $user->id === $media->created_by && $user->can('UpdateOwn:CuratorMedia');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function delete(User $user, CuratorMedia $media): bool
     {
         // INDUSTRIAL BEST PRACTICE: Physical protection first

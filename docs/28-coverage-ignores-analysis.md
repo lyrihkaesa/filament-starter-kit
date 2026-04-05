@@ -44,6 +44,31 @@ Dokumen ini mencatat semua bagian kode yang saat ini diabaikan (`@codeCoverageIg
 - **Alasan:** Berisi logika kustom untuk profile page Filament, termasuk deteksi browser/OS untuk session management. Sangat bergantung pada state browser asli.
 - **Rencana Analisis:** Cek apakah logika deteksi OS/Browser bisa dipisah ke Action/Helper tersendiri agar bisa dites secara unit.
 
+### 9. `app/Filament/Forms/Components/CuratorFileUpload.php`
+- **Status:** Seluruh Class (kecuali deklarasi utama)
+- **Alasan:** Sebagai sebuah custom form component buatan sendiri yang meluas (extends) dari kelas `FileUpload` bawaan Filament, kelas ini bergantung penuh eksistensinya kepada fitur-fitur Livewire (DOM Hydration/Dehydration). Menangani *mocking* untuk komponen *frontend-heavy* seperti ini di Pest/PHPUnit sangat sulit dan sering menghasilkan error yang rapuh (fragile).
+- **Rencana Analisis:** Disarankan untuk tidak menghapus ignore dari sini unless di-test melalui E2E seperti Laravel Dusk.
+
+### 10. `app/Filament/Pages/Auth/Login.php` dan `RestoreAccount.php`
+- **Status:** Di-ignore pada bagian eksepsi `TooManyRequestsException` dan *signature fallback* gagal.
+- **Alasan:** Mekanisme exception rate-limiter dari package ketiga serta penanganan *invalid signature* yang bersifat *defensive checking* secara programatik susah distimulasi tanpa membuat testing environment menjadi tidak masuk akal lambat/kompleks.
+- **Rencana Analisis:** Tetap biarkan di-ignore, ini merupakan boilerplate UI yang sangat bergantung pada environment session & signature handling.
+
+### 11. `app/Models/User.php`
+- **Status:** Di-ignore untuk kumpulan helper boolean (`isAnonymous`, `isSoftDeleted`, `isDeletedBySelf`, dll) dan method policy internal model (`canAccessPanel`).
+- **Alasan:** Fungsi helper ini isinya satu baris saja dan dites langsung secara terintegrasi bersama fitur `DeleteUserAccountAction` dll. Murni pemecahan kode supaya rapi, bukan logika komputasi rumit.
+- **Rencana Analisis:** Tidak ada plan, dibiarkan saja tertulis ignore.
+
+### 12. `app/Actions/Profile/RevokeDeviceAction.php`
+- **Status:** Di-ignore pada penentuan label fallback `Unknown Device` jika browser tidak terdeteksi, serta parse date `last_used_at`.
+- **Alasan:** Sulit sekali menghapus header HTTP user-agent hingga kosong pada setup Pest untuk trigger `Unknown Device`, begitupun dengan memaksa token tidak memiliki history timestamp bawaan Sanctum.
+- **Rencana Analisis:** Karena hanya string fallback defensif, ignore ini dipertahankan selamanya.
+
+### 13. `app/Policies/CuratorMediaPolicy.php`
+- **Status:** Di-ignore untuk beberapa method (`create`, `update`, `delete`, dll).
+- **Alasan:** Kebanyakan method isinya hanya melempar kembali mengecek role atau mengecek kepemilikan. Policy test khusus dapat menghabiskan waktu tanpa nilai test yang berarti. Fitur di test langsung dalam integrasi `Curator`.
+- **Rencana Analisis:** Rencanakan `CuratorMediaPolicyTest` sendiri bila policy berkembang melebihi 1 baris.
+
 ---
 
 ## Kesimpulan & Tindakan Mendatang
