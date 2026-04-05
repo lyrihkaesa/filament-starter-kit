@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use App\Actions\Profile\DeleteUserAccountAction;
 use App\Actions\Profile\RevokeDeviceAction;
 use App\Actions\Profile\RevokeOtherDevicesAction;
@@ -366,6 +368,15 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
 
                 $this->deleteAccount($password, $deleteUserAccountAction);
             });
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        Log::info('Updating profile', $data);
+        $record->update($data);
+        Log::info('Was changed: '.($record->wasChanged() ? 'true' : 'false'));
+
+        return parent::handleRecordUpdate($record, $data);
     }
 
     protected function getNameFormComponent(): TextInput
