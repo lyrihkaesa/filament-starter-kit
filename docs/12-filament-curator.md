@@ -57,7 +57,7 @@ Starter kit ini telah meningkatkan fitur Curator dengan sistem kepemilikan dan p
 - **Privacy Level:** Setiap media memiliki status privasi (`PRIVATE`, `MEMBER`, atau `PUBLIC`) yang menentukan siapa yang dapat melihat media tersebut.
 - **Security Policy:** Hanya `creator`, `admin`, dan `super_admin` yang memiliki akses penuh untuk mengedit atau menghapus media.
 
-Penjelasan mendalam mengenai fitur ini dapat dilihat di [docs/26-curator-ownership-and-privacy.md](26-curator-ownership-and-privacy.md).
+Penjelasan mendalam mengenai fitur ini dapat dilihat di [docs/13-curator-privacy-and-tracking.md](13-curator-privacy-and-tracking.md).
 
 ## Dedicated Temporary Upload Disk
 
