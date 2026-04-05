@@ -178,8 +178,9 @@ Kalau ini pertama kali Anda memakai starter kit ini, saya sarankan urutan membac
 5. `docs/05-user-resource.md` — contoh nyata modul User dari A ke Z
 6. `docs/09-roles-permissions-shield.md` — manajemen role & permission
 7. `docs/14-api.md` — API contract dan alur mobile
+8. `docs/25-creating-new-module.md` — Tutorial: Membuat Modul Baru dari Nol ⭐
 
-Setelah memahami tujuh dokumen di atas, Anda sudah bisa memahami "cara pikir" starter kit ini. Sisanya bisa dibaca sesuai kebutuhan.
+Setelah memahami delapan dokumen di atas, Anda sudah bisa memahami "cara pikir" starter kit ini. Sisanya bisa dibaca sesuai kebutuhan.
 
 ### Daftar Lengkap Dokumentasi
 
@@ -207,6 +208,8 @@ Setelah memahami tujuh dokumen di atas, Anda sudah bisa memahami "cara pikir" st
 | 19 | `19-testing-setup.md` | Setup testing: DB options, arch tests, browser |
 | 20 | `20-test-pest-coverage.md` | Setup Xdebug & code coverage (Windows) |
 | 21 | `21-coverage-ignores-analysis.md` | Analisis `@codeCoverageIgnore` |
-| 22 | `22-laravel-debugbar.md` | Laravel Debugbar untuk development |
+| 22 | `22-laravel-debugbar.md` | Laravel Debugbar & Tutorial N+1 Query |
 | 23 | `23-laravel-backup.md` | Backup otomatis dengan Spatie |
 | 24 | `24-laravel-boost-ai-coding-guidelines.md` | Laravel Boost & panduan AI coding |
+| 25 | `25-creating-new-module.md` | Tutorial: Membuat Modul Baru dari Nol ⭐ |
+| 26 | `26-production-deployment.md` | Panduan Production Deployment ⭐ |

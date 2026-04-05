@@ -66,7 +66,52 @@ Anda juga dapat menggunakan Facade `Debugbar` untuk mencatat pesan dengan level 
 \Debugbar::addThrowable($exception);
 ```
 
-## Konfigurasi
+## Tutorial: Mendeteksi & Memperbaiki N+1 Query
+
+N+1 query adalah masalah performa paling umum di Laravel. Masalah ini terjadi ketika Anda mengambil daftar data (misal: 10 post), lalu di dalam loop Anda memanggil relasi (misal: `$post->user->name`). Laravel akan melakukan 1 query untuk mengambil 10 post, DAN 10 query tambahan untuk mengambil user masing-masing post. Total = 11 query (N+1).
+
+### Cara Mendeteksi dengan Debugbar
+
+1. Buka halaman yang lambat atau yang ingin Anda cek.
+2. Lihat toolbar Debugbar di bagian bawah, klik tab **Queries**.
+3. Cari pola query yang berulang-ulang terhadap tabel yang sama dengan hanya perbedaan ID.
+   - Contoh: `SELECT * FROM users WHERE id = 1`, `SELECT * FROM users WHERE id = 2`, ...
+4. Debugbar biasanya akan memberi peringatan (background merah atau ikon peringatan) jika mendeteksi jumlah query yang tidak wajar.
+
+### Cara Memperbaiki
+
+Solusinya adalah menggunakan **Eager Loading**.
+
+**Kasu :** Menampilkan daftar Post dengan Nama Usernya.
+
+❌ **Salah (N+1):**
+```php
+$posts = Post::all(); // 1 query
+
+foreach ($posts as $post) {
+    echo $post->user->name; // ini memicu N query tambahan!
+}
+```
+
+✅ **Benar (Eager Loading):**
+```php
+$posts = Post::with('user')->get(); // Hanya 2 query total
+
+foreach ($posts as $post) {
+    echo $post->user->name; // Data sudah siap di memori
+}
+```
+
+Jika Anda sudah terlanjur memiliki instance model dan ingin memuat relasinya nanti (Lazy Eager Loading):
+
+```php
+$user->load('posts');
+```
+
+Setelah menerapkan `with()` atau `load()`, cek kembali tab **Queries** di Debugbar. Jumlah query seharusnya berkurang drastis menjadi hanya 2 atau beberapa saja.
+
+---
+
 
 Anda dapat menonaktifkan Debugbar secara manual di `.env`:
 

@@ -33,11 +33,17 @@ Biasanya action pattern diletakkan di:
 app/Actions/
 ```
 
-dan method utamanya di starter kit ini adalah:
+## Kenapa method `handle()`?
 
-```php
-handle(...)
-```
+Mungkin Anda bertanya: "Kenapa bukan `execute()`, `run()`, atau `process()`?".
+
+Ada tiga alasan utama kenapa saya memilih `handle()` sebagai standar:
+
+1.  **Standar Laravel:** Laravel menggunakan `handle()` untuk hampir semua hal yang bersifat "satuan tugas": Jobs, Commands, Middleware, dan Mailables. Menggunakan `handle()` membuat Action terasa seperti warga kelas satu (*first-class citizen*) di ekosistem Laravel.
+2.  **Dependency Injection:** Jika Anda memanggil action menggunakan `app(CreateUserAction::class)->handle($data)`, Laravel akan otomatis meng-inject dependency yang Anda butuhkan di constructor. Ini sangat kuat untuk pengujian (mocking).
+3.  **Keseragaman Dokumen:** Dengan satu nama method yang pasti (`handle`), siapapun yang membaca kode Anda langsung tahu di mana "pintu masuk" utama dari logika bisnis tersebut tanpa harus mencari-cari nama method-nya.
+
+> **Tips:** Jika Anda ingin action yang bisa langsung dipanggil seperti function, Anda bisa menambahkan magic method `__invoke()`, tapi di starter kit ini saya menyarankan tetap eksplisit dengan `handle()`.
 
 ## Apa Itu Filament Action
 
