@@ -2,7 +2,7 @@
 
 Project ini menggunakan beberapa konfigurasi global di `AppServiceProvider` untuk meningkatkan performa, keamanan, pengalaman development, dan konsistensi perilaku aplikasi.
 
-Dokumen ini saya sesuaikan langsung dengan isi [`app/Providers/AppServiceProvider.php`](E:/Projects/Laravel/filament-starter-kit/app/Providers/AppServiceProvider.php), jadi bagian yang dijelaskan di sini mengikuti konfigurasi project yang benar-benar sedang dipakai.
+Dokumen ini saya sesuaikan langsung dengan isi [`app/Providers/AppServiceProvider.php`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Providers/AppServiceProvider.php), jadi bagian yang dijelaskan di sini mengikuti konfigurasi project yang benar-benar sedang dipakai.
 
 ## Kenapa `AppServiceProvider` Penting
 

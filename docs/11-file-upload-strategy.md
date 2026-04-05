@@ -46,11 +46,11 @@ Kalau project ini akan dipakai serius dan ada aplikasi Flutter, saya sarankan an
 
 Starter kit ini sudah punya pondasi yang cukup baik:
 
-- disk `local`, `public`, dan `s3` sudah tersedia di [`config/filesystems.php`](E:/Projects/Laravel/filament-starter-kit/config/filesystems.php)
+- disk `local`, `public`, dan `s3` sudah tersedia di [`config/filesystems.php`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/config/filesystems.php)
 - disk `local` sudah memakai `'serve' => true`, jadi file private lokal bisa dibuat `temporaryUrl()`
-- Filament membaca disk dari [`config/filament.php`](E:/Projects/Laravel/filament-starter-kit/config/filament.php)
-- upload avatar Filament sudah dipakai di [`app/Filament/Pages/Auth/EditProfile.php`](E:/Projects/Laravel/filament-starter-kit/app/Filament/Pages/Auth/EditProfile.php) dan [`app/Filament/Resources/Users/Schemas/UserForm.php`](E:/Projects/Laravel/filament-starter-kit/app/Filament/Resources/Users/Schemas/UserForm.php)
-- avatar Filament saat ini dirender oleh [`app/Models/User.php`](E:/Projects/Laravel/filament-starter-kit/app/Models/User.php)
+- Filament membaca disk dari [`config/filament.php`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/config/filament.php)
+- upload avatar Filament sudah dipakai di [`app/Filament/Pages/Auth/EditProfile.php`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Filament/Pages/Auth/EditProfile.php) dan [`app/Filament/Resources/Users/Schemas/UserForm.php`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Filament/Resources/Users/Schemas/UserForm.php)
+- avatar Filament saat ini dirender oleh [`app/Models/User.php`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Models/User.php)
 
 Artinya:
 
@@ -1048,7 +1048,7 @@ Kalau ingin file private, bucket tidak perlu public. URL akses dibuka via tempor
 
 Ada satu hal yang perlu diperhatikan dari kode saat ini:
 
-- method [`getFilamentAvatarUrl()`](E:/Projects/Laravel/filament-starter-kit/app/Models/User.php#L135) memakai `temporaryUrl()` hanya untuk disk `local`
+- method [`getFilamentAvatarUrl()`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Models/User.php#L135) memakai `temporaryUrl()` hanya untuk disk `local`
 - selain itu ia memakai `url()`
 
 Artinya, jika nanti kamu memakai **bucket S3 private** untuk avatar Filament, behavior ini kemungkinan perlu disesuaikan agar disk private S3 juga memakai `temporaryUrl()`, bukan `url()`.

@@ -2,8 +2,8 @@
 
 Dokumen ini menggantikan panduan AI umum yang lama karena saya tidak ingin isinya bentrok atau ambigu dengan:
 
-- [`GEMINI.md`](E:/Projects/Laravel/filament-starter-kit/GEMINI.md)
-- aturan dan skill di folder [` .agents`](E:/Projects/Laravel/filament-starter-kit/.agents)
+- [`GEMINI.md`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/GEMINI.md)
+- aturan dan skill di folder [` .agents`](https://github.com/lyrihkaesa/filament-starter-kit/tree/main/.agents)
 
 Fokus dokumen ini bukan membahas "semua AI tool secara umum", tetapi menjelaskan bagaimana **Laravel Boost** dipakai di starter kit ini dan bagaimana cara berpikir saat bekerja dengan bantuan AI di dalam project.
 
@@ -24,7 +24,7 @@ Tujuannya sederhana: output AI harus lebih tepat, lebih relevan dengan codebase,
 
 ### `boost.json`
 
-File [`boost.json`](E:/Projects/Laravel/filament-starter-kit/boost.json) adalah konfigurasi ringkas untuk Boost di project ini.
+File [`boost.json`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/boost.json) adalah konfigurasi ringkas untuk Boost di project ini.
 
 Contoh isinya saat ini:
 
@@ -51,7 +51,7 @@ Contoh isinya saat ini:
 
 ### `GEMINI.md`
 
-File [`GEMINI.md`](E:/Projects/Laravel/filament-starter-kit/GEMINI.md) berisi guideline utama yang dibaca agent seperti Gemini ketika bekerja dengan Laravel Boost.
+File [`GEMINI.md`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/GEMINI.md) berisi guideline utama yang dibaca agent seperti Gemini ketika bekerja dengan Laravel Boost.
 
 Di sana ada aturan penting seperti:
 
@@ -63,7 +63,7 @@ Di sana ada aturan penting seperti:
 
 ### Folder `.agents`
 
-Folder [` .agents`](E:/Projects/Laravel/filament-starter-kit/.agents) menyimpan skill dan aturan tambahan yang dipakai agent.
+Folder [` .agents`](https://github.com/lyrihkaesa/filament-starter-kit/tree/main/.agents) menyimpan skill dan aturan tambahan yang dipakai agent.
 
 Contohnya:
 

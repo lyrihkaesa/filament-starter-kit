@@ -37,7 +37,7 @@ Starter kit ini sengaja dibuat sederhana:
 - visibility default Curator tetap `private`
 - field tertentu boleh override visibility jika memang harus `public`
 
-Konfigurasi utamanya ada di [config/curator.php](E:/Projects/Laravel/filament-starter-kit/config/curator.php).
+Konfigurasi utamanya ada di [config/curator.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/config/curator.php).
 
 Default-nya sekarang:
 
@@ -63,7 +63,7 @@ Penjelasan mendalam mengenai fitur ini dapat dilihat di [docs/13-curator-privacy
 
 Untuk upload Filament dan Curator, temporary upload Livewire sekarang memakai disk terpisah.
 
-Konfigurasi ini ada di [config/livewire.php](E:/Projects/Laravel/filament-starter-kit/config/livewire.php).
+Konfigurasi ini ada di [config/livewire.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/config/livewire.php).
 
 Disk temporary terpisah ini penting karena Curator membaca metadata dari file temporary setelah file dipindahkan ke lokasi final. Kalau temporary upload dan final media memakai root filesystem yang sama, metadata file temporary bisa hilang lebih dulu dan upload gagal.
 
@@ -90,7 +90,7 @@ Untuk API mobile nantinya, client juga boleh mengirim `requested_visibility`, te
 
 ## Model Curator Kustom
 
-Starter kit mengarahkan model Curator ke [app/Models/CuratorMedia.php](E:/Projects/Laravel/filament-starter-kit/app/Models/CuratorMedia.php).
+Starter kit mengarahkan model Curator ke [app/Models/CuratorMedia.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Models/CuratorMedia.php).
 
 Model ini dipakai supaya URL turunan media tetap konsisten untuk setup mixed visibility. Pendekatan ini lebih aman dibanding mengandalkan asumsi satu source image global ketika project mulai memiliki campuran media public dan private.
 
@@ -112,7 +112,7 @@ Dengan pola ini, model domain tidak menyimpan path file mentah sebagai source of
 
 Avatar user sekarang tidak lagi memakai `CuratorPicker` seperti thumbnail post.
 
-Sebagai gantinya, avatar memakai komponen reusable [app/Filament/Forms/Components/CuratorFileUpload.php](E:/Projects/Laravel/filament-starter-kit/app/Filament/Forms/Components/CuratorFileUpload.php).
+Sebagai gantinya, avatar memakai komponen reusable [app/Filament/Forms/Components/CuratorFileUpload.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Filament/Forms/Components/CuratorFileUpload.php).
 
 Tujuan pola ini:
 
@@ -123,8 +123,8 @@ Tujuan pola ini:
 
 Pemakaiannya saat ini ada di:
 
-- [app/Filament/Pages/Auth/EditProfile.php](E:/Projects/Laravel/filament-starter-kit/app/Filament/Pages/Auth/EditProfile.php)
-- [app/Filament/Resources/Users/Schemas/UserForm.php](E:/Projects/Laravel/filament-starter-kit/app/Filament/Resources/Users/Schemas/UserForm.php)
+- [app/Filament/Pages/Auth/EditProfile.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Filament/Pages/Auth/EditProfile.php)
+- [app/Filament/Resources/Users/Schemas/UserForm.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Filament/Resources/Users/Schemas/UserForm.php)
 
 ## CuratorFileUpload
 
@@ -156,7 +156,7 @@ CuratorFileUpload::make('avatar_curator_id')
 
 ## Thumbnail Post: Tetap Picker
 
-Untuk thumbnail post, starter kit saat ini masih memakai `CuratorPicker` di [app/Filament/Resources/Posts/Schemas/PostForm.php](E:/Projects/Laravel/filament-starter-kit/app/Filament/Resources/Posts/Schemas/PostForm.php).
+Untuk thumbnail post, starter kit saat ini masih memakai `CuratorPicker` di [app/Filament/Resources/Posts/Schemas/PostForm.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/app/Filament/Resources/Posts/Schemas/PostForm.php).
 
 Itu masih cocok karena kebutuhan thumbnail post lebih dekat ke media picker/editorial flow:
 

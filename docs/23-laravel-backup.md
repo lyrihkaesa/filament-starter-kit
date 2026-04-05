@@ -7,7 +7,7 @@ Starter kit ini sudah terintegrasi dengan [`spatie/laravel-backup`](https://gith
 
 Konfigurasi ini sekarang mengikuti pendekatan default dokumentasi Spatie untuk v10: disk lokal backup boleh dipisah, tetapi S3 cukup memakai disk `s3` biasa tanpa filesystem tambahan.
 
-Secara bawaan, konfigurasi backup disimpan di [config/backup.php](/E:/Projects/Laravel/filament-starter-kit/config/backup.php) dan lokasi backup lokal ada di [config/filesystems.php](/E:/Projects/Laravel/filament-starter-kit/config/filesystems.php).
+Secara bawaan, konfigurasi backup disimpan di [config/backup.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/config/backup.php) dan lokasi backup lokal ada di [config/filesystems.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/config/filesystems.php).
 
 ## Ringkasan Default
 
@@ -236,7 +236,7 @@ Jika Anda ingin menguji notifikasi tanpa menunggu scheduler, cukup pakai `php ar
 
 ## 8. Scheduler Harian, Mingguan, Bulanan
 
-Starter kit ini memakai scheduler Laravel dari [bootstrap/app.php](/E:/Projects/Laravel/filament-starter-kit/bootstrap/app.php). Frekuensinya diatur lewat `.env`.
+Starter kit ini memakai scheduler Laravel dari [bootstrap/app.php](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/bootstrap/app.php). Frekuensinya diatur lewat `.env`.
 
 ### Harian
 

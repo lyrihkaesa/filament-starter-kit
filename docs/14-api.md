@@ -533,7 +533,7 @@ Untuk memudahkan pengembangan dan integrasi, starter kit ini menyertakan koleksi
 3. Pilih environment `local`.
 4. Jalankan alur `Login` -> `Get Profile`.
 
-Detail lebih lanjut ada di [api-tests/README.md](../api-tests/README.md).
+Detail lebih lanjut ada di [api-tests/README.md](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/api-tests/README.md).
 
 ## Referensi
 

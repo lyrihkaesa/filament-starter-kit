@@ -4,7 +4,7 @@ Di starter kit ini, saya **menyarankan menggunakan UUID** untuk primary key diba
 
 Ini bukan sekadar preferensi gaya. Saya memang ingin project baru yang dibuat dari starter kit ini bergerak ke pola identifier yang lebih aman dan lebih fleksibel untuk jangka panjang.
 
-Selain itu, project ini juga sudah punya rule khusus untuk agent di [`uuids.md`](E:/Projects/Laravel/filament-starter-kit/.agents/rules/uuids.md) agar saat agent seperti Gemini CLI, Codex, atau Claude membuat migration dan model baru, mereka mengikuti preferensi ini.
+Selain itu, project ini juga sudah punya rule khusus untuk agent di [`uuids.md`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/.agents/rules/uuids.md) agar saat agent seperti Gemini CLI, Codex, atau Claude membuat migration dan model baru, mereka mengikuti preferensi ini.
 
 ## Kenapa Saya Lebih Suka UUID daripada Auto Increment
 
@@ -81,7 +81,7 @@ Jadi, kalau ada schema lama yang masih memakai UUID versi lama, itu bukan berart
 
 Project ini punya rule khusus di:
 
-- [`uuids.md`](E:/Projects/Laravel/filament-starter-kit/.agents/rules/uuids.md)
+- [`uuids.md`](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/.agents/rules/uuids.md)
 
 Tujuan rule itu adalah supaya agent seperti:
 
