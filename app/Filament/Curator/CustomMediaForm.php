@@ -6,60 +6,52 @@ namespace App\Filament\Curator;
 
 use App\Enums\Privacy;
 use Awcodes\Curator\Resources\Media\Schemas\MediaForm;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\ViewField;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Infolists\Components\TextEntry;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 final class CustomMediaForm extends MediaForm
 {
     /**
-     * @return array<int, Grid>
+     * @return array<string, mixed>
      */
-    public static function getSchema(): array
+    public static function getAdditionalInformationFormSchema(): array
     {
         return [
-            Grid::make(2)
-                ->components([
-                    Section::make()
-                        ->components([
-                            TextInput::make('name')
-                                ->label(__('curator::forms.fields.name'))
-                                ->required()
-                                ->columnSpan('full'),
-                            TextInput::make('alt')
-                                ->label(__('curator::forms.fields.alt'))
-                                ->hint(__('curator::forms.fields.alt_hint'))
-                                ->columnSpan('full'),
-                            TextInput::make('title')
-                                ->label(__('curator::forms.fields.title'))
-                                ->columnSpan('full'),
-                            Textarea::make('caption')
-                                ->label(__('curator::forms.fields.caption'))
-                                ->rows(2)
-                                ->columnSpan('full'),
-                            Textarea::make('description')
-                                ->label(__('curator::forms.fields.description'))
-                                ->rows(2)
-                                ->columnSpan('full'),
-                            Select::make('privacy')
-                                ->label('Privacy')
-                                ->options(Privacy::class)
-                                ->default(Privacy::PUBLIC)
-                                ->required()
-                                ->columnSpan('full'),
-                        ])
-                        ->columnSpan(1),
-                    Section::make()
-                        ->components([
-                            ViewField::make('preview')
-                                ->view('curator::components.forms.preview')
-                                ->columnSpan('full'),
-                        ])
-                        ->columnSpan(1),
-                ]),
-        ];
+            TextInput::make('name')
+                ->label(trans('curator::forms.fields.name'))
+                ->hiddenOn('create')
+                ->required()
+                ->dehydrateStateUsing(function ($component, $state) {
+                    $slugged = Str::slug($state);
+                    $component->state($slugged);
+
+                    return $slugged;
+                }),
+            TextInput::make('alt')
+                ->label(trans('curator::forms.fields.alt'))
+                ->hint(fn (): HtmlString => new HtmlString('<a href="https://www.w3.org/WAI/tutorials/images/decision-tree" class="filament-link text-primary-500 text-xs" target="_blank">'.trans('curator::forms.fields.alt_hint').'</a>')),
+            TextInput::make('title')
+                ->label(trans('curator::forms.fields.title')),
+            Textarea::make('caption')
+                ->label(trans('curator::forms.fields.caption'))
+                ->rows(2),
+            Textarea::make('description')
+                ->label(trans('curator::forms.fields.description'))
+                ->rows(2),
+            ToggleButtons::make('privacy')
+                ->label(__('Privacy'))
+                ->options(Privacy::class)
+                ->default(Privacy::PUBLIC)
+                ->inline()
+                ->required(),
+            TextEntry::make('created_by')
+                ->label(__('Created By'))
+                ->state(fn (?Model $record): ?string => $record?->creator?->name ?? __('System')),
+            ];
     }
 }
