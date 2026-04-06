@@ -30,16 +30,12 @@ Contoh isinya saat ini:
 
 ```json
 {
-    "agents": [
-        "gemini"
-    ],
+    "agents": ["gemini"],
     "guidelines": true,
     "herd_mcp": true,
     "mcp": true,
     "nightwatch_mcp": false,
-    "packages": [
-        "filament/filament"
-    ],
+    "packages": ["filament/filament"],
     "sail": false,
     "skills": [
         "livewire-development",
@@ -220,3 +216,13 @@ Laravel Boost di starter kit ini berfungsi sebagai lapisan konteks untuk AI codi
 - lebih konsisten dengan skill dan guideline yang tersedia
 
 Dokumen ini sengaja dibuat spesifik ke Boost agar tidak tumpang tindih dengan dokumen aturan agent lain. Jadi kalau developer ingin memahami "kenapa AI di project ini bisa lebih terarah", file inilah titik awalnya.
+
+## Notes About PAO & RTK
+
+PAO is agent-optimized output for PHP testing tools. It works with any PHP project — Laravel, Symfony, Laminas, vanilla PHP, or anything else that uses PHPUnit, Pest, or Paratest.
+
+It detects when your tests are running inside an AI agent — Claude Code, Cursor, Devin, Gemini CLI, and others — and replaces the verbose, human-readable output with compact, super minimal, structured JSON. Zero config — just install and it works.
+https://github.com/nunomaduro/pao
+
+rtk filters and compresses command outputs before they reach your LLM context. Single Rust binary, 100+ supported commands, <10ms overhead.
+https://github.com/rtk-ai/rtk

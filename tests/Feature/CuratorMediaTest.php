@@ -6,7 +6,9 @@ use App\Actions\Media\DeleteCuratorMediaAction;
 use App\Enums\Privacy;
 use App\Models\CuratorMedia;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 
 beforeEach(function (): void {
@@ -149,4 +151,27 @@ it('supports soft deletes and tracks who deleted it', function (): void {
 
     expect($media->deletedBy)->toBeInstanceOf(User::class)
         ->and($media->deletedBy->id)->toBe($user->id);
+});
+
+it('generates correct url based on visibility', function (): void {
+    Carbon::setTestNow(now());
+    Storage::fake('s3');
+
+    // Public media
+    $publicMedia = CuratorMedia::factory()->create([
+        'disk' => 's3',
+        'privacy' => Privacy::PUBLIC,
+        'path' => 'test-public.jpg',
+    ]);
+    expect($publicMedia->url)->toBe(Storage::disk('s3')->url('test-public.jpg'));
+
+    // Private media
+    $privateMedia = CuratorMedia::factory()->create([
+        'disk' => 's3',
+        'privacy' => Privacy::PRIVATE,
+        'path' => 'test-private.jpg',
+    ]);
+    expect($privateMedia->url)->toBe(Storage::disk('s3')->temporaryUrl('test-private.jpg', now()->addMinutes(60)));
+
+    Carbon::setTestNow();
 });

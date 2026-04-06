@@ -14,7 +14,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * @property Privacy $privacy
@@ -55,6 +57,28 @@ final class CuratorMedia extends Media
         'privacy',
         'deleted_by',
     ];
+
+    /**
+     * @return Attribute<string|null, never>
+     */
+    public function url(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?string {
+                $storage = Storage::disk($this->disk);
+
+                if ($this->visibility === 'public') {
+                    return $storage->url($this->path);
+                }
+
+                try {
+                    return $storage->temporaryUrl($this->path, now()->addMinutes(60));
+                } catch (Throwable) {
+                    return $storage->url($this->path);
+                }
+            },
+        );
+    }
 
     /**
      * @return BelongsTo<User, $this>

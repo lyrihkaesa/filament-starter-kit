@@ -45,7 +45,6 @@ final class PostForm
                                     ->relationship('thumbnailCurator', 'id')
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->maxSize(3072)
-                                    ->disk('public')
                                     ->directory('posts/thumbnails')
                                     ->visibility('public'),
                                 Toggle::make('is_published')

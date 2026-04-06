@@ -23,6 +23,7 @@ DB_PASSWORD=pass_db
 ```
 
 Generate APP_KEY jika belum ada:
+
 ```bash
 php artisan key:generate --show
 ```
@@ -51,6 +52,7 @@ php artisan storage:link
 ```
 
 Build aset frontend (Vite):
+
 ```bash
 npm install
 npm run build
@@ -72,7 +74,7 @@ Tambahkan baris berikut ke crontab server Anda (`crontab -e`):
 
 ## 5. Queue Worker (Supervisor)
 
-Karena starter kit ini menggunakan antrean (*Queue*) untuk notifikasi dan upload S3, Anda **wajib** menjalankan queue worker secara terus-menerus.
+Karena starter kit ini menggunakan antrean (_Queue_) untuk notifikasi dan upload S3, Anda **wajib** menjalankan queue worker secara terus-menerus.
 
 Gunakan **Supervisor** untuk memantau proses worker. Contoh konfigurasi `/etc/supervisor/conf.d/laravel-worker.conf`:
 
@@ -92,6 +94,7 @@ stopwaitsecs=3600
 ```
 
 Jangan lupa untuk me-restart supervisor:
+
 ```bash
 sudo supervisorctl reread
 sudo supervisorctl update
@@ -105,6 +108,7 @@ sudo supervisorctl start laravel-worker:*
 Starter kit ini sudah menyertakan `spatie/laravel-backup`. Pastikan konfigurasi disk tujuan backup sudah benar (disarankan menggunakan disk eksternal atau S3).
 
 Cek koneksi backup:
+
 ```bash
 php artisan backup:run --only-list
 ```
@@ -117,8 +121,81 @@ Lalu Anda bisa menambahkan jadwal backup harian di `app/Console/Kernel.php` atau
 
 1. [ ] `APP_DEBUG=false` sudah dipastikan?
 2. [ ] Database sudah di-migrate (`php artisan migrate --force`)?
-3. [ ] Folder `storage` dan `bootstrap/cache` sudah punya izin tulis (*write permission*)?
+3. [ ] Folder `storage` dan `bootstrap/cache` sudah punya izin tulis (_write permission_)?
 4. [ ] SSL (HTTPS) sudah aktif? (Sangat disarankan memakai Let's Encrypt atau Cloudflare)
 5. [ ] Scheduler dan Queue Worker berjalan lancar?
 
 Dengan mengikuti langkah-langkah di atas, aplikasi Anda akan berjalan aman dan optimal di server produksi.
+
+---
+
+## Note
+
+```php
+   // 🛡️ Keamanan: Paksa HTTPS pastikan Herd dijadikan Secure Site atau kamu komentari baris ini:
+        URL::forceScheme('https');
+
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+    })
+    ->withExceptions(function (Exceptions $exceptions): void {
+        //
+    });
+
+        final class AppPanelProvider extends PanelProvider
+{
+    public function panel(Panel $panel): Panel
+    {
+        return $panel
+            ->default()
+            ->id('app')
+            ->path('app')
+            ->favicon(secure_asset('images/logo-128x128.png'));
+    }
+}
+```
+
+```php
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cross-Origin Resource Sharing (CORS) Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure your settings for cross-origin resource sharing
+    | or "CORS". This determines what cross-origin operations may execute
+    | in web browsers. You are free to adjust these settings as needed.
+    |
+    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    |
+    */
+
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'livewire/*'],
+
+    'allowed_methods' => ['*'],
+
+    'allowed_origins' => ['*'],
+
+    'allowed_origins_patterns' => [],
+
+    'allowed_headers' => ['*'],
+
+    'exposed_headers' => [],
+
+    'max_age' => 0,
+
+    'supports_credentials' => true,
+
+];
+```
