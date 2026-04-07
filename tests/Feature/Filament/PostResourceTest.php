@@ -46,7 +46,7 @@ it('can create posts', function (): void {
     $this->assertDatabaseHas('posts', [
         'title' => 'New Post',
         'slug' => 'new-post',
-        'content' => 'Post content',
+        'content' => '<p>Post content</p>',
         'is_published' => true,
         'author_id' => $user->id,
     ]);

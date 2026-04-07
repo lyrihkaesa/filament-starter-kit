@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Posts\Schemas;
 
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Awcodes\Curator\Components\Forms\RichEditor\AttachCuratorMediaPlugin;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
@@ -21,10 +22,11 @@ final class PostForm
     {
         return $schema
             ->components([
-                Grid::make(2)
+                Grid::make(4)
+                    ->columnSpanFull()
                     ->components([
                         Section::make()
-                            ->columnSpan(1)
+                            ->columnSpan(3)
                             ->components([
                                 TextInput::make('title')
                                     ->required()
@@ -33,9 +35,15 @@ final class PostForm
                                 TextInput::make('slug')
                                     ->required()
                                     ->unique(ignoreRecord: true),
-                                Textarea::make('content')
+                                RichEditor::make('content')
                                     ->required()
-                                    ->rows(10),
+                                    ->plugins([
+                                        AttachCuratorMediaPlugin::make(),
+                                    ])
+                                    ->enableToolbarButtons([
+                                        'attachCuratorMedia',
+                                    ])
+                                    ->columnSpanFull(),
                             ]),
                         Section::make()
                             ->columnSpan(1)
@@ -55,7 +63,7 @@ final class PostForm
                                     ->searchable()
                                     ->preload()
                                     ->required()
-                                    ->default(auth()->id()),
+                                    ->default(auth('web')->id()),
                             ]),
                     ]),
             ]);
