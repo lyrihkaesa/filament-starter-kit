@@ -1,4 +1,4 @@
-﻿<p align="center">
+<p align="center">
     <img src="public/images/logo-128x128.png" width="128" height="128" alt="Filament Starter Kit Logo">
 </p>
 
@@ -6,146 +6,122 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/lyrihkaesa/filament-starter-kit.svg?style=flat-square)](https://packagist.org/packages/lyrihkaesa/filament-starter-kit)
 [![Total Downloads](https://img.shields.io/packagist/dt/lyrihkaesa/filament-starter-kit.svg?style=flat-square)](https://packagist.org/packages/lyrihkaesa/filament-starter-kit)
-[![PHP Version](https://img.shields.io/badge/php-8.4-blue.svg?style=flat-square)](https://php.net)
+[![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue.svg?style=flat-square)](https://php.net)
 [![Laravel Version](https://img.shields.io/badge/laravel-12.x-red.svg?style=flat-square)](https://laravel.com)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
 
-Starter kit modern untuk membangun admin panel tangguh menggunakan **Laravel 12** dan **Filament v5**.
+Starter kit untuk membangun admin panel dengan **Laravel 12**, **Filament 5**, dan **Livewire 4**.
 
-Fokus utama kit ini adalah **Developer Experience (DX)** dengan struktur yang sangat rapi, _strict typing_, dan pola kode yang _maintainable_ untuk project jangka panjang. Cocok untuk developer yang menginginkan standar kualitas tinggi seperti ekosistem TypeScript di dalam Laravel.
+Fokus utamanya adalah struktur code yang rapi, maintainable, dan nyaman untuk development jangka panjang.
 
-## ✨ Highlight Fitur
+## Kenapa Pakai Starter Kit Ini
 
-- **Modern Stack**: Laravel 12, Filament v5, Livewire 4, dan Tailwind CSS v4.
-- **Architectural Excellence**: Menggunakan **Action Pattern** (`handle()`) untuk memisahkan business logic dari Controller/Page.
-- **Strict Typing**: Codebase yang bersahabat dengan _strict types_ untuk keamanan kode yang lebih baik.
-- **API Ready**: Integrasi **Laravel Sanctum** yang siap digunakan untuk aplikasi mobile atau frontend terpisah.
-- **Security & RBAC**: Manajemen akses canggih menggunakan **Filament Shield**.
-- **Privacy Focused**: Sistem **Anonymization** otomatis untuk user yang dihapus (GDPR-friendly).
-- **UUID First**: Standar penggunaan UUID untuk tabel baru guna skalabilitas dan keamanan.
-- **Quality Assurance**: Terintegrasi penuh dengan **Pest 4** (**100% Test Coverage**), **Pint**, **Larastan**, dan **Rector**.
-- **Storage & Database**: Support _PostgreSQL_ untuk production dan _SQLite_ in-memory untuk testing cepat. Dilengkapi native support `local` dan `s3` storage adapter yang siap pakai.
-- **AI-Friendly**: Terdesain efisien untuk AI Agents. Penggunaan komponen dioptimalkan melalui package **PAO** untuk mengurangi konsumsi token (context length) drastis.
+- Arsitektur jelas: mutation lewat `Action Pattern` (`handle()`), query lewat scope/custom builder.
+- API siap pakai dengan Sanctum dan struktur endpoint `api/v1`.
+- Role & permission sudah siap via Filament Shield.
+- UUID-first untuk tabel baru.
+- Tooling kualitas code sudah terpasang: Pest, Pint, Larastan, Rector.
+- Cocok untuk workflow AI-assisted coding karena aturan project dan docs sudah terstruktur.
 
-## 🚀 Quick Start
+## Quick Start
 
-### Install via Laravel Installer
+### 1) Buat project
 
 ```bash
 laravel new my-app --using=lyrihkaesa/filament-starter-kit
 cd my-app
+```
+
+### 2) Install dependency dan setup awal
+
+```bash
 composer install
 npm install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed
 npm run build
-composer dev
 ```
 
-### Akun Admin Default
+### 3) Jalankan development server
 
-- **Email**: `superadmin@example.com`
-- **Password**: `password`
+```bash
+composer run dev
+```
 
-## 🛠️ Tech Stack & Tools
+### Akun default
 
-| Kategori         | Teknologi                                                        |
-| ---------------- | ---------------------------------------------------------------- |
-| **Framework**    | Laravel 12, Filament 5, Livewire 4                               |
-| **Auth**         | Session (WEB), Sanctum (API), Shield (RBAC)                      |
-| **Styling**      | Tailwind CSS 4                                                   |
-| **Testing**      | Pest 4                                                           |
-| **Code Quality** | Pint (Linting), Larastan (Static Analysis), Rector (Refactoring) |
-| **Utilities**    | Laravel Boost, Matomo Device Detector, PAO                       |
+- Email: `superadmin@example.com`
+- Password: `password`
 
-## 🤖 AI-Friendly Architecture (Hemat Token)
+## Command Harian
 
-Salah satu keunggulan utama dari Starter kit ini adalah desainnya yang sangat **AI-Friendly**. Mengingat penggunaan AI Agent seperti GitHub Copilot, Cursor, atau Gemini dalam development modern, starter kit ini dirancang agar _Context Window/Length_ tetap ramping. Kami menggunakan package **PAO** (Pattern Action Object atau sejenisnya/Spatie) sehingga boilerplate logic tidak memenuhi token space Anda.
-Manfaatnya:
+### Development
 
-- **Biaya AI lebih murah** karena sedikit token yang terpakai untuk setiap context.
-- **Respon AI lebih cepat dan akurat** karena tidak perlu menganalisis ratusan baris kode _noisy_.
-- **Konsep Clear/Strict** memudahkan AI merekomendasikan kode (`Action Pattern`, `Strict Types`).
+```bash
+composer run dev
+php artisan serve
+npm run dev
+```
 
-## 🗄️ Database & Storage Support
+### Testing & Quality
 
-Aplikasi ini siap tempur dengan multi-database dan multi-storage:
+```bash
+composer test
+composer test-full
+composer test:types
+composer test:lint
+composer test:refactor
+```
 
-1. **Database:** Mendukung penuh **PostgreSQL** untuk production grade, namun Anda tetap dapat memanfaatkan **SQLite** untuk keperluan _fast testing_ atau local dev.
-2. **Storage:** Mendukung langsung system **Local Filesystem** untuk kesederhanaan, serta **S3-Compatible Object Storage** (AWS, MinIO, R2, dll) out-of-the-box guna mendukung skalabilitas aplikasi atau integrasi API mobile yang seamless.
+## Prinsip Arsitektur
 
-## 📖 Prinsip Pengembangan
+- **Mutations (create/update/delete):** wajib di `app/Actions`.
+- **Queries (read):**
+  - mulai dari local scope `#[Scope]` di Model,
+  - pindah ke `app/Models/Builders/*Builder.php` jika scope sudah banyak atau query kompleks.
+- **External integrations:** di `app/Services`.
+- **UI layer (Filament/Livewire/Controller):** tipis, hanya orkestrasi.
 
-1.  **Action Pattern**: Logic bisnis harus berada di kelas Action, bukan di Controller atau Filament Page.
-2.  **API Versioning**: Endpoint API terstruktur di bawah `/api/v1` dengan _Eloquent Resources_.
-3.  **Soft Deletes & Anonymize**: User yang dihapus akan di-anonymize datanya sebelum benar-benar dihapus permanen.
-4.  **No N+1 Queries**: Selalu memprioritaskan _eager loading_ untuk performa database.
-5.  **100% Code Coverage**: Code base ini wajib lulus strict Architecture Test dan 100% Test Coverage menggunakan Pest sebelum deployment.
+## Dokumentasi
 
-## 📚 Dokumentasi Lengkap
+Dokumentasi lengkap ada di folder [`docs`](./docs) dan versi online:
 
-Dokumentasi detail dapat ditemukan di folder [`docs`](./docs) atau melalui:
+- [Dokumentasi Online](https://kaesa.charapon.my.id/filament-starter-kit)
 
-👉 **[Dokumentasi Online Filament Starter Kit](https://kaesa.charapon.my.id/filament-starter-kit)**
+### Mulai dari sini
 
-### 🚦 Mulai dari Sini
+- [00 - Intro](./docs/00-intro.md)
+- [01 - Architecture Overview](./docs/01-architecture-overview.md)
+- [02 - Action Pattern](./docs/02-action-pattern.md)
+- [03 - Query Pattern](./docs/03-query-pattern.md)
+- [04 - Policy and Action Integration](./docs/04-policy-and-action-integration.md)
 
-- [00 - Intro & Filosofi](./docs/00-intro.md) — Tujuan starter kit, pilihan database, storage, dan AI support
-- [32 - Architecture Overview](./docs/01-architecture-overview.md) — **Baca ini dulu sebelum membuat fitur baru**
+### Referensi per topik
 
-### 🏛️ Arsitektur & Pattern
+- [05 - User Resource](./docs/05-user-resource.md)
+- [06 - UUID Primary Keys](./docs/06-uuid-primary-keys.md)
+- [07 - Make Starter Resource](./docs/07-make-starter-resource.md)
+- [08 - Guards and Sanctum Flow](./docs/08-guards-and-sanctum-flow.md)
+- [09 - Roles Permissions Shield](./docs/09-roles-permissions-shield.md)
+- [10 - User Deletion and Anonymization](./docs/10-user-deletion-and-anonymization.md)
+- [11 - File Upload Strategy](./docs/11-file-upload-strategy.md)
+- [12 - Filament Curator](./docs/12-filament-curator.md)
+- [13 - Curator Privacy and Tracking](./docs/13-curator-privacy-and-tracking.md)
+- [14 - API](./docs/14-api.md)
+- [15 - Mobile File Upload API](./docs/15-mobile-file-upload-api.md)
+- [16 - Notifications](./docs/16-notifications.md)
+- [17 - Code Quality Toolchain](./docs/17-code-quality-toolchain.md)
+- [18 - App Service Provider](./docs/18-app-service-provider.md)
+- [19 - Testing Setup](./docs/19-testing-setup.md)
+- [20 - Test Pest Coverage](./docs/20-test-pest-coverage.md)
+- [21 - Coverage Ignores Analysis](./docs/21-coverage-ignores-analysis.md)
+- [22 - Laravel Debugbar](./docs/22-laravel-debugbar.md)
+- [23 - Laravel Backup](./docs/23-laravel-backup.md)
+- [24 - Laravel Boost AI Coding Guidelines](./docs/24-laravel-boost-ai-coding-guidelines.md)
+- [25 - Creating New Module](./docs/25-creating-new-module.md)
+- [26 - Production Deployment](./docs/26-production-deployment.md)
 
-- [02 - Action Pattern](./docs/02-action-pattern.md) — Mutations (Create/Update/Delete) via Action class
-- [23 - Query Builders](./docs/03-query-builders.md) — Scopes vs Custom Eloquent Builders
-- [09 - Kenapa Tidak Repository Pattern](./docs/04-repository-pattern.md) — Penjelasan lengkap alasannya
-- [16 - Policy & Action Integration](./docs/05-policy-and-action-integration.md) — Cara authorization bekerja bersama Action
+## License
 
-### 🔐 Auth & Security
-
-- [17 - Guards & Sanctum Flow](./docs/09-guards-and-sanctum-flow.md)
-- [14 - Manajemen Role & Permission](./docs/10-filament-shield.md)
-- [15 - Roles & Permissions Seeders](./docs/11-roles-permissions-seeders.md)
-- [24 - User Deletion & Anonymization](./docs/12-user-deletion-and-anonymization.md)
-
-### 🌐 API
-
-- [07 - Integrasi API & Sanctum](./docs/18-api.md)
-- [21 - Mobile File Upload API](./docs/19-mobile-file-upload-api.md)
-
-### 🗂️ File & Media
-
-- [19 - File Upload Strategy (S3 & Local)](./docs/14-file-upload-strategy.md)
-- [20 - Filament Curator](./docs/15-filament-curator.md)
-- [26 - Curator Ownership & Privacy](./docs/16-curator-ownership-and-privacy.md)
-- [27 - Media Usage Tracking](./docs/17-media-usage-tracking.md)
-
-### 🧪 Testing & QA
-
-- [25 - Database Testing Options](./docs/25-testing-database-options.md) — SQLite vs PostgreSQL untuk testing
-- [03 - Test Coverage Setup (Xdebug)](./docs/26-test-pest-coverage.md)
-- [22 - Architecture Tests](./docs/27-architecture-tests.md)
-- [28 - Coverage Ignores Analysis](./docs/29-coverage-ignores-analysis.md)
-
-### 🛠️ Tools & Filament
-
-- [08 - User Resource](./docs/06-user-resource.md)
-- [11 - Make Starter Resource](./docs/08-make-starter-resource.md)
-- [18 - Implementasi UUID](./docs/07-uuid-primary-keys.md)
-- [31 - Laravel Backup](./docs/31-laravel-backup.md)
-
-
-## ✅ Quality Control
-
-Jalankan perintah berikut untuk menjaga kualitas codebase:
-
-- **Semua Tes**: `composer test-full`
-- **Unit & Feature Test**: `php artisan test`
-- **API Testing**: `bru run api-tests/bruno --env local`
-- **Auto Format**: `composer lint`
-- **Static Analysis**: `composer test:types`
-- **Auto Refactor**: `composer refactor`
-
-## 📄 Lisensi
-
-Proyek ini menggunakan lisensi [MIT](LICENSE).
+Project ini menggunakan lisensi [MIT](LICENSE).
