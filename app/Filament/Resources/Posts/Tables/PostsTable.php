@@ -33,9 +33,14 @@ final class PostsTable
                 TextColumn::make('slug')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('is_published')
+                IconColumn::make('published_at')
                     ->boolean()
                     ->label('Published')
+                    ->sortable(),
+                TextColumn::make('published_at')
+                    ->label('Published At')
+                    ->dateTime()
+                    ->placeholder('Draft')
                     ->sortable(),
                 TextColumn::make('author.name')
                     ->searchable()
@@ -50,8 +55,9 @@ final class PostsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_published')
-                    ->label('Published Status'),
+                TernaryFilter::make('published_at')
+                    ->label('Published Status')
+                    ->nullable(),
                 SelectFilter::make('author_id')
                     ->relationship('author', 'name')
                     ->label('Author')

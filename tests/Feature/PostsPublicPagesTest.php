@@ -8,7 +8,7 @@ it('can render posts index page with published posts', function (): void {
     $publishedPost = Post::factory()->create([
         'title' => 'Published Post',
         'slug' => 'published-post',
-        'is_published' => true,
+        'published_at' => now(),
     ]);
 
     $this->get(route('posts.index'))
@@ -20,13 +20,13 @@ it('does not show unpublished posts on index page', function (): void {
     Post::factory()->create([
         'title' => 'Published Post',
         'slug' => 'published-post-index',
-        'is_published' => true,
+        'published_at' => now(),
     ]);
 
     Post::factory()->create([
         'title' => 'Unpublished Post',
         'slug' => 'unpublished-post-index',
-        'is_published' => false,
+        'published_at' => null,
     ]);
 
     $this->get(route('posts.index'))
@@ -39,7 +39,7 @@ it('can render published post detail page by slug', function (): void {
     $publishedPost = Post::factory()->create([
         'title' => 'Published Post Detail',
         'slug' => 'published-post-detail',
-        'is_published' => true,
+        'published_at' => now(),
     ]);
 
     $this->get(route('posts.show', ['post' => $publishedPost->slug]))
@@ -50,7 +50,7 @@ it('can render published post detail page by slug', function (): void {
 it('returns 404 for unpublished post detail page', function (): void {
     $unpublishedPost = Post::factory()->create([
         'slug' => 'unpublished-post-detail',
-        'is_published' => false,
+        'published_at' => null,
     ]);
 
     $this->get(route('posts.show', ['post' => $unpublishedPost->slug]))

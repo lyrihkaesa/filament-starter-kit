@@ -23,8 +23,13 @@ final class PostInfolist
                         TextEntry::make('title'),
                         TextEntry::make('slug'),
                         TextEntry::make('author.name'),
-                        IconEntry::make('is_published')
+                        IconEntry::make('published_at')
+                            ->label('Published')
                             ->boolean(),
+                        TextEntry::make('published_at')
+                            ->label('Published At')
+                            ->dateTime()
+                            ->placeholder('Draft'),
                         TextEntry::make('content')
                             ->columnSpanFull()
                             ->html(),

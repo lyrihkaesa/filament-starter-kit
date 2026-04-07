@@ -6,10 +6,10 @@ namespace App\Filament\Resources\Posts\Schemas;
 
 use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Awcodes\Curator\Components\Forms\RichEditor\AttachCuratorMediaPlugin;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
@@ -55,9 +55,10 @@ final class PostForm
                                     ->maxSize(3072)
                                     ->directory('posts/thumbnails')
                                     ->visibility('public'),
-                                Toggle::make('is_published')
-                                    ->required()
-                                    ->default(false),
+                                DateTimePicker::make('published_at')
+                                    ->label('Published At')
+                                    ->seconds(false)
+                                    ->helperText('Kosongkan jika masih draft.'),
                                 Select::make('author_id')
                                     ->relationship('author', 'name')
                                     ->searchable()

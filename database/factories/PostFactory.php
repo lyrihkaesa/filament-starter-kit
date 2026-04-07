@@ -22,12 +22,13 @@ final class PostFactory extends Factory
     public function definition(): array
     {
         $title = $this->faker->sentence();
+        $isPublished = $this->faker->boolean();
 
         return [
             'title' => $title,
             'slug' => Str::slug($title),
             'content' => $this->faker->paragraphs(3, true),
-            'is_published' => $this->faker->boolean(),
+            'published_at' => $isPublished ? $this->faker->dateTimeBetween('-1 year', 'now') : null,
             'author_id' => User::factory(),
             'thumbnail' => null,
         ];

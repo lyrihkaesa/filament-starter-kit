@@ -22,7 +22,7 @@ final class Index extends Component
         return view('livewire.posts.index', [
             'posts' => Post::query()
                 ->with(['author', 'thumbnailCurator'])
-                ->where('is_published', true)
+                ->whereNotNull('published_at')
                 ->latest()
                 ->paginate(9),
         ]);

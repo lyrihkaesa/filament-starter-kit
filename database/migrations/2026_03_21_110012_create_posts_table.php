@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('content');
-            $table->boolean('is_published')->default(false);
+            $table->timestamp('published_at')->nullable();
             $table->foreignUuid('author_id')->constrained('users')->cascadeOnDelete();
             $table->string('thumbnail')->nullable();
             $table->foreignUuid('thumbnail_curator_id')->nullable();

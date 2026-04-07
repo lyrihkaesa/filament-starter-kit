@@ -33,12 +33,13 @@ it('can list posts', function (): void {
 
 it('can create posts', function (): void {
     $user = User::factory()->create();
+    $publishedAt = now()->startOfMinute();
 
     Livewire::test(CreatePost::class)
         ->set('data.title', 'New Post')
         ->set('data.slug', 'new-post')
         ->set('data.content', 'Post content')
-        ->set('data.is_published', true)
+        ->set('data.published_at', $publishedAt->toDateTimeString())
         ->set('data.author_id', $user->id)
         ->call('create')
         ->assertHasNoFormErrors();
@@ -47,13 +48,14 @@ it('can create posts', function (): void {
         'title' => 'New Post',
         'slug' => 'new-post',
         'content' => '<p>Post content</p>',
-        'is_published' => true,
+        'published_at' => $publishedAt->toDateTimeString(),
         'author_id' => $user->id,
     ]);
 });
 
 it('can create posts with curator thumbnail', function (): void {
     $user = User::factory()->create();
+    $publishedAt = now()->startOfMinute();
     $media = CuratorMedia::query()->create([
         'disk' => 'public',
         'directory' => 'posts/thumbnails',
@@ -69,7 +71,7 @@ it('can create posts with curator thumbnail', function (): void {
         ->set('data.title', 'Post with Curator Thumbnail')
         ->set('data.slug', 'post-with-curator-thumbnail')
         ->set('data.content', 'Post content')
-        ->set('data.is_published', true)
+        ->set('data.published_at', $publishedAt->toDateTimeString())
         ->set('data.author_id', $user->id)
         ->set('data.thumbnail_curator_id', [$media->fresh()->toArray()])
         ->call('create')

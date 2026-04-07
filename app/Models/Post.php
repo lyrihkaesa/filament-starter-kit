@@ -68,7 +68,7 @@ final class Post extends Model implements HasRichContent
     protected function casts(): array
     {
         return [
-            'is_published' => 'boolean',
+            'published_at' => 'datetime',
         ];
     }
 

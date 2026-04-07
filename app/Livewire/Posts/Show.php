@@ -17,7 +17,7 @@ final class Show extends Component
 
     public function mount(Post $post): void
     {
-        abort_if(! $post->is_published, Response::HTTP_NOT_FOUND);
+        abort_if($post->published_at === null, Response::HTTP_NOT_FOUND);
 
         $this->post = $post->loadMissing(['author', 'thumbnailCurator']);
     }
