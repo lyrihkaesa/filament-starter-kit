@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -158,11 +157,6 @@ final class CuratorMedia extends Media
         self::addGlobalScope(new CuratorMediaScope);
 
         self::creating(function (self $media): void {
-            // @codeCoverageIgnoreStart
-            if (empty($media->{$media->getKeyName()})) {
-                $media->{$media->getKeyName()} = (string) Str::uuid();
-            }
-
             if (empty($media->created_by) && Auth::check()) {
                 $media->created_by = (string) Auth::id();
             }
@@ -170,8 +164,6 @@ final class CuratorMedia extends Media
             if (empty($media->privacy)) {
                 $media->privacy = Privacy::PRIVATE;
             }
-
-            // @codeCoverageIgnoreEnd
         });
 
         self::saving(function (self $media): void {

@@ -25,8 +25,6 @@ final class RestoreAccountNotification extends Notification implements ShouldQue
 
     public function toMail(object $notifiable): MailMessage
     {
-        // @codeCoverageIgnoreStart
-        // Mail notification body tested via integration tests
         if (! ($notifiable instanceof User)) {
             return new MailMessage;
         }
@@ -43,6 +41,5 @@ final class RestoreAccountNotification extends Notification implements ShouldQue
             ->action('Pulihkan Akun', (string) $url)
             ->line('Tautan pemulihan ini akan kedaluwarsa dalam 60 menit.')
             ->line('Jika Anda tidak merasa meminta pemulihan akun, abaikan email ini.');
-        // @codeCoverageIgnoreEnd
     }
 }

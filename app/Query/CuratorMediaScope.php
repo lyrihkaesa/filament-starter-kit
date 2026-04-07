@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Auth;
 final class CuratorMediaScope implements Scope
 {
     /**
-     * @codeCoverageIgnore
-     * Scope depends on complex auth state combinations - tested via integration tests
-     *
      * Apply the scope to a given Eloquent query builder.
      *
      * This scope ensures that users can only see their own media uploads unless
@@ -29,8 +26,6 @@ final class CuratorMediaScope implements Scope
             return;
         }
 
-        // @codeCoverageIgnoreStart
-        // Scope logic depends on complex auth state - tested via integration tests
         $user = Auth::user();
 
         // If no user is authenticated, we don't apply ownership filtering here.
@@ -56,6 +51,5 @@ final class CuratorMediaScope implements Scope
         // 3. Fallback: If they have ViewAny (to see the list) but neither View nor ViewOwn,
         // we default to showing only their own records for security.
         $builder->where('created_by', $user->id);
-        // @codeCoverageIgnoreEnd
     }
 }
