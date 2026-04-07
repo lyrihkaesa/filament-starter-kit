@@ -7,50 +7,76 @@
 
         <script>
             (() => {
-                const readThemeMode = () => localStorage.getItem('theme') ?? 'system';
+                const THEME_KEY = 'theme';
+                const DEFAULT_THEME_MODE = 'system';
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                const validThemeModes = new Set(['light', 'dark', 'system']);
+
+                const normalizeThemeMode = (themeMode) => validThemeModes.has(themeMode) ? themeMode : DEFAULT_THEME_MODE;
+
+                const readThemeMode = () => normalizeThemeMode(localStorage.getItem(THEME_KEY) ?? DEFAULT_THEME_MODE);
 
                 const resolveTheme = (themeMode) => {
-                    if (themeMode === 'system') {
-                        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    const normalizedThemeMode = normalizeThemeMode(themeMode);
+
+                    if (normalizedThemeMode === 'system') {
+                        return mediaQuery.matches ? 'dark' : 'light';
                     }
 
-                    return themeMode === 'dark' ? 'dark' : 'light';
+                    return normalizedThemeMode;
                 };
 
                 const syncThemeButtons = (themeMode) => {
                     document.querySelectorAll('[data-theme-mode]').forEach((button) => {
-                        button.dataset.active = button.dataset.themeMode === themeMode ? 'true' : 'false';
+                        const isActive = button.dataset.themeMode === themeMode;
+
+                        button.dataset.active = isActive ? 'true' : 'false';
+                        button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
                     });
                 };
 
                 const applyTheme = (themeMode) => {
-                    const resolvedTheme = resolveTheme(themeMode);
+                    const normalizedThemeMode = normalizeThemeMode(themeMode);
+                    const resolvedTheme = resolveTheme(normalizedThemeMode);
 
                     document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
                     document.documentElement.style.colorScheme = resolvedTheme;
-                    syncThemeButtons(themeMode);
+                    document.documentElement.dataset.themeMode = normalizedThemeMode;
+
+                    syncThemeButtons(normalizedThemeMode);
                 };
 
-                window.__setTheme = (themeMode) => {
-                    localStorage.setItem('theme', themeMode);
-                    applyTheme(themeMode);
-                    window.dispatchEvent(new CustomEvent('theme-changed', { detail: themeMode }));
+                const persistThemeMode = (themeMode) => {
+                    const normalizedThemeMode = normalizeThemeMode(themeMode);
+
+                    localStorage.setItem(THEME_KEY, normalizedThemeMode);
+                    applyTheme(normalizedThemeMode);
                 };
 
-                applyTheme(readThemeMode());
-                window.addEventListener('DOMContentLoaded', () => applyTheme(readThemeMode()));
+                window.__setTheme = persistThemeMode;
+
+                window.addEventListener('theme-changed', (event) => {
+                    const themeMode = typeof event.detail === 'string'
+                        ? event.detail
+                        : (typeof event.detail?.theme === 'string' ? event.detail.theme : readThemeMode());
+
+                    persistThemeMode(themeMode);
+                });
 
                 window.addEventListener('storage', (event) => {
-                    if (event.key === 'theme') {
+                    if (event.key === THEME_KEY) {
                         applyTheme(readThemeMode());
                     }
                 });
 
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                mediaQuery.addEventListener('change', () => {
                     if (readThemeMode() === 'system') {
                         applyTheme('system');
                     }
                 });
+
+                applyTheme(readThemeMode());
+                window.addEventListener('DOMContentLoaded', () => applyTheme(readThemeMode()));
             })();
         </script>
 
@@ -84,6 +110,7 @@
                             type="button"
                             data-theme-mode="light"
                             data-active="false"
+                            aria-pressed="false"
                             onclick="window.__setTheme('light')"
                             class="rounded-full px-3 py-1 font-medium text-zinc-600 transition data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:text-zinc-300 dark:data-[active=true]:bg-zinc-100 dark:data-[active=true]:text-zinc-900"
                         >
@@ -93,6 +120,7 @@
                             type="button"
                             data-theme-mode="dark"
                             data-active="false"
+                            aria-pressed="false"
                             onclick="window.__setTheme('dark')"
                             class="rounded-full px-3 py-1 font-medium text-zinc-600 transition data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:text-zinc-300 dark:data-[active=true]:bg-zinc-100 dark:data-[active=true]:text-zinc-900"
                         >
@@ -102,6 +130,7 @@
                             type="button"
                             data-theme-mode="system"
                             data-active="false"
+                            aria-pressed="false"
                             onclick="window.__setTheme('system')"
                             class="rounded-full px-3 py-1 font-medium text-zinc-600 transition data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:text-zinc-300 dark:data-[active=true]:bg-zinc-100 dark:data-[active=true]:text-zinc-900"
                         >
