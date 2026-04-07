@@ -169,6 +169,36 @@ Membersihkan catatan penggunaan media saat model pemilik (User/Post) benar-benar
 - **Cegah Penghapusan:** Media tidak dapat di-*delete* atau di-*force delete* jika statusnya masih tercatat digunakan (`CheckMediaUsageAction`).
 - **Otomatis Tersembunyi:** Karena menggunakan `SoftDeletes` pada model `CuratorMedia`, relasi Eloquent (seperti `$user->avatarMedia`) secara otomatis akan mengembalikan `null` jika media tersebut sedang berada di "Recycle Bin" (di-*soft delete*). Jika di-*restore*, maka akan muncul kembali secara otomatis.
 
+Selain proteksi di policy, starter kit ini juga menambahkan proteksi langsung di layer Filament Curator:
+
+- halaman edit media menampilkan warning kalau media masih dipakai
+- row delete action di tabel media diblok untuk media yang masih dipakai
+- bulk delete dibatalkan jika ada media terpilih yang masih dipakai
+
+Jadi proteksinya berlapis:
+
+1. UI memberi warning dan mencegah aksi yang salah.
+2. Policy tetap menolak delete jika media masih dipakai.
+3. `DeleteCuratorMediaAction` tetap mengembalikan `false` jika usage masih ada.
+
+Pendekatan ini dibuat defensif supaya integritas aset tidak bergantung pada satu lapisan saja.
+
+### Catatan Naming di Closure Action Filament
+
+Untuk code style internal project ini, service injection di closure action Filament sebaiknya tidak diberi nama `$action` jika closure tersebut sudah berada di context action Filament.
+
+Contoh yang disarankan:
+
+```php
+->using(fn (CuratorMedia $record, DeleteCuratorMediaAction $deleteMediaAction): bool => $deleteMediaAction->handle($record))
+```
+
+Alasannya:
+
+- `$action` secara mental sudah identik dengan action Filament
+- nama seperti `$deleteMediaAction` lebih mudah dipahami developer baru
+- mengurangi ambiguitas saat membaca closure `before()`, `using()`, `action()`, dan hook action lainnya
+
 ---
 
 ## Pengujian (Testing)

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -94,6 +95,31 @@ final class CuratorMedia extends Media
     public function deletedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    /**
+     * @return HasMany<CuratorMediaUsage, $this>
+     */
+    public function usages(): HasMany
+    {
+        return $this->hasMany(CuratorMediaUsage::class, 'curator_media_id');
+    }
+
+    public function isInUse(): bool
+    {
+        return $this->usages()->exists();
+    }
+
+    public function getUsageCount(): int
+    {
+        return $this->usages()->count();
+    }
+
+    public function getDeletionBlockedMessage(): string
+    {
+        return trans('Media ini sedang dipakai di :count lokasi dan tidak bisa dihapus.', [
+            'count' => $this->getUsageCount(),
+        ]);
     }
 
     /**

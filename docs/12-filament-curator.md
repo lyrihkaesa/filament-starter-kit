@@ -108,6 +108,27 @@ Relasi model yang dipakai:
 
 Dengan pola ini, model domain tidak menyimpan path file mentah sebagai source of truth utama. Yang disimpan adalah referensi ke record Curator.
 
+## Delete Protection di UI Curator
+
+Starter kit ini menambahkan proteksi delete langsung di UI Curator, baik di:
+
+- halaman edit media
+- tabel resource media
+- bulk delete di tabel media
+
+Aturannya:
+
+- jika media masih dipakai model lain, media tidak boleh dihapus
+- user akan mendapat peringatan bahwa media tersebut masih dipakai
+- tombol delete diblok sejak UI, bukan dibiarkan lanjut lalu gagal belakangan
+
+Contoh yang saat ini sudah terlindungi:
+
+- avatar user pada `users.avatar_curator_id`
+- thumbnail post pada `posts.thumbnail_curator_id`
+
+Fitur ini penting untuk mencegah broken image dan broken reference di domain.
+
 ## Avatar User: Direct Upload Tanpa Picker
 
 Avatar user sekarang tidak lagi memakai `CuratorPicker` seperti thumbnail post.
@@ -201,6 +222,24 @@ Dengan pola itu:
 
 - mobile tidak perlu membuat record Curator secara manual sebelum submit form domain
 - Filament dan mobile tetap bermuara ke final media library yang sama, yaitu `curator`
+
+## Catatan untuk Developer Pemula: Naming di Filament Action
+
+Saat menulis closure untuk action Filament, hindari memakai nama variabel service injection sebagai `$action` jika closure itu sendiri sudah berada di konteks action Filament.
+
+Contoh yang disarankan:
+
+```php
+->using(fn (CuratorMedia $record, DeleteCuratorMediaAction $deleteMediaAction): bool => $deleteMediaAction->handle($record))
+```
+
+Lebih baik daripada:
+
+```php
+->using(fn (CuratorMedia $record, DeleteCuratorMediaAction $action): bool => $action->handle($record))
+```
+
+Ini bukan soal PHP error, tetapi soal kejelasan pembacaan kode. Di Filament, `$action` sudah identik dengan action UI. Untuk developer pemula, nama spesifik seperti `$deleteMediaAction` atau `$deleteBulkAction` lebih mudah dipahami dan lebih aman saat maintenance.
 
 ## Kesimpulan
 

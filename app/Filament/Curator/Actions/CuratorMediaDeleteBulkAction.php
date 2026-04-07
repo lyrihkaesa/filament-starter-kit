@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Curator\Actions;
+
+use App\Models\CuratorMedia;
+use App\Models\User;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
+
+final class CuratorMediaDeleteBulkAction
+{
+    public static function make(): DeleteBulkAction
+    {
+        return DeleteBulkAction::make()
+            ->authorize(fn (): bool => self::canDeleteAny())
+            ->before(function (DeleteBulkAction $deleteBulkAction, EloquentCollection|Collection|LazyCollection $records): void {
+                $blockedCount = $records
+                    ->filter(fn (CuratorMedia $record): bool => $record->isInUse())
+                    ->count();
+
+                if ($blockedCount === 0) {
+                    return;
+                }
+
+                Notification::make()
+                    ->danger()
+                    ->title(__('Delete dibatalkan'))
+                    ->body(trans(':count media masih dipakai dan tidak bisa dihapus.', [
+                        'count' => $blockedCount,
+                    ]))
+                    ->send();
+
+                $deleteBulkAction->cancel();
+            });
+    }
+
+    private static function canDeleteAny(): bool
+    {
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $user->can('Delete:CuratorMedia') || $user->can('DeleteOwn:CuratorMedia');
+    }
+}

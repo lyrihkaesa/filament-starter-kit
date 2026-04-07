@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Actions\Media\DeleteCuratorMediaAction;
 use App\Enums\Privacy;
 use App\Models\CuratorMedia;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
@@ -151,6 +152,22 @@ it('supports soft deletes and tracks who deleted it', function (): void {
 
     expect($media->deletedBy)->toBeInstanceOf(User::class)
         ->and($media->deletedBy->id)->toBe($user->id);
+});
+
+it('cannot delete media that is still in use', function (): void {
+    $media = CuratorMedia::factory()->create();
+    $post = Post::factory()->create([
+        'thumbnail_curator_id' => $media->getKey(),
+    ]);
+
+    $media->usages()->create([
+        'model_id' => $post->getKey(),
+        'model_type' => $post->getMorphClass(),
+        'field_name' => 'thumbnail_curator_id',
+    ]);
+
+    expect(resolve(DeleteCuratorMediaAction::class)->handle($media))->toBeFalse()
+        ->and($media->fresh()->trashed())->toBeFalse();
 });
 
 it('generates correct url based on visibility', function (): void {
