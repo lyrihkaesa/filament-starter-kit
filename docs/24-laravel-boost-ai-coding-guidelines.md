@@ -224,5 +224,5 @@ PAO is agent-optimized output for PHP testing tools. It works with any PHP proje
 It detects when your tests are running inside an AI agent — Claude Code, Cursor, Devin, Gemini CLI, and others — and replaces the verbose, human-readable output with compact, super minimal, structured JSON. Zero config — just install and it works.
 https://github.com/nunomaduro/pao
 
-rtk filters and compresses command outputs before they reach your LLM context. Single Rust binary, 100+ supported commands, <10ms overhead.
+rtk filters and compresses command outputs before they reach your LLM context. Single Rust binary, 100+ supported commands, `<10ms` overhead.
 https://github.com/rtk-ai/rtk
