@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Sleep;
 use App\Models\User;
+use Illuminate\Support\Sleep;
 
 it('can edit profile name and email via browser', function (): void {
     $user = User::factory()->create([

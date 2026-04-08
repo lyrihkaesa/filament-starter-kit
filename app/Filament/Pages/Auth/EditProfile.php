@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use App\Actions\Profile\DeleteUserAccountAction;
 use App\Actions\Profile\RevokeDeviceAction;
 use App\Actions\Profile\RevokeOtherDevicesAction;
@@ -27,11 +25,13 @@ use Filament\Schemas\Components\View;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\PersonalAccessToken;
 use RuntimeException;

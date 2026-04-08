@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Support\Activity\ActivitySubjectType;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -51,6 +53,9 @@ final class AppServiceProvider extends ServiceProvider
 
         // 💎 Kualitas: Mode ketat Eloquent (Laravel 9.11+)
         // Model::shouldBeStrict();
+
+        // Paksa alias morph yang stabil agar tidak bergantung pada FQCN model.
+        Relation::enforceMorphMap(ActivitySubjectType::morphMap());
 
         // 💎 Kualitas: Matikan proteksi mass-assignment di local
         if (app()->isLocal()) {

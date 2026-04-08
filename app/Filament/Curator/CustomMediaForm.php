@@ -13,7 +13,6 @@ use Filament\Infolists\Components\TextEntry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Livewire\Livewire;
 
 final class CustomMediaForm extends MediaForm
 {
@@ -27,9 +26,11 @@ final class CustomMediaForm extends MediaForm
                 ->label(trans('curator::forms.fields.name'))
                 ->hiddenOn('create')
                 ->required()
-                ->dehydrateStateUsing(function (Livewire $component, ?string $state): string {
+                ->dehydrateStateUsing(function (mixed $component, ?string $state): string {
                     $slugged = Str::slug($state);
-                    $component->state($slugged);
+                    if (is_object($component) && method_exists($component, 'state')) {
+                        $component->state($slugged);
+                    }
 
                     return $slugged;
                 }),

@@ -20,10 +20,13 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\Models\Concerns\HasActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 
 final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
+    use HasActivity;
     use HasApiTokens;
 
     /** @use HasFactory<UserFactory> */
@@ -65,6 +68,14 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
         'password',
         'remember_token',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logUnguarded()
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges();
+    }
 
     // @codeCoverageIgnoreStart
     /**

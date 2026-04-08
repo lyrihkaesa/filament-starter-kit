@@ -6,8 +6,11 @@ namespace App\Filament\Resources\Users\Tables;
 
 use App\Actions\Profile\DeleteUserAccountAction;
 use App\Actions\Profile\RestoreUserAccountAction;
+use App\Filament\Resources\Activities\ActivityResource;
 use App\Models\User;
+use App\Support\Activity\ActivitySubjectType;
 use Awcodes\Curator\Components\Tables\CuratorColumn;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -47,6 +50,7 @@ final class UsersTable
                     ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
@@ -98,6 +102,13 @@ final class UsersTable
                     ->color('warning')
                     ->iconSize(IconSize::Small),
                 ViewAction::make(),
+                Action::make('activities')
+                    ->label(__('Activities'))
+                    ->icon('heroicon-o-clock')
+                    ->url(fn (User $record): string => ActivityResource::getUrl('index', [
+                        'tableFilters[subject][value]' => ActivitySubjectType::USER,
+                        'tableFilters[subject_id][value]' => $record->id,
+                    ])),
                 EditAction::make(),
                 DeleteAction::make()
                     ->using(fn (User $record, DeleteUserAccountAction $deleteAction) => $deleteAction->handle($record, Auth::user())),
