@@ -22,15 +22,20 @@ beforeEach(function (): void {
     Permission::findOrCreate('ViewAny:CuratorMedia');
     Permission::findOrCreate('View:CuratorMedia');
     Permission::findOrCreate('Update:CuratorMedia');
-    Permission::findOrCreate('Delete:CuratorMedia');
+    Permission::findOrCreate('DeleteOwn:CuratorMedia');
 
-    $user->givePermissionTo(['ViewAny:CuratorMedia', 'View:CuratorMedia', 'Update:CuratorMedia', 'Delete:CuratorMedia']);
+    $user->givePermissionTo(['ViewAny:CuratorMedia', 'View:CuratorMedia', 'Update:CuratorMedia', 'DeleteOwn:CuratorMedia']);
 
     $this->actingAs($user);
 });
 
 it('disables deleting used curator media from the table', function (): void {
-    $media = CuratorMedia::factory()->create();
+    /** @var User $user */
+    $user = auth()->user();
+
+    $media = CuratorMedia::factory()->create([
+        'created_by' => $user->id,
+    ]);
     $post = Post::factory()->create([
         'thumbnail_curator_id' => $media->getKey(),
     ]);
@@ -46,7 +51,12 @@ it('disables deleting used curator media from the table', function (): void {
 });
 
 it('disables deleting used curator media from the edit page', function (): void {
-    $media = CuratorMedia::factory()->create();
+    /** @var User $user */
+    $user = auth()->user();
+
+    $media = CuratorMedia::factory()->create([
+        'created_by' => $user->id,
+    ]);
     $post = Post::factory()->create([
         'thumbnail_curator_id' => $media->getKey(),
     ]);

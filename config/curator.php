@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use App\Filament\Curator\CustomMediaForm;
 use App\Filament\Curator\MediaTable;
+use App\Filament\Pages\Media\EditMedia as AppEditMedia;
 use App\Models\CuratorMedia;
 use Awcodes\Curator\Enums\PreviewableExtensions;
 use Awcodes\Curator\Providers\GlideUrlProvider;
 use Awcodes\Curator\Resources\Media\MediaResource;
 use Awcodes\Curator\Resources\Media\Pages\CreateMedia;
-use Awcodes\Curator\Resources\Media\Pages\EditMedia;
 use Awcodes\Curator\Resources\Media\Pages\ListMedia;
 
 return [
@@ -44,7 +44,7 @@ return [
         'resource' => MediaResource::class,
         'pages' => [
             'create' => CreateMedia::class,
-            'edit' => EditMedia::class,
+            'edit' => AppEditMedia::class,
             'index' => ListMedia::class,
         ],
         'schemas' => [

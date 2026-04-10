@@ -8,6 +8,7 @@ This project uses an explicit **Action Pattern** to handle business logic. This 
 2.  **Standard Method:** Every Action class MUST use `handle()` as its primary entry point.
 3.  **Data Integrity:** Actions that perform multiple database operations MUST wrap the logic within a `DB::transaction()`.
 4.  **Single Responsibility:** Each Action should do one thing well (e.g., `SyncMediaUsageAction`, `DeleteUserAccountAction`).
+5.  **Authorization Boundary:** Actions in `app/Actions/**` MUST NOT perform permission checks (`$user->can()`, `hasPermissionTo()`, role checks). Authorization must live in Form Request `authorize()`, API/Web Controllers, Policies, or Filament Actions.
 
 ## Implementation Standard
 
@@ -53,3 +54,7 @@ When using Actions within Filament closures (e.g., `->action()` or `->using()`),
 - **Testable:** Easy to unit test in isolation.
 - **Atomic:** Transactions ensure data is never left in a partial state.
 - **Transparent:** Developers can see exactly what happens when a command is executed.
+
+## Authorization Placement
+- ✅ Allowed in: Form Request `authorize()`, Controllers (including API controllers), Policies, Filament Actions.
+- ❌ Not allowed in: `app/Actions/**` business Actions.

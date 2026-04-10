@@ -26,10 +26,12 @@ beforeEach(function (): void {
         'UpdateOwn:CuratorMedia',
         'Delete:CuratorMedia',
         'DeleteOwn:CuratorMedia',
+        'DeleteUsed:CuratorMedia',
         'Restore:CuratorMedia',
         'RestoreOwn:CuratorMedia',
         'ForceDelete:CuratorMedia',
         'ForceDeleteOwn:CuratorMedia',
+        'ForceDeleteUsed:CuratorMedia',
         'Replicate:CuratorMedia',
         'Reorder:CuratorMedia',
     ] as $permission) {
@@ -109,7 +111,7 @@ it('authorizes update for admins and owners only', function (): void {
 
 it('blocks delete when media is still in use', function (): void {
     $user = User::factory()->create();
-    $user->givePermissionTo('Delete:CuratorMedia');
+    $user->givePermissionTo('DeleteOwn:CuratorMedia');
 
     $media = CuratorMedia::factory()->create([
         'created_by' => $user->id,
@@ -123,6 +125,38 @@ it('blocks delete when media is still in use', function (): void {
     ]);
 
     expect($this->policy->delete($user, $media))->toBeFalse();
+});
+
+it('allows deleting used media for admin or special permission', function (): void {
+    $admin = User::factory()->create();
+    $admin->givePermissionTo('Delete:CuratorMedia');
+
+    $ownerWithOverride = User::factory()->create();
+    $ownerWithOverride->givePermissionTo(['DeleteOwn:CuratorMedia', 'DeleteUsed:CuratorMedia']);
+
+    $adminMedia = CuratorMedia::factory()->create([
+        'created_by' => $admin->id,
+    ]);
+    $ownerMedia = CuratorMedia::factory()->create([
+        'created_by' => $ownerWithOverride->id,
+    ]);
+
+    CuratorMediaUsage::query()->create([
+        'curator_media_id' => (string) $adminMedia->id,
+        'model_id' => (string) $admin->id,
+        'model_type' => $admin->getMorphClass(),
+        'field_name' => 'avatar_curator_id',
+    ]);
+
+    CuratorMediaUsage::query()->create([
+        'curator_media_id' => (string) $ownerMedia->id,
+        'model_id' => (string) $ownerWithOverride->id,
+        'model_type' => $ownerWithOverride->getMorphClass(),
+        'field_name' => 'avatar_curator_id',
+    ]);
+
+    expect($this->policy->delete($admin, $adminMedia))->toBeTrue()
+        ->and($this->policy->delete($ownerWithOverride, $ownerMedia))->toBeTrue();
 });
 
 it('authorizes delete for admins and owners when media is unused', function (): void {
@@ -161,7 +195,7 @@ it('authorizes restore for admins and owners only', function (): void {
 
 it('blocks force delete when media is still in use', function (): void {
     $user = User::factory()->create();
-    $user->givePermissionTo('ForceDelete:CuratorMedia');
+    $user->givePermissionTo('ForceDeleteOwn:CuratorMedia');
 
     $media = CuratorMedia::factory()->create([
         'created_by' => $user->id,
@@ -175,6 +209,38 @@ it('blocks force delete when media is still in use', function (): void {
     ]);
 
     expect($this->policy->forceDelete($user, $media))->toBeFalse();
+});
+
+it('allows force deleting used media for admin or special permission', function (): void {
+    $admin = User::factory()->create();
+    $admin->givePermissionTo('ForceDelete:CuratorMedia');
+
+    $ownerWithOverride = User::factory()->create();
+    $ownerWithOverride->givePermissionTo(['ForceDeleteOwn:CuratorMedia', 'ForceDeleteUsed:CuratorMedia']);
+
+    $adminMedia = CuratorMedia::factory()->create([
+        'created_by' => $admin->id,
+    ]);
+    $ownerMedia = CuratorMedia::factory()->create([
+        'created_by' => $ownerWithOverride->id,
+    ]);
+
+    CuratorMediaUsage::query()->create([
+        'curator_media_id' => (string) $adminMedia->id,
+        'model_id' => (string) $admin->id,
+        'model_type' => $admin->getMorphClass(),
+        'field_name' => 'avatar_curator_id',
+    ]);
+
+    CuratorMediaUsage::query()->create([
+        'curator_media_id' => (string) $ownerMedia->id,
+        'model_id' => (string) $ownerWithOverride->id,
+        'model_type' => $ownerWithOverride->getMorphClass(),
+        'field_name' => 'avatar_curator_id',
+    ]);
+
+    expect($this->policy->forceDelete($admin, $adminMedia))->toBeTrue()
+        ->and($this->policy->forceDelete($ownerWithOverride, $ownerMedia))->toBeTrue();
 });
 
 it('authorizes force delete for admins and owners when media is unused', function (): void {

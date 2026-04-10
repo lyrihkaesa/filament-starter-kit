@@ -41,13 +41,14 @@ it('removes media usage when SyncMediaUsageAction is executed with null', functi
 });
 
 it('prevents media deletion if it is in use', function (): void {
-    // Note: Give permission, but policy should still block it because it's in use
-    $admin = User::factory()->create();
-    Permission::create(['name' => 'Delete:CuratorMedia']);
-    $admin->givePermissionTo('Delete:CuratorMedia');
+    $owner = User::factory()->create();
+    Permission::create(['name' => 'DeleteOwn:CuratorMedia']);
+    $owner->givePermissionTo('DeleteOwn:CuratorMedia');
 
     $post = Post::factory()->create();
-    $media = CuratorMedia::factory()->create();
+    $media = CuratorMedia::factory()->create([
+        'created_by' => $owner->id,
+    ]);
 
     // Attach media to post (track usage)
     resolve(SyncMediaUsageAction::class)->handle($post, 'thumbnail_curator_id', $media->id);
@@ -55,9 +56,9 @@ it('prevents media deletion if it is in use', function (): void {
     expect(resolve(CheckMediaUsageAction::class)->handle((string) $media->id))->toBeTrue();
 
     // Try to delete via policy
-    $this->actingAs($admin);
+    $this->actingAs($owner);
 
-    // The policy should return false because it's in use, even if the user has permission
+    // Owner without special override permission must stay blocked.
     expect(Gate::allows('delete', $media))->toBeFalse();
 });
 

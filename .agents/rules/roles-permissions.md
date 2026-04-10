@@ -38,4 +38,5 @@ public function update(User $user, CuratorMedia $media): bool
 - **Consistency:** Follows the established patterns used by Filament Shield and the wider Laravel ecosystem.
 
 ## Industrial Best Practice: Integrity Protection
-Authorization (Permissions) should NEVER override physical data integrity. For example, even if a user has `Delete:CuratorMedia`, the Policy SHOULD return `false` if the media is still being used by other records (refer to `CheckMediaUsageAction`).
+Authorization should not bypass physical integrity checks by default.  
+For media deletion, keep "in use" media blocked unless an explicit override permission exists (for example `DeleteUsed:CuratorMedia` or `ForceDeleteUsed:CuratorMedia`) and the check is implemented in Policy/Controller/Filament Action.

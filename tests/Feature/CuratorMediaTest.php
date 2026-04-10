@@ -21,6 +21,7 @@ beforeEach(function (): void {
     Permission::create(['name' => 'UpdateOwn:CuratorMedia']);
     Permission::create(['name' => 'Delete:CuratorMedia']);
     Permission::create(['name' => 'DeleteOwn:CuratorMedia']);
+    Permission::create(['name' => 'DeleteUsed:CuratorMedia']);
 });
 
 it('sets created_by and privacy on creation', function (): void {
@@ -168,6 +169,25 @@ it('cannot delete media that is still in use', function (): void {
 
     expect(resolve(DeleteCuratorMediaAction::class)->handle($media))->toBeFalse()
         ->and($media->fresh()->trashed())->toBeFalse();
+});
+
+it('allows admin to delete media that is still in use', function (): void {
+    $admin = User::factory()->create();
+    $admin->givePermissionTo('Delete:CuratorMedia');
+
+    $media = CuratorMedia::factory()->create();
+    $post = Post::factory()->create([
+        'thumbnail_curator_id' => $media->getKey(),
+    ]);
+
+    $media->usages()->create([
+        'model_id' => $post->getKey(),
+        'model_type' => $post->getMorphClass(),
+        'field_name' => 'thumbnail_curator_id',
+    ]);
+
+    expect(resolve(DeleteCuratorMediaAction::class)->handle($media, $admin->id, true))->toBeTrue()
+        ->and($media->fresh()->trashed())->toBeTrue();
 });
 
 it('generates correct url based on visibility', function (): void {

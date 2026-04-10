@@ -15,12 +15,16 @@ final class CuratorMediaDeleteAction
     {
         return DeleteAction::make()
             ->authorize(fn (CuratorMedia $record): bool => self::canDelete($record))
-            ->disabled(fn (CuratorMedia $record): bool => $record->isInUse())
-            ->tooltip(fn (CuratorMedia $record): ?string => $record->isInUse() ? $record->getDeletionBlockedMessage() : null)
-            ->modalDescription(fn (CuratorMedia $record): string => $record->isInUse()
+            ->disabled(fn (CuratorMedia $record): bool => $record->isInUse() && ! self::canDeleteUsed($record))
+            ->tooltip(fn (CuratorMedia $record): ?string => ($record->isInUse() && ! self::canDeleteUsed($record)) ? $record->getDeletionBlockedMessage() : null)
+            ->modalDescription(fn (CuratorMedia $record): string => ($record->isInUse() && ! self::canDeleteUsed($record))
                 ? $record->getDeletionBlockedMessage()
                 : __('Are you sure you want to delete this media?'))
-            ->using(fn (CuratorMedia $record, DeleteCuratorMediaRecordAction $deleteMediaAction): bool => $deleteMediaAction->handle($record));
+            ->using(fn (CuratorMedia $record, DeleteCuratorMediaRecordAction $deleteMediaAction): bool => $deleteMediaAction->handle(
+                media: $record,
+                deleterId: auth()->id(),
+                allowDeleteWhenUsed: self::canDeleteUsed($record),
+            ));
     }
 
     private static function canDelete(CuratorMedia $record): bool
@@ -36,5 +40,20 @@ final class CuratorMediaDeleteAction
         }
 
         return $user->id === $record->created_by && $user->can('DeleteOwn:CuratorMedia');
+    }
+
+    private static function canDeleteUsed(CuratorMedia $record): bool
+    {
+        if (! self::canDelete($record)) {
+            return false;
+        }
+
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $user->can('Delete:CuratorMedia') || $user->can('DeleteUsed:CuratorMedia');
     }
 }

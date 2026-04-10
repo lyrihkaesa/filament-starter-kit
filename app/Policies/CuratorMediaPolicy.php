@@ -62,16 +62,15 @@ final class CuratorMediaPolicy
 
     public function delete(User $user, CuratorMedia $media): bool
     {
-        // INDUSTRIAL BEST PRACTICE: Physical protection first
-        if (resolve(CheckMediaUsageAction::class)->handle((string) $media->id)) {
+        if (! $this->canDeleteRecord($user, $media)) {
             return false;
         }
 
-        if ($user->can('Delete:CuratorMedia')) {
+        if (! resolve(CheckMediaUsageAction::class)->handle((string) $media->id)) {
             return true;
         }
 
-        return $user->id === $media->created_by && $user->can('DeleteOwn:CuratorMedia');
+        return $this->canDeleteUsedRecord($user);
     }
 
     public function restore(User $user, CuratorMedia $media): bool
@@ -85,15 +84,15 @@ final class CuratorMediaPolicy
 
     public function forceDelete(User $user, CuratorMedia $media): bool
     {
-        if (resolve(CheckMediaUsageAction::class)->handle((string) $media->id)) {
+        if (! $this->canForceDeleteRecord($user, $media)) {
             return false;
         }
 
-        if ($user->can('ForceDelete:CuratorMedia')) {
+        if (! resolve(CheckMediaUsageAction::class)->handle((string) $media->id)) {
             return true;
         }
 
-        return $user->id === $media->created_by && $user->can('ForceDeleteOwn:CuratorMedia');
+        return $this->canForceDeleteUsedRecord($user);
     }
 
     public function replicate(User $user): bool
@@ -104,5 +103,33 @@ final class CuratorMediaPolicy
     public function reorder(User $user): bool
     {
         return $user->can('Reorder:CuratorMedia');
+    }
+
+    private function canDeleteRecord(User $user, CuratorMedia $media): bool
+    {
+        if ($user->can('Delete:CuratorMedia')) {
+            return true;
+        }
+
+        return $user->id === $media->created_by && $user->can('DeleteOwn:CuratorMedia');
+    }
+
+    private function canDeleteUsedRecord(User $user): bool
+    {
+        return $user->can('Delete:CuratorMedia') || $user->can('DeleteUsed:CuratorMedia');
+    }
+
+    private function canForceDeleteRecord(User $user, CuratorMedia $media): bool
+    {
+        if ($user->can('ForceDelete:CuratorMedia')) {
+            return true;
+        }
+
+        return $user->id === $media->created_by && $user->can('ForceDeleteOwn:CuratorMedia');
+    }
+
+    private function canForceDeleteUsedRecord(User $user): bool
+    {
+        return $user->can('ForceDelete:CuratorMedia') || $user->can('ForceDeleteUsed:CuratorMedia');
     }
 }

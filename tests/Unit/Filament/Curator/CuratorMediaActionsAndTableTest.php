@@ -25,6 +25,7 @@ beforeEach(function (): void {
     app(PermissionRegistrar::class)->forgetCachedPermissions();
     Permission::findOrCreate('Delete:CuratorMedia');
     Permission::findOrCreate('DeleteOwn:CuratorMedia');
+    Permission::findOrCreate('DeleteUsed:CuratorMedia');
 });
 
 function markMediaAsInUse(CuratorMedia $media, User $user): void
@@ -81,12 +82,16 @@ it('evaluates curator media delete authorization rules', function (): void {
 });
 
 it('derives disabled state tooltip and modal description from usage state', function (): void {
-    $admin = User::factory()->create();
-    $admin->givePermissionTo('Delete:CuratorMedia');
-    $this->actingAs($admin);
+    $owner = User::factory()->create();
+    $owner->givePermissionTo('DeleteOwn:CuratorMedia');
+    $this->actingAs($owner);
 
-    $unused = CuratorMedia::factory()->create();
-    $used = CuratorMedia::factory()->create();
+    $unused = CuratorMedia::factory()->create([
+        'created_by' => $owner->id,
+    ]);
+    $used = CuratorMedia::factory()->create([
+        'created_by' => $owner->id,
+    ]);
     $user = User::factory()->create();
 
     markMediaAsInUse($used, $user);
@@ -101,6 +106,21 @@ it('derives disabled state tooltip and modal description from usage state', func
     expect($unusedAction->isDisabled())->toBeFalse()
         ->and($unusedAction->getTooltip())->toBeNull()
         ->and($unusedAction->getModalDescription())->toBe('Are you sure you want to delete this media?');
+});
+
+it('keeps used media delete action enabled for admin users', function (): void {
+    $admin = User::factory()->create();
+    $admin->givePermissionTo('Delete:CuratorMedia');
+    $this->actingAs($admin);
+
+    $used = CuratorMedia::factory()->create();
+    $user = User::factory()->create();
+    markMediaAsInUse($used, $user);
+
+    $action = CuratorMediaDeleteAction::make()->record($used);
+
+    expect($action->isDisabled())->toBeFalse()
+        ->and($action->getTooltip())->toBeNull();
 });
 
 it('uses custom delete callback to delete media records', function (): void {
@@ -140,14 +160,33 @@ it('evaluates curator media bulk delete authorization rules', function (): void 
 });
 
 it('cancels bulk deletion when selected records are in use', function (): void {
+    $owner = User::factory()->create();
+    $owner->givePermissionTo('DeleteOwn:CuratorMedia');
+    $this->actingAs($owner);
+
+    $action = CuratorMediaDeleteBulkAction::make();
+    $before = getBulkDeleteBeforeHook($action);
+
+    $usedMedia = CuratorMedia::factory()->create([
+        'created_by' => $owner->id,
+    ]);
+    markMediaAsInUse($usedMedia, $owner);
+
+    expect(fn () => $before($action, collect([$usedMedia])))->toThrow(Cancel::class);
+});
+
+it('allows bulk deletion of used media for admin users', function (): void {
+    $admin = User::factory()->create();
+    $admin->givePermissionTo('Delete:CuratorMedia');
+    $this->actingAs($admin);
+
     $action = CuratorMediaDeleteBulkAction::make();
     $before = getBulkDeleteBeforeHook($action);
 
     $usedMedia = CuratorMedia::factory()->create();
-    $user = User::factory()->create();
-    markMediaAsInUse($usedMedia, $user);
+    markMediaAsInUse($usedMedia, $admin);
 
-    expect(fn () => $before($action, collect([$usedMedia])))->toThrow(Cancel::class);
+    expect($before($action, collect([$usedMedia])))->toBeNull();
 });
 
 it('continues bulk deletion when selected records are unused', function (): void {

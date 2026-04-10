@@ -20,7 +20,7 @@ final class CuratorMediaDeleteBulkAction
             ->authorize(fn (): bool => self::canDeleteAny())
             ->before(function (DeleteBulkAction $deleteBulkAction, EloquentCollection|Collection|LazyCollection $records): void {
                 $blockedCount = $records
-                    ->filter(fn (CuratorMedia $record): bool => $record->isInUse())
+                    ->filter(fn (CuratorMedia $record): bool => $record->isInUse() && ! self::canDeleteUsed())
                     ->count();
 
                 if ($blockedCount === 0) {
@@ -48,5 +48,16 @@ final class CuratorMediaDeleteBulkAction
         }
 
         return $user->can('Delete:CuratorMedia') || $user->can('DeleteOwn:CuratorMedia');
+    }
+
+    private static function canDeleteUsed(): bool
+    {
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $user->can('Delete:CuratorMedia') || $user->can('DeleteUsed:CuratorMedia');
     }
 }
