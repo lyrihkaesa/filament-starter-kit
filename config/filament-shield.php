@@ -195,6 +195,9 @@ return [
                 'viewAny', 'view', 'create', 'update', 'delete', 'restore', 'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
                 'viewOwn', 'updateOwn', 'deleteOwn', 'restoreOwn', 'forceDeleteOwn',
             ],
+            App\Filament\Resources\Activities\ActivityResource::class => [
+                'viewAny', 'view', 'create', 'update', 'delete', 'restore', 'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
+            ],
         ],
         'exclude' => [
             //
