@@ -9,9 +9,9 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 it('returns correct labels for Privacy enum', function (): void {
-    expect(Privacy::PRIVATE->getLabel())->toBe('Private');
-    expect(Privacy::MEMBER->getLabel())->toBe('Member');
-    expect(Privacy::PUBLIC->getLabel())->toBe('Public');
+    expect(Privacy::PRIVATE->getLabel())->toBe(__('Private'));
+    expect(Privacy::MEMBER->getLabel())->toBe(__('Member'));
+    expect(Privacy::PUBLIC->getLabel())->toBe(__('Public'));
 });
 
 it('returns correct colors for Privacy enum', function (): void {

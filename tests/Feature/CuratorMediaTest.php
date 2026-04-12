@@ -161,12 +161,6 @@ it('cannot delete media that is still in use', function (): void {
         'thumbnail_curator_id' => $media->getKey(),
     ]);
 
-    $media->usages()->create([
-        'model_id' => $post->getKey(),
-        'model_type' => $post->getMorphClass(),
-        'field_name' => 'thumbnail_curator_id',
-    ]);
-
     expect(resolve(DeleteCuratorMediaAction::class)->handle($media))->toBeFalse()
         ->and($media->fresh()->trashed())->toBeFalse();
 });
@@ -178,12 +172,6 @@ it('allows admin to delete media that is still in use', function (): void {
     $media = CuratorMedia::factory()->create();
     $post = Post::factory()->create([
         'thumbnail_curator_id' => $media->getKey(),
-    ]);
-
-    $media->usages()->create([
-        'model_id' => $post->getKey(),
-        'model_type' => $post->getMorphClass(),
-        'field_name' => 'thumbnail_curator_id',
     ]);
 
     expect(resolve(DeleteCuratorMediaAction::class)->handle($media, $admin->id, true))->toBeTrue()

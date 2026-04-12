@@ -111,6 +111,7 @@ it('derives disabled state tooltip and modal description from usage state', func
 it('keeps used media delete action enabled for admin users', function (): void {
     $admin = User::factory()->create();
     $admin->givePermissionTo('Delete:CuratorMedia');
+    $admin->givePermissionTo('DeleteUsed:CuratorMedia');
     $this->actingAs($admin);
 
     $used = CuratorMedia::factory()->create();
@@ -178,6 +179,7 @@ it('cancels bulk deletion when selected records are in use', function (): void {
 it('allows bulk deletion of used media for admin users', function (): void {
     $admin = User::factory()->create();
     $admin->givePermissionTo('Delete:CuratorMedia');
+    $admin->givePermissionTo('DeleteUsed:CuratorMedia');
     $this->actingAs($admin);
 
     $action = CuratorMediaDeleteBulkAction::make();

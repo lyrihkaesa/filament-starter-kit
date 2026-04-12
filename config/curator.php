@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 use App\Filament\Curator\CustomMediaForm;
+use App\Filament\Curator\MediaResource;
 use App\Filament\Curator\MediaTable;
+use App\Filament\Curator\Pages\CreateMedia;
+use App\Filament\Curator\Pages\ListMedia;
 use App\Filament\Pages\Media\EditMedia as AppEditMedia;
 use App\Models\CuratorMedia;
 use Awcodes\Curator\Enums\PreviewableExtensions;
 use Awcodes\Curator\Providers\GlideUrlProvider;
-use Awcodes\Curator\Resources\Media\MediaResource;
-use Awcodes\Curator\Resources\Media\Pages\CreateMedia;
-use Awcodes\Curator\Resources\Media\Pages\ListMedia;
 
 return [
     'curation_formats' => PreviewableExtensions::toArray(),

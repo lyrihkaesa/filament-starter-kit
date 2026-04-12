@@ -29,7 +29,7 @@ return [
             'pages' => true,
             'widgets' => true,
             'resources' => true,
-            'custom_permissions' => false,
+            'custom_permissions' => true,
         ],
     ],
 
@@ -73,7 +73,7 @@ return [
     'super_admin' => [
         'enabled' => true,
         'name' => 'super_admin',
-        'define_via_gate' => true,
+        'define_via_gate' => env('FILAMENT_SHIELD_DEFINE_VIA_GATE', false),
         'intercept_gate' => 'before',
     ],
 
@@ -187,6 +187,14 @@ return [
                 'update',
                 'delete',
             ],
+            Awcodes\Curator\Resources\Media\MediaResource::class => [
+                'viewAny', 'view', 'create', 'update', 'delete', 'restore', 'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
+                'viewOwn', 'updateOwn', 'deleteOwn', 'restoreOwn', 'forceDeleteOwn', 'deleteUsed', 'forceDeleteUsed',
+            ],
+            App\Filament\Resources\Posts\PostResource::class => [
+                'viewAny', 'view', 'create', 'update', 'delete', 'restore', 'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
+                'viewOwn', 'updateOwn', 'deleteOwn', 'restoreOwn', 'forceDeleteOwn',
+            ],
         ],
         'exclude' => [
             //
@@ -244,11 +252,7 @@ return [
     */
 
     'custom_permissions' => [
-        'ViewOwn:CuratorMedia',
-        'UpdateOwn:CuratorMedia',
-        'DeleteOwn:CuratorMedia',
-        'RestoreOwn:CuratorMedia',
-        'ForceDeleteOwn:CuratorMedia',
+        //
     ],
 
     /*

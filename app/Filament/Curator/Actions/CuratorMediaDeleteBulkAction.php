@@ -58,6 +58,6 @@ final class CuratorMediaDeleteBulkAction
             return false;
         }
 
-        return $user->can('Delete:CuratorMedia') || $user->can('DeleteUsed:CuratorMedia');
+        return $user->can('DeleteUsed:CuratorMedia');
     }
 }

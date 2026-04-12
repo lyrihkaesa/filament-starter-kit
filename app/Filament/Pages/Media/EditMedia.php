@@ -6,17 +6,13 @@ namespace App\Filament\Pages\Media;
 
 use App\Filament\Curator\Actions\CuratorMediaDeleteAction;
 use App\Filament\Curator\Actions\CuratorMediaUsagesAction;
+use App\Filament\Curator\MediaResource;
 use Awcodes\Curator\Resources\Media\Pages\EditMedia as BaseEditMedia;
 use Filament\Actions\Action;
 
 final class EditMedia extends BaseEditMedia
 {
-    public function getSubheading(): ?string
-    {
-        return $this->record->isInUse()
-            ? $this->record->getDeletionBlockedMessage()
-            : null;
-    }
+    protected static string $resource = MediaResource::class;
 
     /**
      * @return array<int, Action>

@@ -143,13 +143,6 @@ it('can delete posts from table', function (): void {
         'thumbnail_curator_id' => $media->getKey(),
     ]);
 
-    CuratorMediaUsage::query()->create([
-        'curator_media_id' => $media->getKey(),
-        'model_id' => $post->getKey(),
-        'model_type' => $post->getMorphClass(),
-        'field_name' => 'thumbnail_curator_id',
-    ]);
-
     Livewire::test(ListPosts::class)
         ->callTableAction(DeleteAction::class, $post);
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Actions\Media\SyncMediaUsageAction;
 use Awcodes\Curator\Components\Forms\RichEditor\AttachCuratorMediaPlugin;
 use Database\Factories\PostFactory;
 use Filament\Forms\Components\RichEditor\Models\Concerns\InteractsWithRichContent;
@@ -60,6 +61,33 @@ final class Post extends Model implements HasRichContent
         return $this->belongsTo(CuratorMedia::class, 'thumbnail_curator_id');
     }
 
+    protected static function booted(): void
+    {
+        self::creating(function (Post $post): void {
+            if (! $post->author_id && auth()->check()) {
+                $post->author_id = auth()->id();
+            }
+        });
+
+        self::saved(function (Post $post): void {
+            if ($post->isDirty('thumbnail_curator_id')) {
+                resolve(SyncMediaUsageAction::class)->handle(
+                    $post,
+                    'thumbnail_curator_id',
+                    $post->thumbnail_curator_id,
+                );
+            }
+        });
+
+        self::deleted(function (Post $post): void {
+            resolve(SyncMediaUsageAction::class)->handle(
+                $post,
+                'thumbnail_curator_id',
+                null,
+            );
+        });
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -81,5 +109,4 @@ final class Post extends Model implements HasRichContent
                 AttachCuratorMediaPlugin::make(),
             ]);
     }
-
 }

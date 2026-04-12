@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 final class PostResource extends Resource
 {
@@ -44,6 +45,17 @@ final class PostResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (auth()->user()->can('View:Post')) {
+            return $query;
+        }
+
+        return $query->where('author_id', auth()->id());
     }
 
     public static function getPages(): array

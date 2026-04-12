@@ -48,13 +48,6 @@ it('updates post and syncs thumbnail media usage via action', function (): void 
         'thumbnail_curator_id' => $oldMedia->id,
     ]);
 
-    CuratorMediaUsage::query()->create([
-        'curator_media_id' => $oldMedia->id,
-        'model_id' => $post->id,
-        'model_type' => $post->getMorphClass(),
-        'field_name' => 'thumbnail_curator_id',
-    ]);
-
     resolve(UpdatePostAction::class)->handle($post, [
         'thumbnail_curator_id' => $newMedia->id,
     ]);

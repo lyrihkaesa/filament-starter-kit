@@ -55,8 +55,8 @@ it('generates create, update, delete actions by default', function (): void {
 
 it('generates only create action if --create is passed', function (): void {
     $filesystem = new Filesystem();
-    $model = 'Post';
-    $file = app_path(sprintf('Actions/Posts/Create%sAction.php', $model));
+    $model = 'DummyModel';
+    $file = app_path(sprintf('Actions/DummyModels/Create%sAction.php', $model));
 
     Artisan::call('make:action', [
         '--model' => $model,
@@ -70,8 +70,8 @@ it('generates only create action if --create is passed', function (): void {
 
 it('generates only update action if --update is passed', function (): void {
     $filesystem = new Filesystem();
-    $model = 'Post';
-    $file = app_path(sprintf('Actions/Posts/Update%sAction.php', $model));
+    $model = 'DummyModel';
+    $file = app_path(sprintf('Actions/DummyModels/Update%sAction.php', $model));
 
     Artisan::call('make:action', [
         '--model' => $model,
@@ -85,8 +85,8 @@ it('generates only update action if --update is passed', function (): void {
 
 it('generates only delete action if --delete is passed', function (): void {
     $filesystem = new Filesystem();
-    $model = 'Post';
-    $file = app_path(sprintf('Actions/Posts/Delete%sAction.php', $model));
+    $model = 'DummyModel';
+    $file = app_path(sprintf('Actions/DummyModels/Delete%sAction.php', $model));
 
     Artisan::call('make:action', [
         '--model' => $model,
@@ -100,8 +100,8 @@ it('generates only delete action if --delete is passed', function (): void {
 
 it('honors --force to overwrite existing files', function (): void {
     $filesystem = new Filesystem();
-    $model = 'Post';
-    $file = app_path(sprintf('Actions/Posts/Create%sAction.php', $model));
+    $model = 'DummyModel';
+    $file = app_path(sprintf('Actions/DummyModels/Create%sAction.php', $model));
 
     $filesystem->ensureDirectoryExists(dirname($file));
     $filesystem->put($file, 'old content');

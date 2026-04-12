@@ -40,12 +40,6 @@ it('disables deleting used curator media from the table', function (): void {
         'thumbnail_curator_id' => $media->getKey(),
     ]);
 
-    $media->usages()->create([
-        'model_id' => $post->getKey(),
-        'model_type' => $post->getMorphClass(),
-        'field_name' => 'thumbnail_curator_id',
-    ]);
-
     Livewire::test(ListMedia::class)
         ->assertTableActionDisabled(DeleteAction::class, $media);
 });
@@ -59,12 +53,6 @@ it('disables deleting used curator media from the edit page', function (): void 
     ]);
     $post = Post::factory()->create([
         'thumbnail_curator_id' => $media->getKey(),
-    ]);
-
-    $media->usages()->create([
-        'model_id' => $post->getKey(),
-        'model_type' => $post->getMorphClass(),
-        'field_name' => 'thumbnail_curator_id',
     ]);
 
     $page = app(EditMedia::class);

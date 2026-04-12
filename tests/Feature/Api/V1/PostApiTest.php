@@ -82,14 +82,6 @@ it('updates post thumbnail via api and resyncs media usage', function (): void {
         'thumbnail_curator_id' => $oldMedia->id,
     ]);
 
-    // Existing usage
-    $post->thumbnailCurator?->usages()->create([
-        'curator_media_id' => $oldMedia->id,
-        'model_id' => $post->id,
-        'model_type' => $post->getMorphClass(),
-        'field_name' => 'thumbnail_curator_id',
-    ]);
-
     grantPostApiPermissions($admin, ['Update:Post', 'View:Post']);
     Sanctum::actingAs($admin, ['posts:update', 'posts:read']);
 
@@ -115,13 +107,6 @@ it('deletes post via api and removes media usage records', function (): void {
     $media = CuratorMedia::factory()->create();
     $post = Post::factory()->create([
         'thumbnail_curator_id' => $media->id,
-    ]);
-
-    $media->usages()->create([
-        'curator_media_id' => $media->id,
-        'model_id' => $post->id,
-        'model_type' => $post->getMorphClass(),
-        'field_name' => 'thumbnail_curator_id',
     ]);
 
     grantPostApiPermissions($admin, ['Delete:Post']);
