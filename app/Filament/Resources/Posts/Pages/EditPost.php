@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Posts\Pages;
 
+use App\Actions\Posts\DeletePostAction;
+use App\Actions\Posts\UpdatePostAction;
 use App\Filament\Resources\Posts\PostResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use App\Models\Post;
+use Illuminate\Database\Eloquent\Model;
 
 final class EditPost extends EditRecord
 {
@@ -15,7 +19,14 @@ final class EditPost extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->using(fn (Post $record, DeletePostAction $deletePostAction): bool => $deletePostAction->handle($record)),
         ];
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        /** @var Post $record */
+        return resolve(UpdatePostAction::class)->handle($record, $data);
     }
 }

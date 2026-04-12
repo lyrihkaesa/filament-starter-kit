@@ -170,6 +170,14 @@ resolve(DeleteCuratorMediaAction::class)->handle(
 
 Membersihkan catatan penggunaan media saat model pemilik (User/Post) benar-benar dihapus (Force Delete).
 
+#### 4. `ListCuratorMediaUsagesAction`
+
+Mengambil daftar lokasi penggunaan media untuk kebutuhan audit di UI Curator:
+
+```php
+resolve(ListCuratorMediaUsagesAction::class)->handle($media);
+```
+
 ---
 
 ### Proteksi Penghapusan
@@ -193,6 +201,22 @@ Jadi proteksinya berlapis:
 3. `DeleteCuratorMediaAction` tetap aman by default (`allowDeleteWhenUsed=false`).
 
 Pendekatan ini dibuat defensif supaya integritas aset tidak bergantung pada satu lapisan saja.
+
+## Orkestrasi Wajib Lewat Action (Tanpa Observer)
+
+Project ini sengaja tidak mengandalkan observer untuk sinkronisasi usage media agar alur bisnis lebih eksplisit dan mudah di-maintain.
+
+Pola yang dipakai:
+
+1. **Create/Update domain model** memanggil Action domain (`CreatePostAction`, `UpdatePostAction`, `CreateUserAction`, `UpdateUserAction`).
+2. Action domain tersebut memanggil `SyncMediaUsageAction`.
+3. **Delete domain model** memanggil Action delete domain (`DeletePostAction`, dll) yang memanggil `DeleteAllMediaUsagesAction`.
+
+Keuntungan:
+
+- Alur mudah ditelusuri dari controller/API/Filament.
+- Behavior konsisten antara panel dan API.
+- Tidak ada side-effect tersembunyi dari observer.
 
 ### Catatan Naming di Closure Action Filament
 

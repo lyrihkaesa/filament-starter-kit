@@ -241,10 +241,11 @@ it('defines edit media header actions including preview and delete', function ()
 
     $actions = $page->getHeaderActions();
 
-    expect($actions)->toHaveCount(3)
+    expect($actions)->toHaveCount(4)
         ->and($actions[0]->getName())->toBe('save')
         ->and($actions[1]->getName())->toBe('preview')
         ->and($actions[1]->getUrl())->toBe($media->url)
-        ->and($actions[2]->getName())->toBe('delete')
-        ->and($actions[2]->getModalHeading())->toBe('Delete Media');
+        ->and($actions[2]->getName())->toBe('viewUsages')
+        ->and($actions[3]->getName())->toBe('delete')
+        ->and($actions[3]->getModalHeading())->toBe('Delete Media');
 });

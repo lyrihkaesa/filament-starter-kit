@@ -130,6 +130,25 @@ Contoh yang saat ini sudah terlindungi:
 
 Fitur ini penting untuk mencegah broken image dan broken reference di domain.
 
+## Fitur Baru: Lihat Media Dipakai Di Mana
+
+Halaman edit media sekarang punya tombol:
+
+- `Dipakai Di Mana`
+
+Tombol ini membuka modal yang menampilkan daftar penggunaan media dari tabel `curator_media_usages`, termasuk:
+
+- model (`User`, `Post`, dll)
+- `record_id`
+- nama field (misal `avatar_curator_id`, `thumbnail_curator_id`)
+- link ke record (jika route Filament dikenali)
+
+Implementasi:
+
+- `App\Filament\Curator\Actions\CuratorMediaUsagesAction`
+- `App\Actions\Media\ListCuratorMediaUsagesAction`
+- `resources/views/filament/media/used-by-modal.blade.php`
+
 ### Catatan Halaman Edit Media
 
 Agar proteksi delete custom dipakai konsisten, Curator edit page diarahkan ke:

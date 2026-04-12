@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Posts\Tables;
 
+use App\Actions\Posts\DeletePostAction;
+use App\Models\Post;
 use Awcodes\Curator\Components\Tables\CuratorColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -16,6 +18,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 final class PostsTable
 {
@@ -67,11 +70,15 @@ final class PostsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->using(fn (Post $record, DeletePostAction $deletePostAction): bool => $deletePostAction->handle($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->action(function (Collection $records, DeletePostAction $deletePostAction): void {
+                            $records->each(fn (Post $record): bool => $deletePostAction->handle($record));
+                        }),
                 ]),
             ]);
     }

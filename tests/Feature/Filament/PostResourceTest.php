@@ -8,6 +8,7 @@ use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Models\CuratorMedia;
+use App\Models\CuratorMediaUsage;
 use App\Models\Post;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
@@ -81,6 +82,13 @@ it('can create posts with curator thumbnail', function (): void {
         'slug' => 'post-with-curator-thumbnail',
         'thumbnail_curator_id' => $media->getKey(),
     ]);
+
+    $this->assertDatabaseHas('curator_media_usages', [
+        'curator_media_id' => $media->getKey(),
+        'model_id' => Post::query()->where('slug', 'post-with-curator-thumbnail')->value('id'),
+        'model_type' => (new Post())->getMorphClass(),
+        'field_name' => 'thumbnail_curator_id',
+    ]);
 });
 
 it('can update posts', function (): void {
@@ -118,16 +126,41 @@ it('can update posts with curator thumbnail', function (): void {
         ->assertHasNoFormErrors();
 
     expect($post->refresh()->thumbnail_curator_id)->toBe($media->getKey());
+
+    $usage = CuratorMediaUsage::query()
+        ->where('model_id', $post->getKey())
+        ->where('model_type', $post->getMorphClass())
+        ->where('field_name', 'thumbnail_curator_id')
+        ->first();
+
+    expect($usage)->not->toBeNull()
+        ->and($usage?->curator_media_id)->toBe($media->getKey());
 });
 
 it('can delete posts from table', function (): void {
-    $post = Post::factory()->create();
+    $media = CuratorMedia::factory()->create();
+    $post = Post::factory()->create([
+        'thumbnail_curator_id' => $media->getKey(),
+    ]);
+
+    CuratorMediaUsage::query()->create([
+        'curator_media_id' => $media->getKey(),
+        'model_id' => $post->getKey(),
+        'model_type' => $post->getMorphClass(),
+        'field_name' => 'thumbnail_curator_id',
+    ]);
 
     Livewire::test(ListPosts::class)
         ->callTableAction(DeleteAction::class, $post);
 
     $this->assertDatabaseMissing('posts', [
         'id' => $post->id,
+    ]);
+
+    $this->assertDatabaseMissing('curator_media_usages', [
+        'model_id' => $post->getKey(),
+        'model_type' => $post->getMorphClass(),
+        'field_name' => 'thumbnail_curator_id',
     ]);
 });
 

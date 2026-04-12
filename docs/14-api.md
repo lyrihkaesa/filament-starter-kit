@@ -535,6 +535,31 @@ Untuk memudahkan pengembangan dan integrasi, starter kit ini menyertakan koleksi
 
 Detail lebih lanjut ada di [api-tests/README.md](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/api-tests/README.md).
 
+## Update 11 April 2026: Post API v1 (Action-Based)
+
+Endpoint baru:
+
+- `GET /api/v1/posts`
+- `POST /api/v1/posts`
+- `GET /api/v1/posts/{post}`
+- `PATCH /api/v1/posts/{post}`
+- `DELETE /api/v1/posts/{post}`
+
+Arsitektur:
+
+- Controller API Post memanggil Action domain yang sama dengan Filament:
+  - `CreatePostAction`
+  - `UpdatePostAction`
+  - `DeletePostAction`
+- Sinkronisasi `curator_media_usages` berjalan dari Action domain (tanpa observer).
+
+Token abilities:
+
+- `posts:read`
+- `posts:create`
+- `posts:update`
+- `posts:delete`
+
 ## Referensi
 
 - Laravel Sanctum: [https://laravel.com/docs/12.x/sanctum](https://laravel.com/docs/12.x/sanctum)

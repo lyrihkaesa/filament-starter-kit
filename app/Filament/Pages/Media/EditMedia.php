@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages\Media;
 
 use App\Filament\Curator\Actions\CuratorMediaDeleteAction;
+use App\Filament\Curator\Actions\CuratorMediaUsagesAction;
 use Awcodes\Curator\Resources\Media\Pages\EditMedia as BaseEditMedia;
 use Filament\Actions\Action;
 
@@ -30,6 +31,7 @@ final class EditMedia extends BaseEditMedia
                 ->color('gray')
                 ->url($this->record->url, shouldOpenInNewTab: true)
                 ->label(trans('curator::views.panel.view')),
+            CuratorMediaUsagesAction::make(),
             CuratorMediaDeleteAction::make()
                 ->modalHeading(fn (): string => __('Delete Media')),
         ];

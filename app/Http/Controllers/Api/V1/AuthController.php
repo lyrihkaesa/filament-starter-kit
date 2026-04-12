@@ -129,6 +129,22 @@ final class AuthController
             $abilities[] = 'users:delete';
         }
 
+        if ($user->can('ViewAny:Post') || $user->can('View:Post')) {
+            $abilities[] = 'posts:read';
+        }
+
+        if ($user->can('Create:Post')) {
+            $abilities[] = 'posts:create';
+        }
+
+        if ($user->can('Update:Post')) {
+            $abilities[] = 'posts:update';
+        }
+
+        if ($user->can('Delete:Post')) {
+            $abilities[] = 'posts:delete';
+        }
+
         return array_values(array_unique($abilities));
     }
 }
