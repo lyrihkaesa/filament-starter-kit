@@ -37,8 +37,9 @@ final class ManualTestingSeeder extends Seeder
 
             $user = User::where('email', $email)->first();
 
-            if (!$user) {
+            if (! $user) {
                 $this->command->warn("User with email {$email} not found. Skipping for role {$role}.");
+
                 continue;
             }
 
@@ -46,15 +47,15 @@ final class ManualTestingSeeder extends Seeder
             // We use the factory which handles the physical and database record
             $media = CuratorMedia::factory()->create([
                 'created_by' => $user->id,
-                'name' => "Media for " . ucfirst($role),
-                'alt' => "Alternative text for " . $role . " media",
+                'name' => 'Media for '.ucfirst($role),
+                'alt' => 'Alternative text for '.$role.' media',
             ]);
 
             // 5. Create Post authored by this user with the media as thumbnail
             // The Post observer will automatically create the record in curator_media_usages
             Post::factory()->create([
                 'author_id' => $user->id,
-                'title' => "Post created by " . ucfirst($role),
+                'title' => 'Post created by '.ucfirst($role),
                 'thumbnail_curator_id' => $media->id,
                 'published_at' => now(),
             ]);

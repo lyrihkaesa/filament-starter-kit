@@ -12,18 +12,47 @@ use App\Filament\Resources\Posts\Schemas\PostForm;
 use App\Filament\Resources\Posts\Schemas\PostInfolist;
 use App\Filament\Resources\Posts\Tables\PostsTable;
 use App\Models\Post;
+use App\Support\Filament\FilamentNavigation;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 final class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
+    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Content Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Post');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Post');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Post');
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return FilamentNavigation::sort(self::getNavigationLabel());
+    }
 
     public static function form(Schema $schema): Schema
     {

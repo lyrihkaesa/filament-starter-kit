@@ -409,4 +409,15 @@ livewire(ListUsers::class)
 - **Never assume public file visibility.** File visibility is `private` by default. Always use `->visibility('public')` when public access is needed.
 - **Never assume full-width layout.** `Grid`, `Section`, and `Fieldset` do not span all columns by default. Explicitly set column spans when needed.
 
+### Navigation & Sorting
+
+All navigation sorting is centralized in `App\Support\Filament\FilamentNavigation.php`.
+
+- **Strict Type Hinting:** Overriding navigation properties in a Resource MUST use these type hints exactly:
+    - `protected static \UnitEnum|string|null $navigationGroup`
+    - `protected static string|\BackedEnum|null $navigationIcon`
+- **Grouping:** Set `getNavigationGroup()` directly in the Resource using `__('Group Name')`.
+- **Labeling:** Use the `__()` helper for labels to support `id.json` translations.
+- **Sorting:** Use `FilamentNavigation::sort(static::getNavigationLabel())` in `getNavigationSort()`.
+
 </laravel-boost-guidelines>

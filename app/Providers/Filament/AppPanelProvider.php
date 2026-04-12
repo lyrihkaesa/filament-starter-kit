@@ -7,6 +7,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
+use App\Support\Filament\FilamentNavigation;
 use Awcodes\Curator\CuratorPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
@@ -71,16 +72,31 @@ final class AppPanelProvider extends PanelProvider
             ])
             ->plugins([
                 CuratorPlugin::make()
-                    ->label('Media')
-                    ->pluralLabel('Media')
-                    ->navigationIcon('heroicon-o-photo')
-                    ->navigationGroup('Content')
-                    ->navigationSort(2)
-                    ->showBadge(false)
+                    ->label(__('Media'))
+                    ->pluralLabel(__('Media'))
+                    ->navigationGroup(__('Content Management'))
+                    ->navigationSort(FilamentNavigation::sort(__('Media')))
                     ->registerNavigation(true)
                     ->curations(true)
                     ->fileSwap(true),
-                FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make()
+                    ->gridColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                        'lg' => 2,
+                    ])
+                    ->sectionColumnSpan(1)
+                    ->checkboxListColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                        'lg' => 2,
+                    ])
+                    ->resourceCheckboxListColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                    ])
+                    ->navigationGroup(__('System Management'))
+                    ->navigationSort(FilamentNavigation::sort(__('Role'))),
             ])
             ->viteTheme('resources/css/filament/app/theme.css');
     }

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 final class DeleteCuratorMediaAction
 {
-    public function handle(CuratorMedia $media, string|null $deleterId = null, bool $allowDeleteWhenUsed = false): bool
+    public function handle(CuratorMedia $media, ?string $deleterId = null, bool $allowDeleteWhenUsed = false): bool
     {
         if ($media->isInUse() && ! $allowDeleteWhenUsed) {
             return false;

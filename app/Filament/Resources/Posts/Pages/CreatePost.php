@@ -6,8 +6,8 @@ namespace App\Filament\Resources\Posts\Pages;
 
 use App\Actions\Posts\CreatePostAction;
 use App\Filament\Resources\Posts\PostResource;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 
 final class CreatePost extends CreateRecord
 {

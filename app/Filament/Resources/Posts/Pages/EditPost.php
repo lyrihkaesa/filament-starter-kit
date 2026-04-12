@@ -7,9 +7,9 @@ namespace App\Filament\Resources\Posts\Pages;
 use App\Actions\Posts\DeletePostAction;
 use App\Actions\Posts\UpdatePostAction;
 use App\Filament\Resources\Posts\PostResource;
+use App\Models\Post;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use App\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 
 final class EditPost extends EditRecord

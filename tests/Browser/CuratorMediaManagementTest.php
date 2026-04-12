@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Enums\Privacy;
 use App\Models\CuratorMedia;
 use App\Models\Post;
 use App\Models\User;
-use App\Enums\Privacy;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;

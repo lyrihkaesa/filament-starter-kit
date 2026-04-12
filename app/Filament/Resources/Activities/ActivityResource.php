@@ -6,6 +6,7 @@ namespace App\Filament\Resources\Activities;
 
 use App\Filament\Resources\Activities\Pages\ManageActivities;
 use App\Support\Activity\ActivitySubjectType;
+use App\Support\Filament\FilamentNavigation;
 use BackedEnum;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -28,12 +29,40 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\Models\Activity;
 use stdClass;
+use UnitEnum;
 
 final class ActivityResource extends Resource
 {
     protected static ?string $model = Activity::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static UnitEnum|string|null $navigationGroup = 'System Management';
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Clock;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('System Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Activity');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Activity');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Activity');
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return FilamentNavigation::sort(self::getNavigationLabel());
+    }
 
     public static function table(Table $table): Table
     {
