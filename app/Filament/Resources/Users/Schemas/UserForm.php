@@ -41,7 +41,9 @@ final class UserForm
                 TextInput::make('password')
                     ->label(__('Password'))
                     ->password()
-                    ->required(),
+                    ->revealable()
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->dehydrated(fn (?string $state) => filled($state)),
                 Select::make('roles')
                     ->label(__('Roles'))
                     ->relationship('roles', 'name')

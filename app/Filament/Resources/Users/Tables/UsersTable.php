@@ -32,7 +32,7 @@ final class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('avatarMedia'))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['avatarMedia', 'roles']))
             ->columns([
                 CuratorColumn::make('avatarMedia')
                     ->label(__('Avatar'))
@@ -45,6 +45,12 @@ final class UsersTable
                 TextColumn::make('email')
                     ->label(__('Email'))
                     ->searchable(),
+                TextColumn::make('roles.name')
+                    ->label(__('Roles'))
+                    ->badge()
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('email_verified_at')
                     ->label(__('Email verified at'))
                     ->since()
