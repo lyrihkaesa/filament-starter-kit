@@ -67,6 +67,16 @@ final class ActivityResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query): Builder {
+                /** @var \App\Models\User $user */
+                $user = auth()->user();
+
+                if ($user->hasAnyRole(['super_admin', 'admin'])) {
+                    return $query;
+                }
+
+                return $query->where('causer_id', $user->id);
+            })
             ->columns([
                 TextColumn::make('created_at')
                     ->label(__('Log Time'))
@@ -103,7 +113,7 @@ final class ActivityResource extends Resource
                     ->limit(80)
                     ->tooltip(fn (?string $state): ?string => $state)
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
 
             ])
             ->defaultSort('created_at', 'desc')
@@ -116,16 +126,9 @@ final class ActivityResource extends Resource
                         'updated' => __('Updated'),
                         'deleted' => __('Deleted'),
                     ]),
-                SelectFilter::make('subject')
+                SelectFilter::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->options(ActivitySubjectType::labels())
-                    ->query(fn (Builder $query, array $data): Builder => $query->when(
-                        filled($data['value'] ?? null),
-                        fn (Builder $query): Builder => $query->whereIn(
-                            'subject_type',
-                            ActivitySubjectType::databaseValuesForFilter($data['value'] ?? null),
-                        ),
-                    )),
+                    ->options(ActivitySubjectType::labels()),
                 Filter::make('subject_id')
                     ->label(__('Subject ID'))
                     ->form([

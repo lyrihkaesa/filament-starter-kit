@@ -112,8 +112,10 @@ final class UsersTable
                     ->label(__('Activities'))
                     ->icon('heroicon-o-clock')
                     ->url(fn (User $record): string => ActivityResource::getUrl('index', [
-                        'tableFilters[subject][value]' => ActivitySubjectType::USER,
-                        'tableFilters[subject_id][value]' => $record->id,
+                        'filters' => [
+                            'subject_type' => ['value' => ActivitySubjectType::USER],
+                            'subject_id' => ['value' => $record->id],
+                        ],
                     ])),
                 EditAction::make(),
                 DeleteAction::make()
