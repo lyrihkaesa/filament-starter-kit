@@ -65,3 +65,17 @@ Anda dapat mengakses seluruh log aktivitas melalui menu **Activities** di sideba
 
 ## Referensi
 - [Spatie Activitylog v5 Documentation](https://spatie.be/docs/laravel-activitylog/v5/introduction)
+
+## Update Behavior Resource Activity
+
+Resource Activity sekarang menerapkan pembatasan visibilitas berbasis role:
+
+- `super_admin` dan `admin`: dapat melihat seluruh aktivitas.
+- `member`: hanya melihat aktivitas miliknya sendiri.
+
+Implementasi query juga kompatibel dengan data lama dan baru pada kolom `causer_type`:
+
+- alias morph map (`user`)
+- FQCN model (`App\\Models\\User`)
+
+Dengan pendekatan ini, policy lebih konsisten untuk audit trail dan perilaku test member scope menjadi deterministic.

@@ -206,3 +206,36 @@ Jika tes gagal, gunakan metode berikut untuk membantu debugging:
 | Tes dengan SQLite | `php artisan test --env=sqlite.testing` |
 | Architecture test | Otomatis masuk saat `php artisan test` |
 | Browser test saja | `php artisan test --filter=Browser` |
+
+---
+
+## Bagian 4: Isolasi Seeder untuk Environment Testing
+
+Agar testing stabil dan tidak rusak saat `ShieldSeeder.php` di-generate ulang, project ini memakai pola berikut:
+
+- `database/seeders/ShieldSeeder.php` dianggap generated file dari `php artisan shield:generate --all`.
+- Untuk environment `testing`, seeding role/permission/user menggunakan `database/seeders/TestingShieldSeeder.php`.
+- `DatabaseSeeder` melakukan branching berdasarkan environment.
+
+Contoh pola di `DatabaseSeeder`:
+
+```php
+if (app()->environment('testing')) {
+    $this->call([
+        TestingShieldSeeder::class,
+    ]);
+
+    return;
+}
+
+$this->call([
+    ShieldSeeder::class,
+    PostSeeder::class,
+]);
+```
+
+Kenapa ini penting:
+
+- Perubahan manual pada `ShieldSeeder.php` tidak aman karena akan tertimpa generate berikutnya.
+- Test tetap repeatable meski metadata Shield berubah.
+- Password/hash test user mengikuti konfigurasi hash di environment testing.

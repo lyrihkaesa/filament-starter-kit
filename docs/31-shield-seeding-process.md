@@ -1,50 +1,65 @@
 # Filament Shield Seeding Process
 
-Dokumen ini menjelaskan cara mengelola Role dan Permission menggunakan Filament Shield, terutama saat terjadi perubahan struktur database atau penambahan Resource baru.
+Dokumen ini menjelaskan cara mengelola Role dan Permission menggunakan Filament Shield, termasuk strategi seeding yang aman untuk environment testing.
 
 ## 1. Konsep Utama
-Filament Shield menghasilkan permission berdasarkan Resource yang terdaftar. Jika Anda menambah Resource baru (misal: `PostResource`), Shield perlu diberitahu untuk membuat permission untuk resource tersebut.
+Filament Shield menghasilkan permission berdasarkan Resource yang terdaftar. Jika Anda menambah Resource baru (misal: `PostResource`), Shield perlu dijalankan ulang agar permission resource tersebut ikut dibuat.
 
 ## 2. Cara Update Permission (Sync)
-Setiap kali Anda menambah Resource, mengubah Policy, atau mengubah konfigurasi `filament-shield.php`, jalankan perintah ini:
+Setiap kali menambah Resource, mengubah Policy, atau mengubah konfigurasi `filament-shield.php`, jalankan:
 
 ```bash
 php artisan shield:generate --all
 ```
-Perintah ini akan memperbarui `ShieldSeeder.php` dengan daftar permission terbaru berdasarkan Resource yang ada.
 
-## 3. Alur Seeding yang Benar
-Untuk memastikan User mendapatkan Role yang benar, urutan seeding harus seperti ini:
+Perintah ini memperbarui `database/seeders/ShieldSeeder.php` sebagai output generated.
 
-1. **ShieldSeeder**: Membuat Permission & Role (Admin, dsb).
-2. **UserSeeder/PostSeeder**: Membuat User dan memberikan Role yang sudah dibuat oleh Shield.
+## 3. Aturan Penting: Jangan Edit `ShieldSeeder.php` Manual
+`ShieldSeeder.php` diperlakukan sebagai **generated artifact**. Jika Anda edit manual, perubahan akan hilang ketika command Shield dijalankan ulang.
 
-### Contoh Implementasi di `DatabaseSeeder.php`:
+Praktik di project ini:
+
+- `ShieldSeeder.php` dipakai untuk non-testing (local/staging/production-like seeding).
+- Kebutuhan test-only dipindah ke `database/seeders/TestingShieldSeeder.php`.
+- Pemilihan seeder dilakukan di `DatabaseSeeder` berdasarkan environment.
+
+## 4. Alur Seeding di `DatabaseSeeder`
+Pola yang dipakai saat ini:
 
 ```php
 public function run(): void
 {
-    // 1. Generate Permission & Roles dulu
-    $this->call(ShieldSeeder::class);
+    if (app()->environment('testing')) {
+        $this->call([
+            TestingShieldSeeder::class,
+        ]);
 
-    // 2. Buat User Admin (Jika belum ada)
-    $admin = User::factory()->create([
-        'email' => 'admin@example.com',
+        return;
+    }
+
+    $this->call([
+        ShieldSeeder::class,
+        PostSeeder::class,
     ]);
-    $admin->assignRole('admin');
-
-    // 3. Jalankan Seeder Resource lainnya
-    $this->call(PostSeeder::class);
 }
 ```
 
-## 4. Kustomisasi Role Member
-Jika Anda ingin Role `member` memiliki permission tertentu secara otomatis saat seeding:
-1. Jalankan `php artisan shield:generate --all`.
-2. Buka `database/seeders/ShieldSeeder.php`.
-3. Cari bagian konfigurasi role (biasanya dalam array) dan sesuaikan permission-nya di sana sebelum menjalankan `db:seed`.
+Tujuannya:
 
-## 5. Troubleshooting
-Jika Role tidak muncul atau Permission error:
-- Jalankan `php artisan permission:cache-reset` untuk membersihkan cache Spatie Permission.
-- Pastikan Resource sudah terdaftar di `config/filament-shield.php` pada bagian `resource_permission_prefixes`.
+- Jalur testing stabil dan tidak tergantung file generated yang bisa berubah.
+- Jalur non-testing tetap mengikuti sumber permission resmi dari Shield.
+
+## 5. Kustomisasi Role/Permission dengan Aman
+Jika perlu menambah behavior:
+
+1. Gunakan `shield:generate --all` untuk update struktur permission utama.
+2. Jangan edit `ShieldSeeder.php` secara manual untuk kebutuhan test.
+3. Letakkan kebutuhan khusus test di `TestingShieldSeeder.php`.
+4. Untuk user test, gunakan password plain agar cast `hashed` mengikuti konfigurasi hash environment testing.
+
+## 6. Troubleshooting
+Jika role/permission tidak sesuai:
+
+- Jalankan `php artisan permission:cache-reset`.
+- Verifikasi resource sudah terdaftar di `config/filament-shield.php`.
+- Pastikan test dijalankan dengan environment testing yang benar (`APP_ENV=testing`).

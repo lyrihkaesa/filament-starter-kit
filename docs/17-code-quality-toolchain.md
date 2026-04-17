@@ -395,3 +395,29 @@ Efeknya: preset `LaravelLevelSetList::UP_TO_LARAVEL_120` tidak bisa dipakai lagi
 | **Larastan** | Type checking & static analysis | `composer test:types` |
 
 Ketiga tool ini paling efektif dijalankan bersama secara berurutan sebelum membuat pull request.
+
+---
+
+## Quality Gate Baseline (Update Terbaru)
+
+Untuk memastikan standar industri di project ini, jalankan gate berikut secara konsisten sebelum merge:
+
+```bash
+composer run test:lint
+composer run test:types
+composer run test:refactor
+vendor/bin/pest --compact
+```
+
+Target hasil:
+
+- `test:lint` = pass (tanpa perubahan format tersisa)
+- `test:types` = pass (`[OK] No errors`)
+- `test:refactor` = pass (dry-run tanpa perubahan)
+- `pest --compact` = pass (dengan skip yang eksplisit jika memang disengaja)
+
+Catatan praktik:
+
+- Jika memperbaiki issue type, jalankan `pint` ulang sebelum menilai hasil akhir.
+- Untuk debugging cepat, jalankan `pest --filter="<nama test>"` dulu sebelum full suite.
+- Simpan hasil refactor otomatis (Rector/Pint) dalam commit terpisah bila diff besar.
