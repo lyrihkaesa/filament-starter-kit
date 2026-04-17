@@ -55,7 +55,7 @@ it('disables deleting used curator media from the edit page', function (): void 
         'thumbnail_curator_id' => $media->getKey(),
     ]);
 
-    $page = app(EditMedia::class);
+    $page = resolve(EditMedia::class);
     $page->record = $media;
 
     expect($page->getSubheading())->toBe($media->getDeletionBlockedMessage());

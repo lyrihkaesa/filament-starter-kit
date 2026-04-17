@@ -116,7 +116,11 @@ final class CuratorMediaPolicy
 
     private function canDeleteUsedRecord(User $user): bool
     {
-        return $user->can('Delete:CuratorMedia') || $user->can('DeleteUsed:CuratorMedia');
+        if ($user->can('Delete:CuratorMedia')) {
+            return true;
+        }
+
+        return $user->can('DeleteUsed:CuratorMedia');
     }
 
     private function canForceDeleteRecord(User $user, CuratorMedia $media): bool
@@ -130,6 +134,10 @@ final class CuratorMediaPolicy
 
     private function canForceDeleteUsedRecord(User $user): bool
     {
-        return $user->can('ForceDelete:CuratorMedia') || $user->can('ForceDeleteUsed:CuratorMedia');
+        if ($user->can('ForceDelete:CuratorMedia')) {
+            return true;
+        }
+
+        return $user->can('ForceDeleteUsed:CuratorMedia');
     }
 }

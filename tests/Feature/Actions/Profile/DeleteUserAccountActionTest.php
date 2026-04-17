@@ -6,6 +6,7 @@ namespace Tests\Feature\Actions\Profile;
 
 use App\Actions\Profile\DeleteUserAccountAction;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 it('can delete user account passing user as deleter', function (): void {
     $user = User::factory()->create();
@@ -20,7 +21,7 @@ it('can delete user account passing user as deleter', function (): void {
 
 it('can delete user account passing string as deleter', function (): void {
     $user = User::factory()->create();
-    $adminId = (string) \Illuminate\Support\Str::uuid();
+    $adminId = (string) Str::uuid();
 
     $action = new DeleteUserAccountAction();
     $action->handle($user, $adminId);

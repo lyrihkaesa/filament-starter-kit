@@ -46,8 +46,11 @@ final class CuratorMediaDeleteBulkAction
         if (! $user instanceof User) {
             return false;
         }
+        if ($user->can('Delete:CuratorMedia')) {
+            return true;
+        }
 
-        return $user->can('Delete:CuratorMedia') || $user->can('DeleteOwn:CuratorMedia');
+        return $user->can('DeleteOwn:CuratorMedia');
     }
 
     private static function canDeleteUsed(): bool

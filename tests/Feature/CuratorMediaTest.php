@@ -7,23 +7,24 @@ use App\Enums\Privacy;
 use App\Models\CuratorMedia;
 use App\Models\Post;
 use App\Models\User;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function (): void {
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
     // Create necessary permissions for testing (Following Project Convention Action:Model)
-    \Spatie\Permission\Models\Permission::findOrCreate('ViewAny:CuratorMedia');
-    \Spatie\Permission\Models\Permission::findOrCreate('View:CuratorMedia');
-    \Spatie\Permission\Models\Permission::findOrCreate('ViewOwn:CuratorMedia');
-    \Spatie\Permission\Models\Permission::findOrCreate('Update:CuratorMedia');
-    \Spatie\Permission\Models\Permission::findOrCreate('UpdateOwn:CuratorMedia');
-    \Spatie\Permission\Models\Permission::findOrCreate('Delete:CuratorMedia');
-    \Spatie\Permission\Models\Permission::findOrCreate('DeleteOwn:CuratorMedia');
-    \Spatie\Permission\Models\Permission::findOrCreate('DeleteUsed:CuratorMedia');
+    Permission::findOrCreate('ViewAny:CuratorMedia');
+    Permission::findOrCreate('View:CuratorMedia');
+    Permission::findOrCreate('ViewOwn:CuratorMedia');
+    Permission::findOrCreate('Update:CuratorMedia');
+    Permission::findOrCreate('UpdateOwn:CuratorMedia');
+    Permission::findOrCreate('Delete:CuratorMedia');
+    Permission::findOrCreate('DeleteOwn:CuratorMedia');
+    Permission::findOrCreate('DeleteUsed:CuratorMedia');
 });
 
 it('sets created_by and privacy on creation', function (): void {
@@ -181,7 +182,7 @@ it('allows admin to delete media that is still in use', function (): void {
 });
 
 it('generates correct url based on visibility', function (): void {
-    Carbon::setTestNow(now());
+    Date::setTestNow(now());
     Storage::fake('s3');
 
     // Public media
@@ -200,5 +201,5 @@ it('generates correct url based on visibility', function (): void {
     ]);
     expect($privateMedia->url)->toBe(Storage::disk('s3')->temporaryUrl('test-private.jpg', now()->addMinutes(60)));
 
-    Carbon::setTestNow();
+    Date::setTestNow();
 });

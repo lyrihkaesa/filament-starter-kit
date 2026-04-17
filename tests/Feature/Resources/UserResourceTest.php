@@ -13,7 +13,7 @@ use Spatie\Permission\Models\Role;
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    Role::create(['name' => 'super_admin']);
+    Role::findOrCreate('super_admin');
 });
 
 it('can filter active users', function (): void {

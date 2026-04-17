@@ -107,13 +107,14 @@ it('rejects login for an unknown email address', function (): void {
 });
 
 it('rejects login for a wrong password', function (): void {
+    $email = 'api-wrong-pass-' . uniqid() . '@example.com';
     User::factory()->create([
-        'email' => 'admin@example.com',
+        'email' => $email,
         'password' => bcrypt('password123'),
     ]);
 
     $response = $this->postJson('/api/v1/login', [
-        'email' => 'admin@example.com',
+        'email' => $email,
         'password' => 'wrong-password',
     ]);
 

@@ -3,20 +3,22 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use Database\Seeders\ShieldSeeder;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Reset cached roles and permissions
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 });
 
-it('can assign super_admin role and check permissions', function () {
+it('can assign super_admin role and check permissions', function (): void {
     $user = User::factory()->create();
-    $role = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
-    $permission = Permission::firstOrCreate(['name' => 'ViewAny:Post', 'guard_name' => 'web']);
-    
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
+    $permission = Permission::query()->firstOrCreate(['name' => 'ViewAny:Post', 'guard_name' => 'web']);
+
     $role->givePermissionTo($permission);
     $user->assignRole($role);
 
@@ -25,11 +27,11 @@ it('can assign super_admin role and check permissions', function () {
         ->and(Gate::forUser($user)->allows('ViewAny:Post'))->toBeTrue();
 });
 
-it('verifies that ShieldSeeder correctly sets up roles and permissions', function () {
-    $this->seed(\Database\Seeders\ShieldSeeder::class);
+it('verifies that ShieldSeeder correctly sets up roles and permissions', function (): void {
+    $this->seed(ShieldSeeder::class);
 
-    $superAdmin = User::where('email', 'superadmin@example.com')->first();
-    
+    $superAdmin = User::query()->where('email', 'superadmin@example.com')->first();
+
     expect($superAdmin)->not->toBeNull()
         ->and($superAdmin->hasRole('super_admin'))->toBeTrue()
         ->and($superAdmin->can('ViewAny:Post'))->toBeTrue();

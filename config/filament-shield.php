@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Filament\Resources\Activities\ActivityResource;
+use App\Filament\Resources\Posts\PostResource;
 use App\Models\User;
+use Awcodes\Curator\Resources\Media\MediaResource;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
@@ -187,15 +190,15 @@ return [
                 'update',
                 'delete',
             ],
-            Awcodes\Curator\Resources\Media\MediaResource::class => [
+            MediaResource::class => [
                 'viewAny', 'view', 'create', 'update', 'delete', 'restore', 'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
                 'viewOwn', 'updateOwn', 'deleteOwn', 'restoreOwn', 'forceDeleteOwn', 'deleteUsed', 'forceDeleteUsed',
             ],
-            App\Filament\Resources\Posts\PostResource::class => [
+            PostResource::class => [
                 'viewAny', 'view', 'create', 'update', 'delete', 'restore', 'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
                 'viewOwn', 'updateOwn', 'deleteOwn', 'restoreOwn', 'forceDeleteOwn',
             ],
-            App\Filament\Resources\Activities\ActivityResource::class => [
+            ActivityResource::class => [
                 'viewAny', 'view', 'create', 'update', 'delete', 'restore', 'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
             ],
         ],

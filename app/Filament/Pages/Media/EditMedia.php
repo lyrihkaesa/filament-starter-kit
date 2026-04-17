@@ -36,7 +36,7 @@ final class EditMedia extends BaseEditMedia
         ];
     }
 
-    public function getSubheading(): string | Htmlable | null
+    public function getSubheading(): string|Htmlable|null
     {
         if ($this->record instanceof CuratorMedia && $this->record->isInUse() && ! $this->canDeleteUsedMedia()) {
             return $this->record->getDeletionBlockedMessage();

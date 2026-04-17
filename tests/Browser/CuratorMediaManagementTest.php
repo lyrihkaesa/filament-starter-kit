@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function (): void {
-    app(PermissionRegistrar::class)->forgetCachedPermissions();
+    resolve(PermissionRegistrar::class)->forgetCachedPermissions();
 
     foreach ([
         'ViewAny:CuratorMedia',
@@ -73,8 +73,8 @@ it('disables delete action in browser when media is in use for non admin users',
 
     $this->actingAs($owner);
 
-    $page = $this->visit("/app/media/{$media->getKey()}/edit");
-    $page->assertPathIs("/app/media/{$media->getKey()}/edit");
+    $page = $this->visit(sprintf('/app/media/%s/edit', $media->getKey()));
+    $page->assertPathIs(sprintf('/app/media/%s/edit', $media->getKey()));
 
     $isDeleteDisabled = $page->script(<<<'JS'
 (() => {

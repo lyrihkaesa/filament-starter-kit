@@ -17,7 +17,7 @@ final class DeleteCuratorMediaAction
 
         return (bool) DB::transaction(function () use ($media, $deleterId): bool {
             $media->update([
-                'deleted_by' => $deleterId ?? auth()->id(),
+                'deleted_by' => $deleterId ?? (string) auth()->id(),
             ]);
 
             return (bool) $media->delete();

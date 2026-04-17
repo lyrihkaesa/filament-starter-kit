@@ -9,28 +9,29 @@ use App\Models\Post;
 use App\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 use function Pest\Laravel\actingAs;
 
 beforeEach(function (): void {
     // Reset permissions cache before testing
-    app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
-    $this->memberRole = Role::firstOrCreate(['name' => 'member']);
+    $this->memberRole = Role::query()->firstOrCreate(['name' => 'member']);
     $this->memberRole->syncPermissions([
-        Permission::firstOrCreate(['name' => 'ViewOwn:Post']),
-        Permission::firstOrCreate(['name' => 'Create:Post']),
-        Permission::firstOrCreate(['name' => 'UpdateOwn:Post']),
-        Permission::firstOrCreate(['name' => 'DeleteOwn:Post']),
+        Permission::query()->firstOrCreate(['name' => 'ViewOwn:Post']),
+        Permission::query()->firstOrCreate(['name' => 'Create:Post']),
+        Permission::query()->firstOrCreate(['name' => 'UpdateOwn:Post']),
+        Permission::query()->firstOrCreate(['name' => 'DeleteOwn:Post']),
     ]);
 
-    $this->adminRole = Role::firstOrCreate(['name' => 'admin']);
+    $this->adminRole = Role::query()->firstOrCreate(['name' => 'admin']);
     $this->adminRole->syncPermissions([
-        Permission::firstOrCreate(['name' => 'View:Post']),
-        Permission::firstOrCreate(['name' => 'Create:Post']),
-        Permission::firstOrCreate(['name' => 'Update:Post']),
-        Permission::firstOrCreate(['name' => 'Delete:Post']),
-        Permission::firstOrCreate(['name' => 'Delete:CuratorMedia']),
+        Permission::query()->firstOrCreate(['name' => 'View:Post']),
+        Permission::query()->firstOrCreate(['name' => 'Create:Post']),
+        Permission::query()->firstOrCreate(['name' => 'Update:Post']),
+        Permission::query()->firstOrCreate(['name' => 'Delete:Post']),
+        Permission::query()->firstOrCreate(['name' => 'Delete:CuratorMedia']),
         // Intentionally omitting DeleteUsed:CuratorMedia for admin testing
     ]);
 });
@@ -59,7 +60,7 @@ it('syncs media usage automatically when post is saved with a thumbnail', functi
     actingAs($member);
 
     // Assuming CuratorMediaFactory exists
-    $media = CuratorMedia::forceCreate([
+    $media = CuratorMedia::query()->forceCreate([
         'disk' => 'public',
         'directory' => 'media',
         'visibility' => 'public',
@@ -90,7 +91,7 @@ it('prevents user from deleting media if it is in use and they lack bypass permi
     $admin->assignRole($this->adminRole);
     actingAs($admin);
 
-    $media = CuratorMedia::forceCreate([
+    $media = CuratorMedia::query()->forceCreate([
         'disk' => 'public',
         'directory' => 'media',
         'visibility' => 'public',
@@ -123,11 +124,11 @@ it('prevents user from deleting media if it is in use and they lack bypass permi
 
 it('allows deletion of media in use if explicitly bypassed via permission', function (): void {
     $admin = User::factory()->create();
-    $this->adminRole->givePermissionTo(Permission::firstOrCreate(['name' => 'DeleteUsed:CuratorMedia']));
+    $this->adminRole->givePermissionTo(Permission::query()->firstOrCreate(['name' => 'DeleteUsed:CuratorMedia']));
     $admin->assignRole($this->adminRole);
     actingAs($admin);
 
-    $media = CuratorMedia::forceCreate([
+    $media = CuratorMedia::query()->forceCreate([
         'disk' => 'public',
         'directory' => 'media',
         'visibility' => 'public',

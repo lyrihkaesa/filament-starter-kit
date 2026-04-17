@@ -15,6 +15,7 @@ final class CreatePost extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        /** @var array{title: string, slug: string, content: string, author_id: string, thumbnail_curator_id?: string|null, published_at?: string|null} $data */
         return resolve(CreatePostAction::class)->handle($data);
     }
 }

@@ -19,7 +19,11 @@ final class PostPolicy
 
     public function view(AuthUser $authUser, Post $post): bool
     {
-        return $authUser->can('View:Post') || ($authUser->id === $post->author_id && $authUser->can('ViewOwn:Post'));
+        if ($authUser->can('View:Post')) {
+            return true;
+        }
+
+        return $authUser->id === $post->author_id && $authUser->can('ViewOwn:Post');
     }
 
     public function create(AuthUser $authUser): bool
@@ -29,22 +33,38 @@ final class PostPolicy
 
     public function update(AuthUser $authUser, Post $post): bool
     {
-        return $authUser->can('Update:Post') || ($authUser->id === $post->author_id && $authUser->can('UpdateOwn:Post'));
+        if ($authUser->can('Update:Post')) {
+            return true;
+        }
+
+        return $authUser->id === $post->author_id && $authUser->can('UpdateOwn:Post');
     }
 
     public function delete(AuthUser $authUser, Post $post): bool
     {
-        return $authUser->can('Delete:Post') || ($authUser->id === $post->author_id && $authUser->can('DeleteOwn:Post'));
+        if ($authUser->can('Delete:Post')) {
+            return true;
+        }
+
+        return $authUser->id === $post->author_id && $authUser->can('DeleteOwn:Post');
     }
 
     public function restore(AuthUser $authUser, Post $post): bool
     {
-        return $authUser->can('Restore:Post') || ($authUser->id === $post->author_id && $authUser->can('RestoreOwn:Post'));
+        if ($authUser->can('Restore:Post')) {
+            return true;
+        }
+
+        return $authUser->id === $post->author_id && $authUser->can('RestoreOwn:Post');
     }
 
     public function forceDelete(AuthUser $authUser, Post $post): bool
     {
-        return $authUser->can('ForceDelete:Post') || ($authUser->id === $post->author_id && $authUser->can('ForceDeleteOwn:Post'));
+        if ($authUser->can('ForceDelete:Post')) {
+            return true;
+        }
+
+        return $authUser->id === $post->author_id && $authUser->can('ForceDeleteOwn:Post');
     }
 
     public function forceDeleteAny(AuthUser $authUser): bool
@@ -57,7 +77,7 @@ final class PostPolicy
         return $authUser->can('RestoreAny:Post');
     }
 
-    public function replicate(AuthUser $authUser, Post $post): bool
+    public function replicate(AuthUser $authUser): bool
     {
         return $authUser->can('Replicate:Post');
     }

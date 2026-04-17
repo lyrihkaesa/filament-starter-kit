@@ -23,7 +23,6 @@ it('slugifies media name in dehydration callback', function (): void {
 
     $reflection = new ReflectionObject($nameInput);
     $property = $reflection->getProperty('dehydrateStateUsing');
-    $property->setAccessible(true);
 
     $callback = $property->getValue($nameInput);
 

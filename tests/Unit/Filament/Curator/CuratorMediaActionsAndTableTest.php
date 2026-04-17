@@ -13,6 +13,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Support\Exceptions\Cancel;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
@@ -22,7 +23,7 @@ use Tests\TestCase;
 uses(TestCase::class, RefreshDatabase::class);
 
 beforeEach(function (): void {
-    app(PermissionRegistrar::class)->forgetCachedPermissions();
+    resolve(PermissionRegistrar::class)->forgetCachedPermissions();
     Permission::findOrCreate('Delete:CuratorMedia');
     Permission::findOrCreate('DeleteOwn:CuratorMedia');
     Permission::findOrCreate('DeleteUsed:CuratorMedia');
@@ -42,7 +43,6 @@ function getBulkDeleteBeforeHook(DeleteBulkAction $action): Closure
 {
     $reflection = new ReflectionObject($action);
     $property = $reflection->getProperty('before');
-    $property->setAccessible(true);
 
     /** @var Closure $before */
     $before = $property->getValue($action);
@@ -201,7 +201,7 @@ it('continues bulk deletion when selected records are unused', function (): void
 });
 
 it('configures media table with custom action classes', function (): void {
-    $livewire = mock(Filament\Tables\Contracts\HasTable::class);
+    $livewire = mock(HasTable::class);
     $livewire->shouldIgnoreMissing();
     $livewire->layoutView = 'table';
 
@@ -238,7 +238,7 @@ it('defines edit media header actions including preview and delete', function ()
         'visibility' => 'public',
     ]);
 
-    $page = app(EditMedia::class);
+    $page = resolve(EditMedia::class);
     $page->record = $media;
 
     $actions = $page->getHeaderActions();

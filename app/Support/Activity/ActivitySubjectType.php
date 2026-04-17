@@ -6,6 +6,7 @@ namespace App\Support\Activity;
 
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 final readonly class ActivitySubjectType
 {
@@ -25,7 +26,7 @@ final readonly class ActivitySubjectType
     }
 
     /**
-     * @return array<string, class-string>
+     * @return array<string, class-string<Model>>
      */
     public static function morphMap(): array
     {

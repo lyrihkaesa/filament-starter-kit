@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Notifications\Auth\RestoreAccountNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -29,7 +29,7 @@ it('returns an empty mail message for non-user notifiable', function (): void {
 });
 
 it('builds the expected restoration mail message for users', function (): void {
-    Carbon::setTestNow('2026-04-08 08:00:00');
+    Date::setTestNow('2026-04-08 08:00:00');
 
     $user = User::factory()->create();
     $notification = new RestoreAccountNotification();
@@ -53,5 +53,5 @@ it('builds the expected restoration mail message for users', function (): void {
             'Jika Anda tidak merasa meminta pemulihan akun, abaikan email ini.',
         ]);
 
-    Carbon::setTestNow();
+    Date::setTestNow();
 });

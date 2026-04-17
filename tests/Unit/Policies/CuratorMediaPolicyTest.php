@@ -15,7 +15,7 @@ use Tests\TestCase;
 uses(TestCase::class, RefreshDatabase::class);
 
 beforeEach(function (): void {
-    app(PermissionRegistrar::class)->forgetCachedPermissions();
+    resolve(PermissionRegistrar::class)->forgetCachedPermissions();
 
     foreach ([
         'ViewAny:CuratorMedia',
@@ -68,8 +68,10 @@ it('applies view rules based on privacy and ownership', function (): void {
 
     $owner = User::factory()->create();
     $owner->givePermissionTo('ViewOwn:CuratorMedia');
+
     $admin = User::factory()->create();
     $admin->givePermissionTo('View:CuratorMedia');
+
     $other = User::factory()->create();
 
     $privateMedia = CuratorMedia::factory()->create([
@@ -95,8 +97,10 @@ it('checks create permission', function (): void {
 it('authorizes update for admins and owners only', function (): void {
     $owner = User::factory()->create();
     $owner->givePermissionTo('UpdateOwn:CuratorMedia');
+
     $admin = User::factory()->create();
     $admin->givePermissionTo('Update:CuratorMedia');
+
     $other = User::factory()->create();
     $other->givePermissionTo('UpdateOwn:CuratorMedia');
 
@@ -162,8 +166,10 @@ it('allows deleting used media for admin or special permission', function (): vo
 it('authorizes delete for admins and owners when media is unused', function (): void {
     $owner = User::factory()->create();
     $owner->givePermissionTo('DeleteOwn:CuratorMedia');
+
     $admin = User::factory()->create();
     $admin->givePermissionTo('Delete:CuratorMedia');
+
     $other = User::factory()->create();
     $other->givePermissionTo('DeleteOwn:CuratorMedia');
 
@@ -179,8 +185,10 @@ it('authorizes delete for admins and owners when media is unused', function (): 
 it('authorizes restore for admins and owners only', function (): void {
     $owner = User::factory()->create();
     $owner->givePermissionTo('RestoreOwn:CuratorMedia');
+
     $admin = User::factory()->create();
     $admin->givePermissionTo('Restore:CuratorMedia');
+
     $other = User::factory()->create();
     $other->givePermissionTo('RestoreOwn:CuratorMedia');
 
@@ -246,8 +254,10 @@ it('allows force deleting used media for admin or special permission', function 
 it('authorizes force delete for admins and owners when media is unused', function (): void {
     $owner = User::factory()->create();
     $owner->givePermissionTo('ForceDeleteOwn:CuratorMedia');
+
     $admin = User::factory()->create();
     $admin->givePermissionTo('ForceDelete:CuratorMedia');
+
     $other = User::factory()->create();
     $other->givePermissionTo('ForceDeleteOwn:CuratorMedia');
 

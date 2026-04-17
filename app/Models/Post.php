@@ -65,7 +65,7 @@ final class Post extends Model implements HasRichContent
     {
         self::creating(function (Post $post): void {
             if (! $post->author_id && auth()->check()) {
-                $post->author_id = auth()->id();
+                $post->author_id = (string) auth()->id();
             }
         });
 

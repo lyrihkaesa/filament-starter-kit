@@ -27,6 +27,7 @@ final class EditPost extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Post $record */
+        /** @var array{title?: string, slug?: string, content?: string, author_id?: string, thumbnail_curator_id?: string|null, published_at?: string|null} $data */
         return resolve(UpdatePostAction::class)->handle($record, $data);
     }
 }

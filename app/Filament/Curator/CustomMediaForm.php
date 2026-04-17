@@ -5,19 +5,22 @@ declare(strict_types=1);
 namespace App\Filament\Curator;
 
 use App\Enums\Privacy;
+use App\Models\CuratorMedia;
+use App\Models\User;
 use Awcodes\Curator\Resources\Media\Schemas\MediaForm;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Infolists\Components\Entry;
 use Filament\Infolists\Components\TextEntry;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Schemas\Components\Component;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 final class CustomMediaForm extends MediaForm
 {
     /**
-     * @return array<string, mixed>
+     * @return array<int, Component|Entry>
      */
     public static function getAdditionalInformationFormSchema(): array
     {
@@ -27,7 +30,7 @@ final class CustomMediaForm extends MediaForm
                 ->hiddenOn('create')
                 ->required()
                 ->dehydrateStateUsing(function (mixed $component, ?string $state): string {
-                    $slugged = Str::slug($state);
+                    $slugged = Str::slug($state ?? '');
                     if (is_object($component) && method_exists($component, 'state')) {
                         $component->state($slugged);
                     }
@@ -53,7 +56,12 @@ final class CustomMediaForm extends MediaForm
                 ->required(),
             TextEntry::make('created_by')
                 ->label(__('Created By'))
-                ->state(fn (?Model $record): ?string => $record?->creator?->name ?? __('System')),
+                ->state(function (CuratorMedia $record): string {
+                    /** @var User|null $creator */
+                    $creator = $record->creator;
+
+                    return $creator->name ?? __('System');
+                }),
         ];
     }
 }

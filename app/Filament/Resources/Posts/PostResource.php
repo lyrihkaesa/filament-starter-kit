@@ -29,7 +29,7 @@ final class PostResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string
     {
         return __('Content Management');
     }
@@ -80,11 +80,11 @@ final class PostResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        if (auth()->user()->can('View:Post')) {
+        if (auth()->user()?->can('View:Post')) {
             return $query;
         }
 
-        return $query->where('author_id', auth()->id());
+        return $query->where('author_id', (string) auth()->id());
     }
 
     public static function getPages(): array

@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 use App\Filament\Resources\Activities\Pages\ManageActivities;
 use App\Models\User;
-use App\Models\Post;
-use Spatie\Activitylog\Models\Activity;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
+
 use function Pest\Livewire\livewire;
 
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+uses(RefreshDatabase::class);
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
-
-beforeEach(function () {
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+beforeEach(function (): void {
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
     // Setup roles and permissions
-    $adminRole = \Spatie\Permission\Models\Role::findOrCreate('admin', 'web');
-    $memberRole = \Spatie\Permission\Models\Role::findOrCreate('member', 'web');
-    
-    $viewAnyPermission = \Spatie\Permission\Models\Permission::findOrCreate('ViewAny:Activity', 'web');
-    $viewPermission = \Spatie\Permission\Models\Permission::findOrCreate('View:Activity', 'web');
-    
+    $adminRole = Role::findOrCreate('admin', 'web');
+    $memberRole = Role::findOrCreate('member', 'web');
+
+    $viewAnyPermission = Permission::findOrCreate('ViewAny:Activity', 'web');
+    $viewPermission = Permission::findOrCreate('View:Activity', 'web');
+
     $adminRole->givePermissionTo([$viewAnyPermission, $viewPermission]);
     $memberRole->givePermissionTo([$viewAnyPermission, $viewPermission]);
 });
 
-it('allows admin to see all activities', function () {
+it('allows admin to see all activities', function (): void {
     $admin = User::factory()->create();
     $admin->assignRole('admin');
-    
+
     $user1 = User::factory()->create();
     $user2 = User::factory()->create();
 
@@ -45,12 +45,12 @@ it('allows admin to see all activities', function () {
         ->assertSee($user2->name);
 });
 
-it('restricts members to see only their own activities', function () {
+it('restricts members to see only their own activities', function (): void {
     $member1 = User::factory()->create();
     $member1->name = 'Member One';
     $member1->save();
     $member1->assignRole('member');
-    
+
     $member2 = User::factory()->create();
     $member2->name = 'Member Two';
     $member2->save();
@@ -67,10 +67,10 @@ it('restricts members to see only their own activities', function () {
         ->assertDontSee('Member Two');
 });
 
-it('can filter activities by subject type and subject id via URL', function () {
+it('can filter activities by subject type and subject id via URL', function (): void {
     $admin = User::factory()->create();
     $admin->assignRole('admin');
-    
+
     $targetUser = User::factory()->create();
     $targetUser->name = 'Target User';
     $targetUser->save();

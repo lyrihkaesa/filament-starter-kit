@@ -43,7 +43,7 @@ final class UserForm
                     ->password()
                     ->revealable()
                     ->required(fn (string $operation): bool => $operation === 'create')
-                    ->dehydrated(fn (?string $state) => filled($state)),
+                    ->dehydrated(fn (?string $state): bool => filled($state)),
                 Select::make('roles')
                     ->label(__('Roles'))
                     ->relationship('roles', 'name')

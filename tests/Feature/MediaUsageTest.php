@@ -10,14 +10,15 @@ use App\Models\CuratorMedia;
 use App\Models\CuratorMediaUsage;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
-beforeEach(function () {
-    app(PermissionRegistrar::class)->forgetCachedPermissions();
+beforeEach(function (): void {
+    resolve(PermissionRegistrar::class)->forgetCachedPermissions();
 });
 
 it('tracks media usage when SyncMediaUsageAction is executed', function (): void {
@@ -28,12 +29,12 @@ it('tracks media usage when SyncMediaUsageAction is executed', function (): void
     resolve(SyncMediaUsageAction::class)->handle($user, 'avatar_curator_id', $media->id);
 
     expect(CuratorMediaUsage::query()->count())->toBe($initialCount + 1);
-    
+
     $usage = CuratorMediaUsage::query()
         ->where('curator_media_id', $media->id)
         ->where('model_id', $user->id)
         ->first();
-        
+
     expect($usage)->not->toBeNull()
         ->and($usage->model_type)->toBe($user->getMorphClass())
         ->and($usage->field_name)->toBe('avatar_curator_id');

@@ -18,7 +18,7 @@ final class ManualTestingSeeder extends Seeder
     public function run(): void
     {
         // 1. Reset Permissions Cache
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        resolve(PermissionRegistrar::class)->forgetCachedPermissions();
 
         // 2. Call Shield Seeder to ensure roles and base users exist
         // Note: ShieldSeeder already creates superadmin@example.com, admin@example.com, and member@example.com
@@ -35,10 +35,10 @@ final class ManualTestingSeeder extends Seeder
                 'member' => 'member@example.com',
             };
 
-            $user = User::where('email', $email)->first();
+            $user = User::query()->where('email', $email)->first();
 
             if (! $user) {
-                $this->command->warn("User with email {$email} not found. Skipping for role {$role}.");
+                $this->command->warn(sprintf('User with email %s not found. Skipping for role %s.', $email, $role));
 
                 continue;
             }
@@ -60,7 +60,7 @@ final class ManualTestingSeeder extends Seeder
                 'published_at' => now(),
             ]);
 
-            $this->command->info("Seeded media and post for {$role} ({$email})");
+            $this->command->info(sprintf('Seeded media and post for %s (%s)', $role, $email));
         }
 
         $this->command->info('Manual Testing Seeder completed successfully!');

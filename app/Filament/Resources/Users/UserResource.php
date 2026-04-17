@@ -30,9 +30,9 @@ final class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Users;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string
     {
-        return __('System Management');
+        return __('User Management');
     }
 
     public static function getNavigationLabel(): string

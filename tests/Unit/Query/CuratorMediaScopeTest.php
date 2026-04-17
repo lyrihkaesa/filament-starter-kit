@@ -13,7 +13,7 @@ use Tests\TestCase;
 uses(TestCase::class, RefreshDatabase::class);
 
 beforeEach(function (): void {
-    app(PermissionRegistrar::class)->forgetCachedPermissions();
+    resolve(PermissionRegistrar::class)->forgetCachedPermissions();
     Permission::findOrCreate('View:CuratorMedia');
     Permission::findOrCreate('ViewOwn:CuratorMedia');
     Permission::findOrCreate('ViewAny:CuratorMedia');
@@ -21,7 +21,6 @@ beforeEach(function (): void {
     $app = app();
     $reflection = new ReflectionObject($app);
     $property = $reflection->getProperty('isRunningInConsole');
-    $property->setAccessible(true);
 
     $this->consoleProperty = $property;
     $this->originalConsoleState = $property->getValue($app);
