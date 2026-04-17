@@ -59,12 +59,12 @@ final class CuratorMedia extends Media
     ];
 
     /**
-     * @return Attribute<string|null, never>
+     * @return Attribute<string, never>
      */
     public function url(): Attribute
     {
         return Attribute::make(
-            get: function (): ?string {
+            get: function (): string {
                 $storage = Storage::disk($this->disk);
 
                 if ($this->visibility === 'public') {

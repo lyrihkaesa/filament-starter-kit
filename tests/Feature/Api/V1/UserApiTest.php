@@ -100,7 +100,7 @@ it('validates unsupported pagination types', function (): void {
 it('creates a user with the correct rest status code', function (): void {
     $admin = User::factory()->create();
     grantUserApiPermissions($admin, ['Create:User', 'View:User', 'Update:Role']);
-    Role::create(['name' => 'member', 'guard_name' => 'web']);
+    Role::findOrCreate('member', 'web');
 
     Sanctum::actingAs($admin, ['users:create', 'users:read']);
 
@@ -124,7 +124,7 @@ it('creates a user with the correct rest status code', function (): void {
 it('rejects role assignment when the caller cannot manage roles during creation', function (): void {
     $admin = User::factory()->create();
     grantUserApiPermissions($admin, ['Create:User']);
-    Role::create(['name' => 'member', 'guard_name' => 'web']);
+    Role::findOrCreate('member', 'web');
 
     Sanctum::actingAs($admin, ['users:create']);
 
@@ -201,7 +201,7 @@ it('rejects role assignment when the caller cannot manage roles during update', 
     $admin = User::factory()->create();
     $target = User::factory()->create();
     grantUserApiPermissions($admin, ['Update:User']);
-    Role::create(['name' => 'member', 'guard_name' => 'web']);
+    Role::findOrCreate('member', 'web');
 
     Sanctum::actingAs($admin, ['users:update']);
 

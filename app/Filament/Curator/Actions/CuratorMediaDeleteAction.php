@@ -20,11 +20,15 @@ final class CuratorMediaDeleteAction
             ->modalDescription(fn (CuratorMedia $record): string => ($record->isInUse() && ! self::canDeleteUsed($record))
                 ? $record->getDeletionBlockedMessage()
                 : __('Are you sure you want to delete this media?'))
-            ->using(fn (CuratorMedia $record, DeleteCuratorMediaRecordAction $deleteMediaAction): bool => $deleteMediaAction->handle(
-                media: $record,
-                deleterId: auth()->id(),
-                allowDeleteWhenUsed: self::canDeleteUsed($record),
-            ));
+            ->using(function (CuratorMedia $record, DeleteCuratorMediaRecordAction $deleteMediaAction): bool {
+                $deleterId = auth()->id();
+
+                return $deleteMediaAction->handle(
+                    media: $record,
+                    deleterId: $deleterId !== null ? (string) $deleterId : null,
+                    allowDeleteWhenUsed: self::canDeleteUsed($record),
+                );
+            });
     }
 
     private static function canDelete(CuratorMedia $record): bool

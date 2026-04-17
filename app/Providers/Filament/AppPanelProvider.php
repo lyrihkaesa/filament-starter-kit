@@ -75,7 +75,7 @@ final class AppPanelProvider extends PanelProvider
                     ->label(__('Media'))
                     ->pluralLabel(__('Media'))
                     ->navigationGroup(__('Content Management'))
-                    ->navigationSort(FilamentNavigation::sort(__('Media')))
+                    ->navigationSort(FilamentNavigation::sort(__('Media')) ?? 0)
                     ->registerNavigation(true)
                     ->curations(true)
                     ->fileSwap(true),
@@ -96,7 +96,7 @@ final class AppPanelProvider extends PanelProvider
                         'sm' => 2,
                     ])
                     ->navigationGroup(__('System Management'))
-                    ->navigationSort(FilamentNavigation::sort(__('Role'))),
+                    ->navigationSort(FilamentNavigation::sort(__('Role')) ?? 0),
             ])
             ->viteTheme('resources/css/filament/app/theme.css');
     }

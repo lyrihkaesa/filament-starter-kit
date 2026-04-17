@@ -24,7 +24,9 @@ final class Show extends Component
 
     public function render(): View
     {
-        return view('livewire.posts.show')
-            ->title($this->post->title); // @phpstan-ignore-line
+        $view = view('livewire.posts.show');
+        assert($view instanceof View);
+
+        return $view;
     }
 }

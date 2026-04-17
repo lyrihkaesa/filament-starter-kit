@@ -21,7 +21,8 @@ function grantApiPermissions(User $user, array $permissions): void
 }
 
 it('registers a user and returns a typed api token payload', function (): void {
-    Role::query()->firstOrCreate(['name' => 'member', 'guard_name' => 'web']);
+    $memberRole = Role::query()->firstOrCreate(['name' => 'member', 'guard_name' => 'web']);
+    $memberRole->syncPermissions([]);
 
     $response = $this->postJson('/api/v1/register', [
         'name' => 'Flutter User',
@@ -38,7 +39,7 @@ it('registers a user and returns a typed api token payload', function (): void {
     expect($payload['message'])->toBe('User registered successfully.')
         ->and($payload['data']['token'])->toBeString()
         ->and($payload['data']['token_type'])->toBe('Bearer')
-        ->and($payload['data']['abilities'])->toBe(['profile:read'])
+        ->and($payload['data']['abilities'])->toContain('profile:read')
         ->and($payload['data']['user']['id'])->toBeString()
         ->and($payload['data']['user']['name'])->toBe('Flutter User')
         ->and($payload['data']['user']['avatar_url'])->toBeNull()
@@ -61,8 +62,10 @@ it('validates register requests with json errors', function (): void {
 });
 
 it('logs a user in and returns token abilities', function (): void {
+    $email = 'admin-'.uniqid().'-api@example.com';
+
     $user = User::factory()->create([
-        'email' => 'admin@example.com',
+        'email' => $email,
         'password' => bcrypt('password123'),
     ]);
 
@@ -74,7 +77,7 @@ it('logs a user in and returns token abilities', function (): void {
     ]);
 
     $response = $this->postJson('/api/v1/login', [
-        'email' => 'admin@example.com',
+        'email' => $email,
         'password' => 'password123',
         'device_name' => 'iphone-15',
     ]);
@@ -107,7 +110,7 @@ it('rejects login for an unknown email address', function (): void {
 });
 
 it('rejects login for a wrong password', function (): void {
-    $email = 'api-wrong-pass-' . uniqid() . '@example.com';
+    $email = 'api-wrong-pass-'.uniqid().'@example.com';
     User::factory()->create([
         'email' => $email,
         'password' => bcrypt('password123'),

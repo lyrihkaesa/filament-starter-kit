@@ -28,7 +28,10 @@ final class EditMedia extends BaseEditMedia
                 ->label(trans('curator::views.panel.edit_save')),
             Action::make('preview')
                 ->color('gray')
-                ->url($this->record->url, shouldOpenInNewTab: true)
+                ->url(
+                    fn (): ?string => $this->record instanceof CuratorMedia ? $this->record->url : null,
+                    shouldOpenInNewTab: true
+                )
                 ->label(trans('curator::views.panel.view')),
             CuratorMediaUsagesAction::make(),
             CuratorMediaDeleteAction::make()

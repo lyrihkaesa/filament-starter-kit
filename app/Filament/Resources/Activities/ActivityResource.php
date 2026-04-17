@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Activities;
 
 use App\Filament\Resources\Activities\Pages\ManageActivities;
+use App\Models\User;
 use App\Support\Activity\ActivitySubjectType;
 use BackedEnum;
 use Filament\Actions\ViewAction;
@@ -86,7 +87,7 @@ final class ActivityResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('properties')
                     ->label(__('Changes'))
-                    ->icon(fn (Activity $record): ?string => ($record->properties->isNotEmpty() ?? false) ? 'heroicon-o-eye' : null)
+                    ->icon(fn (Activity $record): ?string => self::hasProperties($record) ? 'heroicon-o-eye' : null)
                     ->color('primary')
                     ->alignCenter(),
             ])
@@ -103,7 +104,13 @@ final class ActivityResource extends Resource
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query->when(
                         $data['value'] ?? null,
-                        fn (Builder $query, mixed $value): Builder => $query->where('subject_id', (string) $value)
+                        function (Builder $query, mixed $value): Builder {
+                            if (! is_scalar($value)) {
+                                return $query;
+                            }
+
+                            return $query->where('subject_id', (string) $value);
+                        }
                     )),
                 Filter::make('created_at')
                     ->label(__('Date Range'))
@@ -112,8 +119,20 @@ final class ActivityResource extends Resource
                         DatePicker::make('until')->label(__('Until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
-                        ->when($data['from'] ?? null, fn (Builder $query, mixed $date): Builder => $query->whereDate('created_at', '>=', (string) $date))
-                        ->when($data['until'] ?? null, fn (Builder $query, mixed $date): Builder => $query->whereDate('created_at', '<=', (string) $date))),
+                        ->when($data['from'] ?? null, function (Builder $query, mixed $date): Builder {
+                            if (! is_scalar($date)) {
+                                return $query;
+                            }
+
+                            return $query->whereDate('created_at', '>=', (string) $date);
+                        })
+                        ->when($data['until'] ?? null, function (Builder $query, mixed $date): Builder {
+                            if (! is_scalar($date)) {
+                                return $query;
+                            }
+
+                            return $query->whereDate('created_at', '<=', (string) $date);
+                        })),
             ])
             ->filtersFormColumns(3)
             ->recordActions([
@@ -143,7 +162,7 @@ final class ActivityResource extends Resource
                                 TextColumn::make('subject_id')->label(__('Subject ID'))->inline(),
                             ]),
                         Section::make(__('Changes'))
-                            ->visible(fn (Activity $record): bool => $record->properties->isNotEmpty() ?? false)
+                            ->visible(fn (Activity $record): bool => self::hasProperties($record))
                             ->schema(function (Activity $record): array {
                                 [$oldValues, $newValues] = self::extractChangeBuckets($record);
 
@@ -193,11 +212,44 @@ final class ActivityResource extends Resource
             ]);
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            return $query;
+        }
+
+        if ($user->hasRole(['super_admin', 'admin'])) {
+            return $query;
+        }
+
+        if ($user->hasRole('member')) {
+            $userId = $user->getKey();
+
+            if (! is_scalar($userId)) {
+                return $query->whereRaw('1 = 0');
+            }
+
+            return $query
+                ->whereIn('causer_type', [ActivitySubjectType::USER, User::class])
+                ->where('causer_id', (string) $userId);
+        }
+
+        return $query;
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ManageActivities::route('/'),
         ];
+    }
+
+    private static function hasProperties(Activity $record): bool
+    {
+        return self::normalizeToArray($record->properties) !== [];
     }
 
     /**
@@ -272,11 +324,28 @@ final class ActivityResource extends Resource
         }
 
         if ($value instanceof stdClass) {
-            return (array) $value;
+            /** @var array<int|string, mixed> $objectArray */
+            $objectArray = (array) $value;
+
+            return self::normalizeArrayKeys($objectArray);
         }
 
-        /** @var array<string, mixed> $value */
-        return $value;
+        return self::normalizeArrayKeys($value);
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $value
+     * @return array<string, mixed>
+     */
+    private static function normalizeArrayKeys(array $value): array
+    {
+        $normalized = [];
+
+        foreach ($value as $key => $item) {
+            $normalized[(string) $key] = $item;
+        }
+
+        return $normalized;
     }
 
     private static function stringifyValue(mixed $value): ?string
@@ -301,6 +370,6 @@ final class ActivityResource extends Resource
             return (string) json_encode($value);
         }
 
-        return (string) $value;
+        return null;
     }
 }

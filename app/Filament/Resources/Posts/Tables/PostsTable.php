@@ -77,7 +77,13 @@ final class PostsTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->action(function (Collection $records, DeletePostAction $deletePostAction): void {
-                            $records->each(fn (Post $record): bool => $deletePostAction->handle($record));
+                            $records->each(function (mixed $record) use ($deletePostAction): void {
+                                if (! $record instanceof Post) {
+                                    return;
+                                }
+
+                                $deletePostAction->handle($record);
+                            });
                         }),
                 ]),
             ]);
