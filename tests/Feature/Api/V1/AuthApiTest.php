@@ -21,7 +21,7 @@ function grantApiPermissions(User $user, array $permissions): void
 }
 
 it('registers a user and returns a typed api token payload', function (): void {
-    Role::create(['name' => 'member', 'guard_name' => 'web']);
+    Role::query()->firstOrCreate(['name' => 'member', 'guard_name' => 'web']);
 
     $response = $this->postJson('/api/v1/register', [
         'name' => 'Flutter User',

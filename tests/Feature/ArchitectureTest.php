@@ -8,6 +8,7 @@ arch()->preset()->strict()->ignoring([
     'App\Http\Requests',
     'App\Models',
     'App\Console\Commands',
+    'App\Database\Seeders',
 ]);
 arch()->preset()->laravel()->ignoring('App\Providers\Filament');
 arch()->preset()->security()->ignoring([

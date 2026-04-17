@@ -14,12 +14,14 @@ use Spatie\Permission\Models\Permission;
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
+    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
     // Setup roles and permissions
-    $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'web']);
-    $memberRole = Role::create(['name' => 'member', 'guard_name' => 'web']);
+    $adminRole = \Spatie\Permission\Models\Role::findOrCreate('admin', 'web');
+    $memberRole = \Spatie\Permission\Models\Role::findOrCreate('member', 'web');
     
-    $viewAnyPermission = Permission::create(['name' => 'ViewAny:Activity', 'guard_name' => 'web']);
-    $viewPermission = Permission::create(['name' => 'View:Activity', 'guard_name' => 'web']);
+    $viewAnyPermission = \Spatie\Permission\Models\Permission::findOrCreate('ViewAny:Activity', 'web');
+    $viewPermission = \Spatie\Permission\Models\Permission::findOrCreate('View:Activity', 'web');
     
     $adminRole->givePermissionTo([$viewAnyPermission, $viewPermission]);
     $memberRole->givePermissionTo([$viewAnyPermission, $viewPermission]);

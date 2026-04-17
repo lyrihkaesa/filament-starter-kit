@@ -20,11 +20,9 @@ it('can update profile information and upload avatar to selected storage disk', 
 
     Livewire::actingAs($user)
         ->test(EditProfile::class)
-        ->fillForm([
-            'name' => 'Feature Name Pest',
-            'email' => 'feature-email@example.com',
-            'avatar_curator_id' => $file,
-        ])
+        ->set('data.name', 'Feature Name Pest')
+        ->set('data.email', 'feature-email@example.com')
+        ->set('data.avatar_curator_id', $file)
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertNotified();

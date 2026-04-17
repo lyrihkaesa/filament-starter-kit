@@ -12,37 +12,50 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
+
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+beforeEach(function () {
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+});
 
 it('tracks media usage when SyncMediaUsageAction is executed', function (): void {
+    $initialCount = CuratorMediaUsage::query()->count();
     $user = User::factory()->create();
     $media = CuratorMedia::factory()->create();
 
     resolve(SyncMediaUsageAction::class)->handle($user, 'avatar_curator_id', $media->id);
 
-    expect(CuratorMediaUsage::query()->count())->toBe(1);
-    $usage = CuratorMediaUsage::query()->first();
-    expect($usage->curator_media_id)->toBe($media->id)
-        ->and($usage->model_id)->toBe($user->id)
+    expect(CuratorMediaUsage::query()->count())->toBe($initialCount + 1);
+    
+    $usage = CuratorMediaUsage::query()
+        ->where('curator_media_id', $media->id)
+        ->where('model_id', $user->id)
+        ->first();
+        
+    expect($usage)->not->toBeNull()
         ->and($usage->model_type)->toBe($user->getMorphClass())
         ->and($usage->field_name)->toBe('avatar_curator_id');
 });
 
 it('removes media usage when SyncMediaUsageAction is executed with null', function (): void {
+    $initialCount = CuratorMediaUsage::query()->count();
     $user = User::factory()->create();
     $media = CuratorMedia::factory()->create();
 
     // Create usage
     resolve(SyncMediaUsageAction::class)->handle($user, 'avatar_curator_id', $media->id);
-    expect(CuratorMediaUsage::query()->count())->toBe(1);
+    expect(CuratorMediaUsage::query()->count())->toBe($initialCount + 1);
 
     // Remove usage
     resolve(SyncMediaUsageAction::class)->handle($user, 'avatar_curator_id', null);
-    expect(CuratorMediaUsage::query()->count())->toBe(0);
+    expect(CuratorMediaUsage::query()->count())->toBe($initialCount);
 });
 
 it('prevents media deletion if it is in use', function (): void {
     $owner = User::factory()->create();
-    Permission::create(['name' => 'DeleteOwn:CuratorMedia']);
+    Permission::findOrCreate('DeleteOwn:CuratorMedia', 'web');
     $owner->givePermissionTo('DeleteOwn:CuratorMedia');
 
     $post = Post::factory()->create();
@@ -63,15 +76,16 @@ it('prevents media deletion if it is in use', function (): void {
 });
 
 it('cleans up usage records when a model is deleted', function (): void {
+    $initialCount = CuratorMediaUsage::query()->count();
     $user = User::factory()->create();
     $media = CuratorMedia::factory()->create();
 
     resolve(SyncMediaUsageAction::class)->handle($user, 'avatar_curator_id', $media->id);
-    expect(CuratorMediaUsage::query()->count())->toBe(1);
+    expect(CuratorMediaUsage::query()->count())->toBe($initialCount + 1);
 
     // Delete user
     $user->delete();
 
     // Usage should be gone (triggered by User model deleting hook)
-    expect(CuratorMediaUsage::query()->count())->toBe(0);
+    expect(CuratorMediaUsage::query()->count())->toBe($initialCount);
 });

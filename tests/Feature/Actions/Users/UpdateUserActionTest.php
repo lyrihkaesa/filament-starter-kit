@@ -43,8 +43,8 @@ it('can update a user and sync roles', function (): void {
     $user = User::factory()->create();
 
     // Create roles for testing
-    $role1 = Role::create(['name' => 'admin', 'guard_name' => 'web']);
-    $role2 = Role::create(['name' => 'editor', 'guard_name' => 'web']);
+    $role1 = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+    $role2 = Role::firstOrCreate(['name' => 'editor', 'guard_name' => 'web']);
 
     $data = [
         'name' => 'New Name',

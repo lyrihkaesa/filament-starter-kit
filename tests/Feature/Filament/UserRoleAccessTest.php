@@ -13,14 +13,18 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+});
+
 it('disables roles field for users without Update:Role permission', function (): void {
     $user = User::factory()->create();
 
     // Give permission to view/update user, but NOT to update roles
-    $role = Role::create(['name' => 'admin', 'guard_name' => 'web']);
-    $role->givePermissionTo(Permission::create(['name' => 'ViewAny:User', 'guard_name' => 'web']));
-    $role->givePermissionTo(Permission::create(['name' => 'View:User', 'guard_name' => 'web']));
-    $role->givePermissionTo(Permission::create(['name' => 'Update:User', 'guard_name' => 'web']));
+    $role = Role::findOrCreate('admin', 'web');
+    $role->givePermissionTo(Permission::findOrCreate('ViewAny:User', 'web'));
+    $role->givePermissionTo(Permission::findOrCreate('View:User', 'web'));
+    $role->givePermissionTo(Permission::findOrCreate('Update:User', 'web'));
 
     $user->assignRole($role);
     $targetUser = User::factory()->create();
@@ -37,11 +41,11 @@ it('enables roles field for users with Update:Role permission', function (): voi
     $user = User::factory()->create();
 
     // Give permission to view/update user AND update roles
-    $role = Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
-    $role->givePermissionTo(Permission::create(['name' => 'ViewAny:User', 'guard_name' => 'web']));
-    $role->givePermissionTo(Permission::create(['name' => 'View:User', 'guard_name' => 'web']));
-    $role->givePermissionTo(Permission::create(['name' => 'Update:User', 'guard_name' => 'web']));
-    $role->givePermissionTo(Permission::create(['name' => 'Update:Role', 'guard_name' => 'web']));
+    $role = Role::findOrCreate('super_admin', 'web');
+    $role->givePermissionTo(Permission::findOrCreate('ViewAny:User', 'web'));
+    $role->givePermissionTo(Permission::findOrCreate('View:User', 'web'));
+    $role->givePermissionTo(Permission::findOrCreate('Update:User', 'web'));
+    $role->givePermissionTo(Permission::findOrCreate('Update:Role', 'web'));
 
     $user->assignRole($role);
     $targetUser = User::factory()->create();

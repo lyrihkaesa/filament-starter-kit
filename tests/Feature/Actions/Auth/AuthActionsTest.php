@@ -13,7 +13,7 @@ use Spatie\Permission\Models\Role;
 uses(RefreshDatabase::class);
 
 it('assigns the member role during registration when it exists', function (): void {
-    Role::create(['name' => 'member', 'guard_name' => 'web']);
+    Role::firstOrCreate(['name' => 'member', 'guard_name' => 'web']);
 
     $user = resolve(RegisterUserAction::class)->handle([
         'name' => 'Mobile User',
@@ -25,6 +25,9 @@ it('assigns the member role during registration when it exists', function (): vo
 });
 
 it('registers a user without roles when the member role does not exist', function (): void {
+    Role::where('name', 'member')->delete();
+    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
     $user = resolve(RegisterUserAction::class)->handle([
         'name' => 'Mobile User',
         'email' => 'mobile@example.com',

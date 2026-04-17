@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -7,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Spatie\Permission\PermissionRegistrar;
 
-class ShieldSeeder extends Seeder
+final class ShieldSeeder extends Seeder
 {
     public function run(): void
     {
@@ -43,7 +44,7 @@ class ShieldSeeder extends Seeder
         $this->command->info('Shield Seeding Completed.');
     }
 
-    protected static function seedTenants(string $tenants): void
+    private static function seedTenants(string $tenants): void
     {
         if (blank($tenantData = json_decode($tenants, true))) {
             return;
@@ -62,7 +63,7 @@ class ShieldSeeder extends Seeder
         }
     }
 
-    protected static function seedUsers(string $users): void
+    private static function seedUsers(string $users): void
     {
         if (blank($userData = json_decode($users, true))) {
             return;
@@ -110,7 +111,7 @@ class ShieldSeeder extends Seeder
         }
     }
 
-    protected static function seedUserTenantPivot(string $pivot): void
+    private static function seedUserTenantPivot(string $pivot): void
     {
         if (blank($pivotData = json_decode($pivot, true))) {
             return;
@@ -139,7 +140,7 @@ class ShieldSeeder extends Seeder
         }
     }
 
-    protected static function makeRolesWithPermissions(string $rolesWithPermissions): void
+    private static function makeRolesWithPermissions(string $rolesWithPermissions): void
     {
         if (blank($rolePlusPermissions = json_decode($rolesWithPermissions, true))) {
             return;

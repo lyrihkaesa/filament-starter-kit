@@ -13,15 +13,17 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 
 beforeEach(function (): void {
+    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
     // Create necessary permissions for testing (Following Project Convention Action:Model)
-    Permission::create(['name' => 'ViewAny:CuratorMedia']);
-    Permission::create(['name' => 'View:CuratorMedia']);
-    Permission::create(['name' => 'ViewOwn:CuratorMedia']);
-    Permission::create(['name' => 'Update:CuratorMedia']);
-    Permission::create(['name' => 'UpdateOwn:CuratorMedia']);
-    Permission::create(['name' => 'Delete:CuratorMedia']);
-    Permission::create(['name' => 'DeleteOwn:CuratorMedia']);
-    Permission::create(['name' => 'DeleteUsed:CuratorMedia']);
+    \Spatie\Permission\Models\Permission::findOrCreate('ViewAny:CuratorMedia');
+    \Spatie\Permission\Models\Permission::findOrCreate('View:CuratorMedia');
+    \Spatie\Permission\Models\Permission::findOrCreate('ViewOwn:CuratorMedia');
+    \Spatie\Permission\Models\Permission::findOrCreate('Update:CuratorMedia');
+    \Spatie\Permission\Models\Permission::findOrCreate('UpdateOwn:CuratorMedia');
+    \Spatie\Permission\Models\Permission::findOrCreate('Delete:CuratorMedia');
+    \Spatie\Permission\Models\Permission::findOrCreate('DeleteOwn:CuratorMedia');
+    \Spatie\Permission\Models\Permission::findOrCreate('DeleteUsed:CuratorMedia');
 });
 
 it('sets created_by and privacy on creation', function (): void {
