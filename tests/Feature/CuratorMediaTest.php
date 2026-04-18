@@ -5,12 +5,12 @@ declare(strict_types=1);
 use App\Actions\Media\DeleteCuratorMediaAction;
 use App\Enums\Privacy;
 use App\Models\CuratorMedia;
+use App\Models\Permission;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function (): void {

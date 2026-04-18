@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Actions\Profile\RevokeDeviceAction;
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\PersonalAccessToken;
 
 uses(RefreshDatabase::class);
 

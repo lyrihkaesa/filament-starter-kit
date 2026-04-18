@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Activity;
+use App\Models\PersonalAccessToken;
 use App\Policies\ActivityPolicy;
 use App\Support\Activity\ActivitySubjectType;
 use Carbon\CarbonImmutable;
@@ -21,7 +23,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Spatie\Activitylog\Models\Activity;
+use Laravel\Sanctum\Sanctum;
 
 // use Illuminate\Validation\Rules\Password;
 
@@ -41,6 +43,7 @@ final class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Activity::class, ActivityPolicy::class);
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
         // @codeCoverageIgnoreStart
 
         // 🚀 Optimasi Asset: Prefetching agresif (Laravel 11.7+)

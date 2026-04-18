@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Activities;
 
 use App\Filament\Resources\Activities\Pages\ManageActivities;
+use App\Models\Activity;
 use App\Models\User;
 use App\Support\Activity\ActivitySubjectType;
 use BackedEnum;
@@ -25,7 +26,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Spatie\Activitylog\Models\Activity;
 use stdClass;
 use UnitEnum;
 

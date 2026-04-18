@@ -8,11 +8,11 @@ use App\Actions\Media\CheckMediaUsageAction;
 use App\Actions\Media\SyncMediaUsageAction;
 use App\Models\CuratorMedia;
 use App\Models\CuratorMediaUsage;
+use App\Models\Permission;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);

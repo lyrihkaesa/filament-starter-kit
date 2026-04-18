@@ -8,6 +8,7 @@ use App\Filament\Curator\Actions\CuratorMediaDeleteBulkAction;
 use App\Filament\Curator\MediaTable;
 use App\Filament\Pages\Media\EditMedia;
 use App\Models\CuratorMedia;
+use App\Models\Permission;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -16,7 +17,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 

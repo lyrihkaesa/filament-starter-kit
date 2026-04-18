@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Database\Seeders\ShieldSeeder;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function (): void {

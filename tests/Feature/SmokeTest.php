@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Models\Role;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 it('redirects home to login', function (): void {
     $this->get('/')

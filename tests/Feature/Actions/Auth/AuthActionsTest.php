@@ -5,10 +5,10 @@ declare(strict_types=1);
 use App\Actions\Auth\LoginUserAction;
 use App\Actions\Auth\LogoutCurrentTokenAction;
 use App\Actions\Auth\RegisterUserAction;
+use App\Models\PersonalAccessToken;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\PersonalAccessToken;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);

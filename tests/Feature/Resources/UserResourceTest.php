@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature\Resources;
 
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 

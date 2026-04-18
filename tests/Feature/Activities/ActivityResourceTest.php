@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\Activities\ActivityResource;
+use App\Filament\Resources\Activities\Pages\ManageActivities;
+use App\Models\Activity;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
 
-beforeEach(function () {
+beforeEach(function (): void {
     Role::findOrCreate('super_admin');
     $this->user = User::factory()->create();
     $this->user->assignRole('super_admin');
-    Gate::before(fn () => true);
+    Gate::before(fn (): true => true);
 });
 
-it('can list activities', function () {
-    Activity::create([
+it('can list activities', function (): void {
+    Activity::query()->create([
         'description' => 'updated',
         'subject_type' => User::class,
         'subject_id' => $this->user->id,
@@ -30,12 +30,12 @@ it('can list activities', function () {
 
     actingAs($this->user);
 
-    livewire(App\Filament\Resources\Activities\Pages\ManageActivities::class)
+    livewire(ManageActivities::class)
         ->assertCanSeeTableRecords(Activity::all());
 });
 
-it('can view activity details', function () {
-    $activity = Activity::create([
+it('can view activity details', function (): void {
+    $activity = Activity::query()->create([
         'description' => 'updated',
         'subject_type' => User::class,
         'subject_id' => $this->user->id,
@@ -46,6 +46,6 @@ it('can view activity details', function () {
 
     actingAs($this->user);
 
-    livewire(App\Filament\Resources\Activities\Pages\ManageActivities::class)
+    livewire(ManageActivities::class)
         ->assertTableActionVisible('view', $activity);
 });

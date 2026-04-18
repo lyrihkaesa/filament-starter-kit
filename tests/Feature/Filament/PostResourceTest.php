@@ -10,11 +10,11 @@ use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Models\CuratorMedia;
 use App\Models\CuratorMediaUsage;
 use App\Models\Post;
+use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 

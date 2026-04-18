@@ -6,13 +6,13 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Pages\Media\EditMedia;
 use App\Models\CuratorMedia;
+use App\Models\Permission;
 use App\Models\Post;
 use App\Models\User;
 use Awcodes\Curator\Resources\Media\Pages\ListMedia;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Permission;
 
 uses(RefreshDatabase::class);
 

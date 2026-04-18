@@ -19,6 +19,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 final class PostResource extends Resource
@@ -36,17 +37,17 @@ final class PostResource extends Resource
         return ['title', 'slug'];
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @var Post $record */
         return [
-            'Author' => $record->author?->name ?? __('Unknown'),
+            'Author' => $record->author->name ?? __('Unknown'),
         ];
     }
 
     public static function getGlobalSearchEloquentQuery(): Builder
     {
-        return static::getEloquentQuery()->with(['author']);
+        return self::getEloquentQuery()->with(['author']);
     }
 
     public static function getNavigationGroup(): string

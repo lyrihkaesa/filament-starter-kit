@@ -10,6 +10,7 @@ use App\Actions\Profile\RevokeOtherDevicesAction;
 use App\Actions\Profile\UpdateUserPasswordAction;
 use App\Data\DeviceInfo;
 use App\Filament\Forms\Components\CuratorFileUpload;
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use DeviceDetector\DeviceDetector;
 use Filament\Actions\Action;
@@ -33,7 +34,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
-use Laravel\Sanctum\PersonalAccessToken;
 use RuntimeException;
 use Throwable;
 

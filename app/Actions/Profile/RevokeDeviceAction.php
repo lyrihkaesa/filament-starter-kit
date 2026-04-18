@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Actions\Profile;
 
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use DeviceDetector\DeviceDetector;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\PersonalAccessToken;
 
 /**
  * Revokes a single active device for a user.
@@ -29,7 +29,7 @@ final readonly class RevokeDeviceAction
         }
 
         if (str_starts_with($prefixedDeviceId, 'token:')) {
-            $this->revokeToken($user, (int) mb_substr($prefixedDeviceId, 6));
+            $this->revokeToken($user, mb_substr($prefixedDeviceId, 6));
 
             return;
         }
@@ -73,7 +73,7 @@ final readonly class RevokeDeviceAction
             ->sendToDatabase($user);
     }
 
-    private function revokeToken(User $user, int $tokenId): void
+    private function revokeToken(User $user, string $tokenId): void
     {
         $token = PersonalAccessToken::query()
             ->where('tokenable_id', $user->id)

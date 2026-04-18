@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Policies;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Policies\RolePolicy;
 use Database\Seeders\ShieldSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 

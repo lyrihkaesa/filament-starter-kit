@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Auth;
 
 use App\Actions\Users\CreateUserAction;
+use App\Models\Role;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 final readonly class RegisterUserAction
 {

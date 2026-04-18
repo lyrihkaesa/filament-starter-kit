@@ -5,10 +5,10 @@ declare(strict_types=1);
 use App\Enums\Privacy;
 use App\Models\CuratorMedia;
 use App\Models\CuratorMediaUsage;
+use App\Models\Permission;
 use App\Models\User;
 use App\Policies\CuratorMediaPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 

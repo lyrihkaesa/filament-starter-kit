@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Actions\Profile;
 
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\PersonalAccessToken;
 use Throwable;
 
 /**

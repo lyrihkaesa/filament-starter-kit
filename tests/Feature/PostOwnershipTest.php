@@ -5,10 +5,10 @@ declare(strict_types=1);
 use App\Actions\Media\CheckMediaUsageAction;
 use App\Actions\Media\DeleteCuratorMediaAction;
 use App\Models\CuratorMedia;
+use App\Models\Permission;
 use App\Models\Post;
+use App\Models\Role;
 use App\Models\User;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 use function Pest\Laravel\actingAs;

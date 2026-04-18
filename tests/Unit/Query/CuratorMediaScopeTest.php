@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Models\CuratorMedia;
+use App\Models\Permission;
 use App\Models\User;
 use App\Query\CuratorMediaScope;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
