@@ -1,6 +1,8 @@
 # Audit Trail (Activity Log)
 
-Starter Kit ini menggunakan **Spatie Laravel Activitylog v5** sebagai engine pendata aktivitas (audit trail). Fitur ini telah ditingkatkan untuk menggunakan implementasi **Native Filament Resource** guna fleksibilitas dan kompatibilitas jangka panjang dengan Laravel 12.
+Starter Kit ini menggunakan **Spatie Laravel Activitylog v5** sebagai engine pendata aktivitas (audit trail). 
+
+**PENTING:** Untuk mendukung konsistensi identifier, starter kit ini menggunakan **UUID v7** untuk tabel `activity_log`. Hal ini dicapai dengan menggunakan custom model `App\Models\Activity` yang meng-override model bawaan Spatie.
 
 ## Fitur Utama
 

@@ -77,6 +77,44 @@ Karena untuk desain schema baru, saya lebih suka bergerak ke pendekatan UUID mod
 
 Jadi, kalau ada schema lama yang masih memakai UUID versi lama, itu bukan berarti salah. Saya hanya tidak ingin menjadikannya baseline untuk desain baru.
 
+## Kustomisasi Paket Pihak Ketiga (PENTING)
+
+Salah satu keunikan starter kit ini adalah **pemaksaan UUID v7** bahkan untuk paket pihak ketiga yang secara default menggunakan Integer/BigInt.
+
+Jika Anda terbiasa menggunakan paket seperti Spatie Permission atau Activitylog, Anda mungkin akan bingung kenapa di sini mereka menggunakan UUID. Berikut adalah penjelasannya:
+
+### 1. Kenapa Saya Mengubah Default Paket?
+Konsistensi adalah kunci. Saya tidak ingin memiliki database yang campur aduk antara UUID (untuk tabel utama) dan BigInt (untuk tabel paket). Dengan UUID v7 yang sortable, kita mendapatkan keuntungan keamanan UUID tanpa mengorbankan performa indexing database secara signifikan.
+
+### 2. Apa Saja yang Diubah?
+Saya melakukan "Override" pada model dan migrasi bawaan paket-paket berikut:
+
+- **Spatie Permission**: Tabel `roles` dan `permissions` menggunakan UUID.
+- **Spatie Activitylog**: Tabel `activity_log` menggunakan UUID.
+- **Laravel Sanctum**: Tabel `personal_access_tokens` menggunakan UUID.
+
+### 3. Cara Kerjanya (Custom Models)
+Untuk mendukung ini, saya tidak menggunakan model bawaan paket secara langsung, melainkan meng-extend mereka ke dalam folder `app/Models/`:
+
+- `App\Models\Role` meng-extend `Spatie\Permission\Models\Role`
+- `App\Models\Permission` meng-extend `Spatie\Permission\Models\Permission`
+- `App\Models\Activity` meng-extend `Spatie\Activitylog\Models\Activity`
+- `App\Models\PersonalAccessToken` meng-extend `Laravel\Sanctum\PersonalAccessToken`
+
+Semua model di atas menggunakan trait `HasUuids` dan dikonfigurasi dengan:
+```php
+public $incrementing = false;
+protected $keyType = 'string';
+```
+
+### 4. Konfigurasi yang Harus Diperhatikan
+Jangan kaget jika Anda melihat isi file konfigurasi paket sudah saya ubah:
+- `config/permission.php`: `models.role` dan `models.permission` diarahkan ke `App\Models`.
+- `config/activitylog.php`: `activity_model` diarahkan ke `App\Models\Activity`.
+- `AppServiceProvider.php`: Menggunakan `Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class)`.
+
+**Pesan untuk Developer:** Jika Anda menambah paket baru yang memiliki tabel database, pastikan Anda mengikuti pola yang sama: gunakan migrasi UUID dan buat custom model jika paket tersebut default-nya menggunakan Integer.
+
 ## Rule Project untuk Agent
 
 Project ini punya rule khusus di:

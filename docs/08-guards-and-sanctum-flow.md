@@ -2,7 +2,7 @@
 
 Panduan ini menjelaskan cara kerja **Laravel Guard** dan bagaimana Anda membangun alur otorisasi modern menggunakan Sanctum token, policy, dan validasi atribut.
 
-Dokumen ini sengaja dibuat berurutan supaya developer pemula memahami bahwa keamanan API bukan hanya soal "apakah token valid", tetapi juga siapa user-nya dan data apa yang sedang ia kirim.
+**Catatan Khusus UUID v7:** Tabel `personal_access_tokens` telah dimodifikasi untuk menggunakan **UUID v7** sebagai primary key. Hal ini dilakukan dengan meng-override model bawaan melalui `App\Models\PersonalAccessToken` dan mendaftarkannya di `AppServiceProvider`.
 
 ## Memahami Guard
 

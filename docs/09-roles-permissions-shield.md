@@ -151,28 +151,18 @@ Buat seeder yang menangani:
 3. membuat role dasar
 4. memberikan role ke user awal
 
+**Catatan Khusus UUID v7:** Starter kit ini menggunakan `App\Models\Role` dan `App\Models\Permission` (bukan bawaan Spatie) agar mendukung UUID v7 secara otomatis.
+
 Contoh:
 
 ```php
 // database/seeders/ShieldSeeder.php
-use Spatie\Permission\Models\Role;
+use App\Models\Role; // Menggunakan model kustom App\Models
 use Spatie\Permission\PermissionRegistrar;
 
 public function run(): void
 {
-    // 1. Bersihkan cache permission agar tidak bentrok
-    app()[PermissionRegistrar::class]->forgetCachedPermissions();
-
-    // 2. Jalankan perintah shield untuk isi data permission
-    $this->command->call('shield:generate', ['--all' => true]);
-
-    // 3. Buat Peran (Role) jika belum ada
-    $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
-    $panelUser = Role::firstOrCreate(['name' => 'panel_user', 'guard_name' => 'web']);
-
-    // 4. Berikan Peran ke User Utama
-    $user = \App\Models\User::firstWhere('email', 'admin@example.com');
-    $user?->assignRole($superAdmin);
+    // ...
 }
 ```
 
