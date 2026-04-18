@@ -5,30 +5,30 @@ declare(strict_types=1);
 namespace App\Http\Requests\Posts;
 
 use App\Models\Post;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 final class UpdatePostRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        $authUser = $this->user();
-        $targetPost = $this->route('post');
+    public function authorize(
+        #[RouteParameter('post')] Post $post,
+        #[CurrentUser] User $user
+    ): bool {
+        if ($user->currentAccessToken() && ! $user->tokenCan('posts:update')) {
+            return false;
+        }
 
-        return $authUser !== null
-            && $targetPost instanceof Post
-            && $authUser->tokenCan('posts:update')
-            && $authUser->can('update', $targetPost);
+        return $user->can('update', $post);
     }
 
     /**
      * @return array<string, mixed>
      */
-    public function rules(): array
+    public function rules(#[RouteParameter('post')] Post $post): array
     {
-        /** @var Post $post */
-        $post = $this->route('post');
-
         return [
             'title' => ['sometimes', 'string', 'max:255'],
             'slug' => ['sometimes', 'string', 'max:255', Rule::unique('posts', 'slug')->ignore($post->id)],

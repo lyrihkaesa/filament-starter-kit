@@ -102,9 +102,6 @@ final class PostController
         Gate::forUser($authUser)->authorize('delete', $post);
         throw_unless($authUser->tokenCan('posts:delete'), AuthorizationException::class, 'Missing required token ability.');
 
-        $deleteUserAction->handle($user); // wait, should be $deletePostAction->handle($post)
-
-        // Correcting manually in the full file write
         $deletePostAction->handle($post);
 
         return response()->json([

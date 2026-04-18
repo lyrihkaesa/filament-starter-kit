@@ -12,7 +12,22 @@
   2. `{Model} $model` (the bound model from the route)
   3. `{Action} $action` (the logic handler)
   4. `#[CurrentUser] User $user` (the authenticated user)
-- **Authorization in Request:** Authorization logic **MUST** be placed in the `authorize()` method of the `FormRequest` using Policies: `$this->user()->can('update', $this->route('model'))`.
+- **Authorization in Request:** Authorization logic **MUST** be placed in the `authorize()` method of the `FormRequest` using Policies.
+- **Dual-Context Auth:** To support both Web (Session) and API (Sanctum), the `authorize()` method must check if a token is present before checking token abilities:
+  ```php
+  public function authorize(): bool
+  {
+      $user = $this->user();
+      if (!$user) return false;
+
+      // Only check token ability if the user is authenticated via Sanctum token
+      if ($user->currentAccessToken() && !$user->tokenCan('posts:update')) {
+          return false;
+      }
+
+      return $user->can('update', $this->route('post'));
+  }
+  ```
 - **Authorization in Controller:** Only allowed for simple `GET` requests that do not require a `FormRequest`.
 - **Injected Auth:** Use the `#[CurrentUser]` attribute to inject the authenticated user.
 - **Strict Request Access:** Use type-safe methods for data retrieval:

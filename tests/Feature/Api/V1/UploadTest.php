@@ -256,7 +256,7 @@ it('can resolve a temporary upload into curator media', function (): void {
     Storage::disk('uploads_tmp')->put($upload->path, 'fake image content');
 
     $action = new ResolveMediaAction();
-    $media = $action->execute($upload->id, null, 'user_avatar');
+    $media = $action->handle($upload->id, null, 'user_avatar');
 
     expect($media)->not->toBeNull();
     expect($media->name)->toBe('test');

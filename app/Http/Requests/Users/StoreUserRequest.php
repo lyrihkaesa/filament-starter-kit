@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Http\Requests\Users;
 
 use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class StoreUserRequest extends FormRequest
 {
-    public function authorize(): bool
+    public function authorize(#[CurrentUser] User $user): bool
     {
-        $user = $this->user();
+        if ($user->currentAccessToken() && ! $user->tokenCan('users:create')) {
+            return false;
+        }
 
-        if ($user === null || ! $user->tokenCan('users:create') || ! $user->can('create', User::class)) {
+        if (! $user->can('create', User::class)) {
             return false;
         }
 

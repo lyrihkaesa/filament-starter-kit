@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Requests\Users;
 
 use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class IndexUserRequest extends FormRequest
 {
-    public function authorize(): bool
+    public function authorize(#[CurrentUser] User $user): bool
     {
-        $user = $this->user();
+        // If using Sanctum token, check ability
+        if ($user->currentAccessToken() && ! $user->tokenCan('users:read')) {
+            return false;
+        }
 
-        return $user !== null
-            && $user->tokenCan('users:read')
-            && $user->can('viewAny', User::class);
+        return $user->can('viewAny', User::class);
     }
 
     /**

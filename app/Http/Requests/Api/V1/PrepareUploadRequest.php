@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class PrepareUploadRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        $user = $this->user();
-
-        return $user !== null && $user->tokenCan('profile:read');
+    public function authorize(
+        #[CurrentUser] User $user
+    ): bool {
+        return ! ($user->currentAccessToken() && ! $user->tokenCan('profile:read'));
     }
 
     /**

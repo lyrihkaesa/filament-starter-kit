@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class UpdateProfileRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return $this->user() !== null;
+    public function authorize(
+        #[CurrentUser] User $user
+    ): bool {
+        return ! ($user->currentAccessToken() && ! $user->tokenCan('profile:read'));
     }
 
     /**
