@@ -15,7 +15,10 @@ final class UpdatePostRequest extends FormRequest
         $authUser = $this->user();
         $targetPost = $this->route('post');
 
-        return $authUser !== null && $targetPost instanceof Post && $authUser->can('update', $targetPost);
+        return $authUser !== null
+            && $targetPost instanceof Post
+            && $authUser->tokenCan('posts:update')
+            && $authUser->can('update', $targetPost);
     }
 
     /**

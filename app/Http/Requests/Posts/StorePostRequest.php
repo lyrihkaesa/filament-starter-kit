@@ -13,7 +13,9 @@ final class StorePostRequest extends FormRequest
     {
         $user = $this->user();
 
-        return $user !== null && $user->can('create', Post::class);
+        return $user !== null
+            && $user->tokenCan('posts:create')
+            && $user->can('create', Post::class);
     }
 
     /**

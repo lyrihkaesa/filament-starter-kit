@@ -13,7 +13,9 @@ final class IndexPostRequest extends FormRequest
     {
         $user = $this->user();
 
-        return $user !== null && $user->can('viewAny', Post::class);
+        return $user !== null
+            && $user->tokenCan('posts:read')
+            && $user->can('viewAny', Post::class);
     }
 
     /**

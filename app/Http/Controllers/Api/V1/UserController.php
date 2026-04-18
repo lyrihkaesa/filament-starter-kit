@@ -14,6 +14,7 @@ use App\Http\Resources\Api\V1\UserCollection;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -24,26 +25,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class UserController
 {
-    public function index(IndexUserRequest $request): JsonResponse
+    public function index(IndexUserRequest $request, #[CurrentUser] User $user): JsonResponse
     {
-        $this->ensureAbility($request, 'users:read');
-
-        $validated = $request->validated();
-        $perPage = isset($validated['per_page']) && is_numeric($validated['per_page']) ? (int) ($validated['per_page']) : 15;
+        $perPage = $request->integer('per_page', 15);
 
         $query = User::query()->latest()
             ->orderByDesc('id');
 
-        $cursor = isset($validated['cursor']) && is_scalar($validated['cursor']) ? (string) $validated['cursor'] : null;
+        $cursor = $request->string('cursor')->toString() ?: null;
 
-        $users = isset($validated['pagination']) && $validated['pagination'] === 'cursor'
+        $users = $request->string('pagination')->toString() === 'cursor'
             ? $query->cursorPaginate($perPage, ['*'], 'cursor', $cursor)->withQueryString()
             : $query->paginate($perPage)->withQueryString();
 
         $items = $this->collectionItems($users);
-        $itemCapabilities = $this->capabilitiesForUsers($request, $items);
+        $itemCapabilities = $this->capabilitiesForUsers($user, $items);
         $collectionCapabilities = [
-            'create' => $this->canPerform($request, 'users:create', 'create'),
+            'create' => $this->canPerform($user, 'users:create', 'create'),
         ];
 
         return (new UserCollection($users))
@@ -54,38 +52,37 @@ final class UserController
             ->response();
     }
 
-    public function store(StoreUserRequest $request, CreateUserAction $createUserAction): JsonResponse
+    public function store(StoreUserRequest $request, CreateUserAction $createUserAction, #[CurrentUser] User $user): JsonResponse
     {
-        $this->ensureAbility($request, 'users:create');
-
         /** @var array{name: string, email: string, password: string, email_verified_at?: string|null, roles?: array<int, string>} $payload */
         $payload = $request->validated();
-        $user = $createUserAction->handle($payload);
+        $newUser = $createUserAction->handle($payload);
 
-        return $this->userResponse($request, $user, 'User created successfully.', Response::HTTP_CREATED);
+        return $this->userResponse($user, $newUser, 'User created successfully.', Response::HTTP_CREATED);
     }
 
-    public function show(Request $request, User $user): JsonResponse
+    public function show(Request $request, User $user, #[CurrentUser] User $authUser): JsonResponse
     {
-        $this->authorizeAction($request, 'users:read', 'view', $user);
+        Gate::forUser($authUser)->authorize('view', $user);
+        throw_unless($authUser->tokenCan('users:read'), AuthorizationException::class, 'Missing required token ability.');
 
-        return $this->userResponse($request, $user, 'User retrieved successfully.');
+        return $this->userResponse($authUser, $user, 'User retrieved successfully.');
     }
 
-    public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUserAction): JsonResponse
+    public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUserAction, #[CurrentUser] User $authUser): JsonResponse
     {
-        $this->ensureAbility($request, 'users:update');
-
         /** @var array{name?: string, email?: string, password?: string, email_verified_at?: string|null, roles?: array<int, string>} $payload */
         $payload = $request->validated();
         $updatedUser = $updateUserAction->handle($user, $payload);
 
-        return $this->userResponse($request, $updatedUser, 'User updated successfully.');
+        return $this->userResponse($authUser, $updatedUser, 'User updated successfully.');
     }
 
-    public function destroy(Request $request, User $user, DeleteUserAction $deleteUserAction): JsonResponse
+    public function destroy(Request $request, User $user, DeleteUserAction $deleteUserAction, #[CurrentUser] User $authUser): JsonResponse
     {
-        $this->authorizeAction($request, 'users:delete', 'delete', $user);
+        Gate::forUser($authUser)->authorize('delete', $user);
+        throw_unless($authUser->tokenCan('users:delete'), AuthorizationException::class, 'Missing required token ability.');
+
         $deleteUserAction->handle($user);
 
         return response()->json([
@@ -93,10 +90,10 @@ final class UserController
         ]);
     }
 
-    private function userResponse(Request $request, User $user, string $message, int $status = Response::HTTP_OK): JsonResponse
+    private function userResponse(User $authUser, User $subjectUser, string $message, int $status = Response::HTTP_OK): JsonResponse
     {
-        return (new UserResource($user))
-            ->withCapabilities($this->capabilitiesForUser($request, $user))
+        return (new UserResource($subjectUser))
+            ->withCapabilities($this->capabilitiesForUser($authUser, $subjectUser))
             ->additional([
                 'message' => $message,
             ])
@@ -104,29 +101,15 @@ final class UserController
             ->setStatusCode($status);
     }
 
-    private function authorizeAction(Request $request, string $ability, string $policyAbility, User $user): void
-    {
-        $this->ensureAbility($request, $ability);
-        Gate::authorize($policyAbility, $user);
-    }
-
-    private function ensureAbility(Request $request, string $ability): void
-    {
-        /** @var User $authUser */
-        $authUser = $request->user();
-
-        throw_unless($authUser->tokenCan($ability), AuthorizationException::class, 'Missing required token ability.');
-    }
-
     /**
      * @return array<string, bool>
      */
-    private function capabilitiesForUser(Request $request, User $user): array
+    private function capabilitiesForUser(User $authUser, User $targetUser): array
     {
         return [
-            'view' => $this->canPerform($request, 'users:read', 'view', $user),
-            'update' => $this->canPerform($request, 'users:update', 'update', $user),
-            'delete' => $this->canPerform($request, 'users:delete', 'delete', $user),
+            'view' => $this->canPerform($authUser, 'users:read', 'view', $targetUser),
+            'update' => $this->canPerform($authUser, 'users:update', 'update', $targetUser),
+            'delete' => $this->canPerform($authUser, 'users:delete', 'delete', $targetUser),
         ];
     }
 
@@ -134,24 +117,21 @@ final class UserController
      * @param  iterable<int, User>  $users
      * @return array<string, array<string, bool>>
      */
-    private function capabilitiesForUsers(Request $request, iterable $users): array
+    private function capabilitiesForUsers(User $authUser, iterable $users): array
     {
         $capabilities = [];
 
         foreach ($users as $user) {
             $routeKey = $user->getRouteKey();
-            $capabilities[is_scalar($routeKey) ? (string) $routeKey : ''] = $this->capabilitiesForUser($request, $user);
+            $capabilities[is_scalar($routeKey) ? (string) $routeKey : ''] = $this->capabilitiesForUser($authUser, $user);
         }
 
         return $capabilities;
     }
 
-    private function canPerform(Request $request, string $tokenAbility, string $policyAbility, ?User $subject = null): bool
+    private function canPerform(User $authUser, string $tokenAbility, string $policyAbility, ?User $subject = null): bool
     {
-        /** @var User|null $authUser */
-        $authUser = $request->user();
-
-        if (! $authUser instanceof User || ! $authUser->tokenCan($tokenAbility)) {
+        if (! $authUser->tokenCan($tokenAbility)) {
             return false;
         }
 

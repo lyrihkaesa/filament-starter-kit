@@ -4,7 +4,9 @@
         "tests/TestCase.php",
         "tmp",
         "intelephense_helper.php",
-        "_ide_helper.php"
+        "_ide_helper.php",
+        "app/Models/PersonalAccessToken.php",
+        "app/Actions/ResolveMediaAction.php"
     ],
     "rules": {
         "array_push": true,

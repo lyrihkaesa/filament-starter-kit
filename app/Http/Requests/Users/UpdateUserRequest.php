@@ -19,7 +19,7 @@ final class UpdateUserRequest extends FormRequest
             return false;
         }
 
-        if ($authUser === null || ! $authUser->can('update', $targetUser)) {
+        if ($authUser === null || ! $authUser->tokenCan('users:update') || ! $authUser->can('update', $targetUser)) {
             return false;
         }
 

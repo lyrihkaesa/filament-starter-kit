@@ -13,7 +13,7 @@ final class StoreUserRequest extends FormRequest
     {
         $user = $this->user();
 
-        if ($user === null || ! $user->can('create', User::class)) {
+        if ($user === null || ! $user->tokenCan('users:create') || ! $user->can('create', User::class)) {
             return false;
         }
 

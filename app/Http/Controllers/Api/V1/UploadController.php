@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Requests\Api\V1\PrepareUploadRequest;
 use App\Models\TemporaryUpload;
 use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,14 +18,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class UploadController
 {
-    public function store(PrepareUploadRequest $request): JsonResponse
+    public function store(PrepareUploadRequest $request, #[CurrentUser] User $user): JsonResponse
     {
-        $user = $request->user();
-        assert($user instanceof User);
-
-        $purposeInput = $request->input('purpose');
-        assert(is_string($purposeInput));
-        $purpose = $purposeInput;
+        $purpose = $request->string('purpose')->toString();
 
         $config = config('api-uploads.purposes.'.$purpose);
         assert(is_array($config));
@@ -40,8 +36,7 @@ final class UploadController
         $disk = Storage::disk($diskName);
 
         $sessionId = Str::uuid()->toString();
-        $fileNameInput = $request->input('file_name');
-        assert(is_string($fileNameInput));
+        $fileNameInput = $request->string('file_name')->toString();
         $extension = pathinfo($fileNameInput, PATHINFO_EXTENSION);
 
         $fileName = Str::uuid()->toString().($extension !== '' ? '.'.$extension : '');
@@ -53,8 +48,8 @@ final class UploadController
             'disk' => $diskName,
             'path' => $path,
             'file_name' => $fileNameInput,
-            'mime_type' => $request->input('content_type'),
-            'size' => $request->input('file_size'),
+            'mime_type' => $request->string('content_type')->toString(),
+            'size' => $request->integer('file_size'),
             'purpose' => $purpose,
             'status' => 'prepared',
             'final_visibility' => $request->getFinalVisibility(),
@@ -87,7 +82,7 @@ final class UploadController
                 'upload_url' => $uploadUrl,
                 'method' => $method,
                 'headers' => [
-                    'Content-Type' => $request->input('content_type'),
+                    'Content-Type' => $request->string('content_type')->toString(),
                 ],
                 'expires_at' => now()->addMinutes(30)->toIso8601String(),
             ],
@@ -108,11 +103,8 @@ final class UploadController
         ]);
     }
 
-    public function edit(Request $request, TemporaryUpload $upload): JsonResponse
+    public function edit(Request $request, TemporaryUpload $upload, #[CurrentUser] User $user): JsonResponse
     {
-        $user = $request->user();
-        assert($user instanceof User);
-
         abort_if($upload->user_id !== $user->id || $upload->status !== 'prepared', Response::HTTP_FORBIDDEN, 'Invalid upload session.');
 
         $disk = Storage::disk((string) $upload->disk);
@@ -129,11 +121,8 @@ final class UploadController
         ]);
     }
 
-    public function show(Request $request, TemporaryUpload $upload): JsonResponse
+    public function show(Request $request, TemporaryUpload $upload, #[CurrentUser] User $user): JsonResponse
     {
-        $user = $request->user();
-        assert($user instanceof User);
-
         abort_if($upload->user_id !== $user->id, Response::HTTP_FORBIDDEN);
 
         return response()->json([
@@ -141,11 +130,8 @@ final class UploadController
         ]);
     }
 
-    public function destroy(Request $request, TemporaryUpload $upload): JsonResponse
+    public function destroy(Request $request, TemporaryUpload $upload, #[CurrentUser] User $user): JsonResponse
     {
-        $user = $request->user();
-        assert($user instanceof User);
-
         abort_if($upload->user_id !== $user->id, Response::HTTP_FORBIDDEN);
 
         if ($upload->status !== 'finalized') {

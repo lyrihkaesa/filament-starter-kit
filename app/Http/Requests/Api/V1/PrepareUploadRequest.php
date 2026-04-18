@@ -12,7 +12,9 @@ final class PrepareUploadRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $user = $this->user();
+
+        return $user !== null && $user->tokenCan('profile:read');
     }
 
     /**
@@ -32,6 +34,9 @@ final class PrepareUploadRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array<int, callable>
+     */
     public function after(): array
     {
         return [
@@ -67,7 +72,7 @@ final class PrepareUploadRequest extends FormRequest
                         $validator->errors()->add('requested_visibility', 'The requested visibility is not allowed for this purpose.');
                     }
                 }
-            }
+            },
         ];
     }
 

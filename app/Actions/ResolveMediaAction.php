@@ -9,9 +9,9 @@ use App\Models\TemporaryUpload;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-final class ResolveMediaAction
+class ResolveMediaAction
 {
-    public function execute(?string $uploadId, ?string $curatorId, string $purpose): ?CuratorMedia
+    public function handle(?string $uploadId, ?string $curatorId, string $purpose): ?CuratorMedia
     {
         // @codeCoverageIgnoreStart
         if ($curatorId) {

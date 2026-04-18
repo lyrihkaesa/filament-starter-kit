@@ -10,10 +10,13 @@
 - Keep one Action for one responsibility.
 - Keep authorization outside Actions.
 - Allowed auth layers: Form Request `authorize()`, Controllers, Policies, Filament Actions.
+- **PASS** all necessary data (User, Request data, etc.) as parameters to `handle()`.
 
 ## Avoid
 - Permission checks inside Actions (`$user->can()`, role checks, `hasPermissionTo()`).
 - Broad "god" Actions that mix unrelated responsibilities.
+- Global helpers/facades that imply a web/auth context: **DO NOT** use `auth()`, `Auth::user()`, `Auth::id()`, `request()`, or `session()` inside Actions.
+- Actions should be "Context-Blind" so they can be run from CLI, Jobs, or Tests without issues.
 
 ## Example
 ```php

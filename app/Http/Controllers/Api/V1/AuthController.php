@@ -7,13 +7,17 @@ namespace App\Http\Controllers\Api\V1;
 use App\Actions\Auth\LoginUserAction;
 use App\Actions\Auth\LogoutCurrentTokenAction;
 use App\Actions\Auth\RegisterUserAction;
+use App\Actions\Profile\UpdateProfileAction;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 
 final class AuthController
@@ -21,17 +25,16 @@ final class AuthController
     public function store(RegisterRequest $request, RegisterUserAction $registerUserAction, LoginUserAction $loginUserAction): JsonResponse
     {
         $validated = $request->validated();
-        $deviceName = isset($validated['device_name']) && is_scalar($validated['device_name']) ? (string) $validated['device_name'] : 'flutter-mobile';
-        unset($validated['device_name'], $validated['password_confirmation']);
+        $deviceName = $request->string('device_name', 'flutter-mobile')->toString();
 
         /** @var array{name: string, email: string, password: string} $payload */
-        $payload = $validated;
+        $payload = Arr::except($validated, ['device_name', 'password_confirmation']);
 
-        /** @var User $user */
         $user = $registerUserAction->handle($payload);
         $abilities = $this->resolveAbilities($user);
-        $passwordInput = $request->input('password', '');
-        $token = $loginUserAction->handle($user, is_scalar($passwordInput) ? (string) $passwordInput : '', $deviceName, $abilities);
+        $password = $request->string('password')->toString();
+
+        $token = $loginUserAction->handle($user, $password, $deviceName, $abilities);
 
         return JsonResource::make([
             'user' => new UserResource($user),
@@ -45,10 +48,11 @@ final class AuthController
 
     public function create(LoginRequest $request, LoginUserAction $loginUserAction): JsonResponse
     {
-        $validated = $request->validated();
-        $deviceName = isset($validated['device_name']) && is_scalar($validated['device_name']) ? (string) $validated['device_name'] : 'flutter-mobile';
+        $email = $request->string('email')->toString();
+        $password = $request->string('password')->toString();
+        $deviceName = $request->string('device_name', 'flutter-mobile')->toString();
 
-        $user = User::query()->where('email', isset($validated['email']) && is_scalar($validated['email']) ? (string) $validated['email'] : '')->first();
+        $user = User::query()->where('email', $email)->first();
 
         if (! $user instanceof User) {
             return response()->json([
@@ -60,7 +64,7 @@ final class AuthController
         }
 
         $abilities = $this->resolveAbilities($user);
-        $token = $loginUserAction->handle($user, isset($validated['password']) && is_scalar($validated['password']) ? (string) $validated['password'] : '', $deviceName, $abilities);
+        $token = $loginUserAction->handle($user, $password, $deviceName, $abilities);
 
         if ($token === null) {
             return response()->json([
@@ -81,11 +85,22 @@ final class AuthController
         ])->response();
     }
 
-    public function show(): JsonResponse
+    public function update(UpdateProfileRequest $request, UpdateProfileAction $action, #[CurrentUser] User $user): JsonResponse
     {
-        /** @var User $user */
-        $user = request()->user();
+        /** @var array{name?: string, avatar_upload_id?: string|null, avatar_media_id?: string|null, locale?: string, timezone?: string, theme?: string} $data */
+        $data = $request->validated();
 
+        $updatedUser = $action->handle($user, $data);
+
+        return (new UserResource($updatedUser))
+            ->additional([
+                'message' => 'Profile updated successfully.',
+            ])
+            ->response();
+    }
+
+    public function show(#[CurrentUser] User $user): JsonResponse
+    {
         throw_unless($user->tokenCan('profile:read'), AuthorizationException::class, 'Missing required token ability.');
 
         return (new UserResource($user))
@@ -95,10 +110,8 @@ final class AuthController
             ->response();
     }
 
-    public function destroy(LogoutCurrentTokenAction $logoutCurrentTokenAction): JsonResponse
+    public function destroy(LogoutCurrentTokenAction $logoutCurrentTokenAction, #[CurrentUser] User $user): JsonResponse
     {
-        /** @var User $user */
-        $user = request()->user();
         $logoutCurrentTokenAction->handle($user);
 
         return response()->json([

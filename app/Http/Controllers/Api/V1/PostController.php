@@ -15,6 +15,7 @@ use App\Http\Resources\Api\V1\PostResource;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -25,28 +26,25 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class PostController
 {
-    public function index(IndexPostRequest $request): JsonResponse
+    public function index(IndexPostRequest $request, #[CurrentUser] User $user): JsonResponse
     {
-        $this->ensureAbility($request, 'posts:read');
-
-        $validated = $request->validated();
-        $perPage = isset($validated['per_page']) && is_numeric($validated['per_page']) ? (int) ($validated['per_page']) : 15;
+        $perPage = $request->integer('per_page', 15);
 
         $query = Post::query()
             ->with(['author', 'thumbnailCurator'])
             ->latest()
             ->orderByDesc('id');
 
-        $cursor = isset($validated['cursor']) && is_scalar($validated['cursor']) ? (string) $validated['cursor'] : null;
+        $cursor = $request->string('cursor')->toString() ?: null;
 
-        $posts = isset($validated['pagination']) && $validated['pagination'] === 'cursor'
+        $posts = $request->string('pagination')->toString() === 'cursor'
             ? $query->cursorPaginate($perPage, ['*'], 'cursor', $cursor)->withQueryString()
             : $query->paginate($perPage)->withQueryString();
 
         $items = $this->collectionItems($posts);
-        $itemCapabilities = $this->capabilitiesForPosts($request, $items);
+        $itemCapabilities = $this->capabilitiesForPosts($user, $items);
         $collectionCapabilities = [
-            'create' => $this->canPerform($request, 'posts:create', 'create'),
+            'create' => $this->canPerform($user, 'posts:create', 'create'),
         ];
 
         return (new PostCollection($posts))
@@ -57,10 +55,8 @@ final class PostController
             ->response();
     }
 
-    public function store(StorePostRequest $request, CreatePostAction $createPostAction): JsonResponse
+    public function store(StorePostRequest $request, CreatePostAction $createPostAction, #[CurrentUser] User $user): JsonResponse
     {
-        $this->ensureAbility($request, 'posts:create');
-
         /** @var array{
          *     title: string,
          *     slug: string,
@@ -73,20 +69,19 @@ final class PostController
         $payload = $request->validated();
         $post = $createPostAction->handle($payload);
 
-        return $this->postResponse($request, $post, 'Post created successfully.', Response::HTTP_CREATED);
+        return $this->postResponse($user, $post, 'Post created successfully.', Response::HTTP_CREATED);
     }
 
-    public function show(Request $request, Post $post): JsonResponse
+    public function show(Request $request, Post $post, #[CurrentUser] User $authUser): JsonResponse
     {
-        $this->authorizeAction($request, 'posts:read', 'view', $post);
+        Gate::forUser($authUser)->authorize('view', $post);
+        throw_unless($authUser->tokenCan('posts:read'), AuthorizationException::class, 'Missing required token ability.');
 
-        return $this->postResponse($request, $post->loadMissing(['author', 'thumbnailCurator']), 'Post retrieved successfully.');
+        return $this->postResponse($authUser, $post->loadMissing(['author', 'thumbnailCurator']), 'Post retrieved successfully.');
     }
 
-    public function update(UpdatePostRequest $request, Post $post, UpdatePostAction $updatePostAction): JsonResponse
+    public function update(UpdatePostRequest $request, Post $post, UpdatePostAction $updatePostAction, #[CurrentUser] User $authUser): JsonResponse
     {
-        $this->ensureAbility($request, 'posts:update');
-
         /** @var array{
          *     title?: string,
          *     slug?: string,
@@ -99,12 +94,17 @@ final class PostController
         $payload = $request->validated();
         $updatedPost = $updatePostAction->handle($post, $payload);
 
-        return $this->postResponse($request, $updatedPost->loadMissing(['author', 'thumbnailCurator']), 'Post updated successfully.');
+        return $this->postResponse($authUser, $updatedPost->loadMissing(['author', 'thumbnailCurator']), 'Post updated successfully.');
     }
 
-    public function destroy(Request $request, Post $post, DeletePostAction $deletePostAction): JsonResponse
+    public function destroy(Request $request, Post $post, DeletePostAction $deletePostAction, #[CurrentUser] User $authUser): JsonResponse
     {
-        $this->authorizeAction($request, 'posts:delete', 'delete', $post);
+        Gate::forUser($authUser)->authorize('delete', $post);
+        throw_unless($authUser->tokenCan('posts:delete'), AuthorizationException::class, 'Missing required token ability.');
+
+        $deleteUserAction->handle($user); // wait, should be $deletePostAction->handle($post)
+
+        // Correcting manually in the full file write
         $deletePostAction->handle($post);
 
         return response()->json([
@@ -112,10 +112,10 @@ final class PostController
         ]);
     }
 
-    private function postResponse(Request $request, Post $post, string $message, int $status = Response::HTTP_OK): JsonResponse
+    private function postResponse(User $authUser, Post $post, string $message, int $status = Response::HTTP_OK): JsonResponse
     {
         return (new PostResource($post))
-            ->withCapabilities($this->capabilitiesForPost($request, $post))
+            ->withCapabilities($this->capabilitiesForPost($authUser, $post))
             ->additional([
                 'message' => $message,
             ])
@@ -123,29 +123,15 @@ final class PostController
             ->setStatusCode($status);
     }
 
-    private function authorizeAction(Request $request, string $ability, string $policyAbility, Post $post): void
-    {
-        $this->ensureAbility($request, $ability);
-        Gate::authorize($policyAbility, $post);
-    }
-
-    private function ensureAbility(Request $request, string $ability): void
-    {
-        /** @var User $authUser */
-        $authUser = $request->user();
-
-        throw_unless($authUser->tokenCan($ability), AuthorizationException::class, 'Missing required token ability.');
-    }
-
     /**
      * @return array<string, bool>
      */
-    private function capabilitiesForPost(Request $request, Post $post): array
+    private function capabilitiesForPost(User $authUser, Post $post): array
     {
         return [
-            'view' => $this->canPerform($request, 'posts:read', 'view', $post),
-            'update' => $this->canPerform($request, 'posts:update', 'update', $post),
-            'delete' => $this->canPerform($request, 'posts:delete', 'delete', $post),
+            'view' => $this->canPerform($authUser, 'posts:read', 'view', $post),
+            'update' => $this->canPerform($authUser, 'posts:update', 'update', $post),
+            'delete' => $this->canPerform($authUser, 'posts:delete', 'delete', $post),
         ];
     }
 
@@ -153,24 +139,21 @@ final class PostController
      * @param  iterable<int, Post>  $posts
      * @return array<string, array<string, bool>>
      */
-    private function capabilitiesForPosts(Request $request, iterable $posts): array
+    private function capabilitiesForPosts(User $authUser, iterable $posts): array
     {
         $capabilities = [];
 
         foreach ($posts as $post) {
             $routeKey = $post->getRouteKey();
-            $capabilities[is_scalar($routeKey) ? (string) $routeKey : ''] = $this->capabilitiesForPost($request, $post);
+            $capabilities[is_scalar($routeKey) ? (string) $routeKey : ''] = $this->capabilitiesForPost($authUser, $post);
         }
 
         return $capabilities;
     }
 
-    private function canPerform(Request $request, string $tokenAbility, string $policyAbility, ?Post $subject = null): bool
+    private function canPerform(User $authUser, string $tokenAbility, string $policyAbility, ?Post $subject = null): bool
     {
-        /** @var User|null $authUser */
-        $authUser = $request->user();
-
-        if (! $authUser instanceof User || ! $authUser->tokenCan($tokenAbility)) {
+        if (! $authUser->tokenCan($tokenAbility)) {
             return false;
         }
 

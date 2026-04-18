@@ -15,6 +15,7 @@ Route::middleware('throttle:api-auth')->group(function (): void {
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me', [AuthController::class, 'show'])->name('me');
+    Route::patch('/me', [AuthController::class, 'update'])->name('me.update');
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::apiResource('users', UserController::class);
     Route::apiResource('posts', PostController::class);

@@ -13,7 +13,9 @@ final class IndexUserRequest extends FormRequest
     {
         $user = $this->user();
 
-        return $user !== null && $user->can('viewAny', User::class);
+        return $user !== null
+            && $user->tokenCan('users:read')
+            && $user->can('viewAny', User::class);
     }
 
     /**
