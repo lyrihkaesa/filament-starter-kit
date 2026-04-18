@@ -69,6 +69,7 @@ final class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                \App\Http\Middleware\SetLocale::class,
             ])
             ->plugins([
                 CuratorPlugin::make()

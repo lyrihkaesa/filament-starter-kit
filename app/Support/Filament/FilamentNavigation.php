@@ -16,11 +16,11 @@ final class FilamentNavigation
         }
 
         $navigationLabels = [
-            // Manajemen Konten
+            // Content Management
             __('Post'),
             __('Media'),
 
-            // Manajemen Sistem
+            // System Management
             __('User'),
             __('Role'),
             __('Activity'),

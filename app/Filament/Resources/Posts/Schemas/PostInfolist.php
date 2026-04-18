@@ -24,12 +24,12 @@ final class PostInfolist
                         TextEntry::make('slug'),
                         TextEntry::make('author.name'),
                         IconEntry::make('published_at')
-                            ->label('Published')
+                            ->label(__('Published'))
                             ->boolean(),
                         TextEntry::make('published_at')
-                            ->label('Published At')
+                            ->label(__('Published At'))
                             ->dateTime()
-                            ->placeholder('Draft'),
+                            ->placeholder(__('Draft')),
                         TextEntry::make('content')
                             ->columnSpanFull()
                             ->html(),

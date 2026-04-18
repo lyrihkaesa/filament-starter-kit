@@ -1,19 +1,19 @@
 <section class="space-y-8">
     <div class="space-y-4">
         <p class="font-['Instrument_Sans'] text-xs font-semibold uppercase tracking-[0.24em] text-orange-600 dark:text-orange-300">
-            Public Posts
+            {{ __('Public Posts') }}
         </p>
         <h1 class="max-w-3xl font-['Source_Serif_4'] text-4xl font-semibold leading-tight text-zinc-950 dark:text-zinc-50 sm:text-5xl">
-            Artikel terbaru dengan rich text dan media Curator.
+            {{ __('Latest articles with rich text and Curator media.') }}
         </h1>
         <p class="max-w-3xl text-sm leading-7 text-zinc-600 dark:text-zinc-300 sm:text-base">
-            Halaman ini hanya menampilkan post yang sudah dipublish. Klik artikel untuk melihat detail lengkap.
+            {{ __('This page only shows published posts. Click on an article to view full details.') }}
         </p>
     </div>
 
     @if ($posts->isEmpty())
         <div class="rounded-2xl border border-dashed border-zinc-900/20 bg-white/60 p-10 text-center text-zinc-600 dark:border-white/20 dark:bg-zinc-900/40 dark:text-zinc-300">
-            Belum ada post yang dipublish.
+            {{ __('No published posts found.') }}
         </div>
     @else
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -36,14 +36,14 @@
                                 >
                             @else
                                 <div class="grid h-full place-content-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                                    No Thumbnail
+                                    {{ __('No Thumbnail') }}
                                 </div>
                             @endif
                         </div>
 
                         <div class="space-y-4 p-5">
                             <div class="flex items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                                <span>{{ $post->author?->name ?? 'Unknown Author' }}</span>
+                                <span>{{ $post->author?->name ?? __('Unknown Author') }}</span>
                                 <time datetime="{{ $post->created_at?->toDateString() }}">{{ $post->created_at?->format('d M Y') }}</time>
                             </div>
 
@@ -56,7 +56,7 @@
                             </p>
 
                             <div class="inline-flex items-center text-sm font-semibold text-orange-700 dark:text-orange-300">
-                                Baca detail
+                                {{ __('Read detail') }}
                             </div>
                         </div>
                     </a>

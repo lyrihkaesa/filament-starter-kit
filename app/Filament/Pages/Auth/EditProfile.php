@@ -18,6 +18,7 @@ use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\EmbeddedSchema;
 use Filament\Schemas\Components\Form;
@@ -98,6 +99,22 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
                     ->visibility('public'),
                 $this->getNameFormComponent(),
                 $this->getEmailFormComponent(),
+                ToggleButtons::make('locale')
+                    ->label(__('Locale'))
+                    ->options([
+                        'en' => 'English',
+                        'id' => 'Bahasa Indonesia',
+                    ])
+                    ->icons([
+                        'en' => 'heroicon-o-language',
+                        'id' => 'heroicon-o-language',
+                    ])
+                    ->colors([
+                        'en' => 'info',
+                        'id' => 'info',
+                    ])
+                    ->inline()
+                    ->required(),
                 Select::make('roles')
                     ->label(__('Roles'))
                     ->relationship('roles', 'name')
@@ -375,6 +392,10 @@ final class EditProfile extends BaseEditProfile implements HasSchemas
         Log::info('Updating profile', $data);
         $record->update($data);
         Log::info('Was changed: '.($record->wasChanged() ? 'true' : 'false'));
+
+        if ($record->wasChanged('locale')) {
+            $this->redirect(request()->header('Referer'));
+        }
 
         return parent::handleRecordUpdate($record, $data);
     }

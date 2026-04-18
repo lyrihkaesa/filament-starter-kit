@@ -38,32 +38,35 @@ final class PostsTable
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('published_at')
                     ->boolean()
-                    ->label('Published')
+                    ->label(__('Published'))
                     ->sortable(),
                 TextColumn::make('published_at')
-                    ->label('Published At')
+                    ->label(__('Published At'))
                     ->dateTime()
-                    ->placeholder('Draft')
+                    ->placeholder(__('Draft'))
                     ->sortable(),
                 TextColumn::make('author.name')
+                    ->label(__('Author'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('Created at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label(__('Updated at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TernaryFilter::make('published_at')
-                    ->label('Published Status')
+                    ->label(__('Published Status'))
                     ->nullable(),
                 SelectFilter::make('author_id')
                     ->relationship('author', 'name')
-                    ->label('Author')
+                    ->label(__('Author'))
                     ->searchable()
                     ->preload(),
             ])

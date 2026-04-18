@@ -242,6 +242,9 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'anonymized_at' => 'datetime',
+            'locale' => 'string',
+            'timezone' => 'string',
+            'theme' => 'string',
         ];
     }
 }

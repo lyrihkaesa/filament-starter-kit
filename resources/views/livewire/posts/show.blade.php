@@ -5,7 +5,7 @@
             class="inline-flex items-center gap-2 text-sm font-semibold text-zinc-600 transition hover:text-orange-700 dark:text-zinc-300 dark:hover:text-orange-300"
         >
             <span aria-hidden="true">&larr;</span>
-            Kembali ke daftar post
+            {{ __('Back to post list') }}
         </a>
 
         <div class="space-y-3">

@@ -56,10 +56,11 @@ final class PostForm
                                     ->directory('posts/thumbnails')
                                     ->visibility('public'),
                                 DateTimePicker::make('published_at')
-                                    ->label('Published At')
+                                    ->label(__('Published At'))
                                     ->seconds(false)
-                                    ->helperText('Kosongkan jika masih draft.'),
+                                    ->helperText(__('Leave empty for draft.')),
                                 Select::make('author_id')
+                                    ->label(__('Author'))
                                     ->relationship('author', 'name')
                                     ->searchable()
                                     ->preload()

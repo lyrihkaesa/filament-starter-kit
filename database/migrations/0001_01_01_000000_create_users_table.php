@@ -25,6 +25,9 @@ return new class extends Migration
             $table->softDeletes();
             $table->uuid('deleted_by')->nullable();
             $table->datetime('anonymized_at')->nullable();
+            $table->string('locale')->default(config('app.locale', 'en'));
+            $table->string('timezone')->default(config('app.timezone', 'UTC'));
+            $table->string('theme')->default('system');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table): void {
