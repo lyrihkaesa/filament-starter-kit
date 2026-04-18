@@ -32,41 +32,43 @@ final class PrepareUploadRequest extends FormRequest
         ];
     }
 
-    public function withValidator(Validator $validator): void
+    public function after(): array
     {
-        $validator->after(function (Validator $validator): void {
-            if ($this->has('purpose') && ! $validator->errors()->has('purpose')) {
-                $purposeInput = $this->input('purpose');
-                assert(is_string($purposeInput));
-                $purpose = $purposeInput;
-                $config = config('api-uploads.purposes.'.$purpose);
+        return [
+            function (Validator $validator): void {
+                if ($this->has('purpose') && ! $validator->errors()->has('purpose')) {
+                    $purposeInput = $this->input('purpose');
+                    assert(is_string($purposeInput));
+                    $purpose = $purposeInput;
+                    $config = config('api-uploads.purposes.'.$purpose);
 
-                // @codeCoverageIgnoreStart
-                if (! is_array($config)) {
-                    return;
-                }
+                    // @codeCoverageIgnoreStart
+                    if (! is_array($config)) {
+                        return;
+                    }
 
-                // @codeCoverageIgnoreEnd
+                    // @codeCoverageIgnoreEnd
 
-                $fileSize = $this->input('file_size');
-                $maxSizeConfig = $config['max_size'] ?? 0;
-                if (is_numeric($fileSize) && is_numeric($maxSizeConfig) && (int) $fileSize > ((int) $maxSizeConfig * 1024)) {
-                    $validator->errors()->add('file_size', 'The file size exceeds the maximum allowed size for this purpose.');
-                }
+                    $fileSize = $this->input('file_size');
+                    $maxSizeConfig = $config['max_size'] ?? 0;
+                    if (is_numeric($fileSize) && is_numeric($maxSizeConfig) && (int) $fileSize > ((int) $maxSizeConfig * 1024)) {
+                        $validator->errors()->add('file_size', 'The file size exceeds the maximum allowed size for this purpose.');
+                    }
 
-                $contentType = $this->input('content_type');
-                if (is_string($contentType) && in_array($contentType, (array) $config['allowed_mimes'], true)) {
-                    // Valid
-                } elseif (is_string($contentType)) {
-                    $validator->errors()->add('content_type', 'The file type is not allowed for this purpose.');
-                }
+                    $contentType = $this->input('content_type');
+                    if (is_string($contentType) && in_array($contentType, (array) $config['allowed_mimes'], true)) {
+                        // Valid
+                    } elseif (is_string($contentType)) {
+                        $validator->errors()->add('content_type', 'The file type is not allowed for this purpose.');
+                    }
 
-                $requestedVisibility = $this->input('requested_visibility');
-                if ($this->has('requested_visibility') && is_string($requestedVisibility) && ! in_array($requestedVisibility, (array) ($config['allowed_visibilities'] ?? []), true)) {
-                    $validator->errors()->add('requested_visibility', 'The requested visibility is not allowed for this purpose.');
+                    $requestedVisibility = $this->input('requested_visibility');
+                    if ($this->has('requested_visibility') && is_string($requestedVisibility) && ! in_array($requestedVisibility, (array) ($config['allowed_visibilities'] ?? []), true)) {
+                        $validator->errors()->add('requested_visibility', 'The requested visibility is not allowed for this purpose.');
+                    }
                 }
             }
-        });
+        ];
     }
 
     public function getFinalVisibility(): string
