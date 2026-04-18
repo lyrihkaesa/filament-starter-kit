@@ -11,11 +11,12 @@ use BackedEnum;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Html;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -85,10 +86,20 @@ final class ActivityResource extends Resource
                 TextColumn::make('subject_id')
                     ->label(__('ID'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('properties')
+                TextColumn::make('changes_count')
                     ->label(__('Changes'))
-                    ->icon(fn (Activity $record): ?string => self::hasProperties($record) ? 'heroicon-o-eye' : null)
+                    ->state(function (Activity $record): int {
+                        [$old, $new] = self::extractChangeBuckets($record);
+
+                        return match ($record->description) {
+                            'created', 'updated' => count($new),
+                            'deleted' => count($old),
+                            default => count($new) ?: count($old),
+                        };
+                    })
+                    ->badge()
                     ->color('primary')
+                    ->placeholder('0')
                     ->alignCenter(),
             ])
             ->defaultSort('created_at', 'desc')
@@ -142,24 +153,34 @@ final class ActivityResource extends Resource
                         Section::make(__('Activity Overview'))
                             ->columns(3)
                             ->schema([
-                                TextColumn::make('created_at')->label(__('Log Time'))->dateTime()->inline(),
-                                TextColumn::make('causer.name')->label(__('User'))->placeholder(__('System'))->inline(),
-                                TextColumn::make('description')
-                                    ->label(__('Event'))
-                                    ->badge()
-                                    ->color(fn (string $state): string => match ($state) {
-                                        'created' => 'success',
-                                        'updated' => 'warning',
-                                        'deleted' => 'danger',
-                                        default => 'gray',
+                                TextEntry::make('created_at')
+                                    ->label(__('Log Time'))
+                                    ->state(fn (Activity $record): string => $record->created_at?->format('Y-m-d H:i:s') ?? '-')
+                                    ->inlineLabel(),
+                                TextEntry::make('causer.name')
+                                    ->label(__('User'))
+                                    ->state(function (Activity $record): string {
+                                        $name = data_get($record, 'causer.name');
+
+                                        return is_string($name) ? $name : (string) __('System');
                                     })
-                                    ->inline(),
+                                    ->inlineLabel(),
+                                TextEntry::make('description')
+                                    ->label(__('Event'))
+                                    ->state(fn (Activity $record): string => __($record->description))
+                                    ->inlineLabel(),
                             ]),
                         Section::make(__('Subject Details'))
                             ->columns(2)
                             ->schema([
-                                TextColumn::make('subject_type')->label(__('Subject Type'))->formatStateUsing(fn (string $state): string => ActivitySubjectType::labelFromDatabase($state))->inline(),
-                                TextColumn::make('subject_id')->label(__('Subject ID'))->inline(),
+                                TextEntry::make('subject_type')
+                                    ->label(__('Subject Type'))
+                                    ->state(fn (Activity $record): string => ActivitySubjectType::labelFromDatabase($record->subject_type))
+                                    ->inlineLabel(),
+                                TextEntry::make('subject_id')
+                                    ->label(__('Subject ID'))
+                                    ->state(fn (Activity $record): mixed => $record->subject_id)
+                                    ->inlineLabel(),
                             ]),
                         Section::make(__('Changes'))
                             ->visible(fn (Activity $record): bool => self::hasProperties($record))
@@ -168,18 +189,19 @@ final class ActivityResource extends Resource
 
                                 if (empty($oldValues) && empty($newValues)) {
                                     return [
-                                        TextColumn::make('properties')
+                                        TextEntry::make('properties')
                                             ->label(__('Metadata'))
-                                            ->state(fn (Activity $record): array => self::stringifyArrayValues($record->properties))
-                                            ->listWithLineBreaks(),
+                                            ->state(fn (Activity $record): string => (string) json_encode(self::stringifyArrayValues($record->properties))),
                                     ];
                                 }
 
                                 $oldStringified = self::stringifyArrayValues($oldValues);
                                 $newStringified = self::stringifyArrayValues($newValues);
 
-                                $schema = [];
                                 $allKeys = array_unique(array_merge(array_keys($oldStringified), array_keys($newStringified)));
+
+                                $rows = [];
+                                $sensitiveKeys = ['password', 'remember_token', 'token', 'access_token', 'refresh_token', 'secret', 'key', 'api_key', 'signature'];
 
                                 foreach ($allKeys as $key) {
                                     $oldVal = $oldStringified[$key] ?? '-';
@@ -189,24 +211,51 @@ final class ActivityResource extends Resource
                                         continue;
                                     }
 
-                                    $schema[] = Section::make($key)
-                                        ->columns(2)
-                                        ->compact()
-                                        ->schema([
-                                            TextColumn::make('old_'.$key)
-                                                ->label(__('Before'))
-                                                ->state($oldVal)
-                                                ->color('danger')
-                                                ->inline(),
-                                            TextColumn::make('new_'.$key)
-                                                ->label(__('After'))
-                                                ->state($newVal)
-                                                ->color('success')
-                                                ->inline(),
-                                        ]);
+                                    $isSensitive = false;
+                                    foreach ($sensitiveKeys as $sensitive) {
+                                        if (str_contains(mb_strtolower($key), $sensitive)) {
+                                            $isSensitive = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if ($isSensitive) {
+                                        $oldVal = ($oldVal === '-') ? '-' : '********';
+                                        $newVal = ($newVal === '-') ? '-' : '********';
+                                    }
+
+                                    $rows[] = [
+                                        'key' => $key,
+                                        'old' => $oldVal,
+                                        'new' => $newVal,
+                                    ];
                                 }
 
-                                return $schema;
+                                if ($rows === []) {
+                                    return [];
+                                }
+
+                                $tableHtml = '<div class="overflow-x-auto"><table class="w-full text-sm text-left border-collapse">';
+                                $tableHtml .= '<thead class="bg-gray-50 dark:bg-white/5"><tr>';
+                                $tableHtml .= '<th class="px-4 py-2 border border-gray-200 dark:border-gray-800 font-bold">'.__('Key').'</th>';
+                                $tableHtml .= '<th class="px-4 py-2 border border-gray-200 dark:border-gray-800 font-bold">'.__('Before (Old)').'</th>';
+                                $tableHtml .= '<th class="px-4 py-2 border border-gray-200 dark:border-gray-800 font-bold">'.__('After (New)').'</th>';
+                                $tableHtml .= '</tr></thead>';
+                                $tableHtml .= '<tbody>';
+
+                                foreach ($rows as $row) {
+                                    $tableHtml .= '<tr>';
+                                    $tableHtml .= '<td class="px-4 py-2 border border-gray-200 dark:border-gray-800 font-medium"><code>'.e($row['key']).'</code></td>';
+                                    $tableHtml .= '<td class="px-4 py-2 border border-gray-200 dark:border-gray-800 text-danger-600 dark:text-danger-400">'.e($row['old']).'</td>';
+                                    $tableHtml .= '<td class="px-4 py-2 border border-gray-200 dark:border-gray-800 text-success-600 dark:text-success-400">'.e($row['new']).'</td>';
+                                    $tableHtml .= '</tr>';
+                                }
+
+                                $tableHtml .= '</tbody></table></div>';
+
+                                return [
+                                    Html::make($tableHtml),
+                                ];
                             }),
                     ]),
             ]);
@@ -249,7 +298,11 @@ final class ActivityResource extends Resource
 
     private static function hasProperties(Activity $record): bool
     {
-        return self::normalizeToArray($record->properties) !== [];
+        if (self::normalizeToArray($record->properties) !== []) {
+            return true;
+        }
+
+        return self::normalizeToArray($record->attribute_changes) !== [];
     }
 
     /**
@@ -300,13 +353,19 @@ final class ActivityResource extends Resource
     }
 
     /**
-     * @param  array<string, mixed>|Collection<int|string, mixed>|Arrayable<int|string, mixed>|stdClass|null  $value
      * @return array<string, mixed>
      */
-    private static function normalizeToArray(array|Collection|Arrayable|stdClass|null $value): array
+    private static function normalizeToArray(mixed $value): array
     {
         if ($value === null) {
             return [];
+        }
+
+        if (is_string($value)) {
+            /** @var array<string, mixed> $data */
+            $data = json_decode($value, true) ?? [];
+
+            return $data;
         }
 
         if ($value instanceof Collection) {
@@ -330,7 +389,11 @@ final class ActivityResource extends Resource
             return self::normalizeArrayKeys($objectArray);
         }
 
-        return self::normalizeArrayKeys($value);
+        if (is_array($value)) {
+            return self::normalizeArrayKeys($value);
+        }
+
+        return [];
     }
 
     /**
