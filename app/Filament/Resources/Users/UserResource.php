@@ -26,9 +26,24 @@ final class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static UnitEnum|string|null $navigationGroup = 'System Management';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Users;
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        /** @var User $record */
+        return [
+            'Email' => $record->email,
+        ];
+    }
 
     public static function getNavigationGroup(): string
     {

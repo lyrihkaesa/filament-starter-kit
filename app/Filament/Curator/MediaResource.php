@@ -12,6 +12,13 @@ use Filament\Tables\Table;
 
 final class MediaResource extends BaseMediaResource
 {
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'alt', 'title', 'caption'];
+    }
+
     public static function table(Table $table): Table
     {
         return MediaTable::configure($table);

@@ -25,9 +25,29 @@ final class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
+    protected static ?string $recordTitleAttribute = 'title';
+
     protected static UnitEnum|string|null $navigationGroup = 'Content Management';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'slug'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        /** @var Post $record */
+        return [
+            'Author' => $record->author?->name ?? __('Unknown'),
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return static::getEloquentQuery()->with(['author']);
+    }
 
     public static function getNavigationGroup(): string
     {
