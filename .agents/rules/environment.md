@@ -1,20 +1,22 @@
 ---
-trigger: shell_command, environment_setup
+trigger: model_decision
 description: when executing shell commands, managing files, or checking development environment on Windows/PowerShell
 ---
 
 # Development Environment & Shell Standards
 
-This project is primarily developed on **Windows**, and AI agents must use **PowerShell** for all shell operations.
+## Use When
+- Running shell commands.
+- Managing files from terminal.
+- Validating local environment assumptions.
 
-## Shell Syntax
-- **Command Separation**: Use `;` (semicolon) to separate commands. Do **NOT** use `&&` as it is not supported in many PowerShell environments.
-- **File Operations**: Prefer PowerShell-compatible flags (e.g., `rm -Recurse` instead of `rm -rf`).
-- **Environment Detection**: Always verify the OS (win32) before assuming shell capabilities.
-
-## Code Standards
-- **Line Endings**: Maintain **LF** line endings even on Windows to ensure compatibility with Laravel standards and CI/CD pipelines.
-- **Execution**: When running Artisan or vendor binaries, ensure the pathing is correct for the Windows environment.
+## Rules
+- Default shell is PowerShell on Windows.
+- Use `;` as command separator, not `&&`.
+- Use PowerShell-friendly flags (`rm -Recurse`, not `rm -rf`).
+- Detect OS from session context before assuming shell syntax.
+- Keep line endings as LF.
+- Use Windows-compatible paths when running Artisan/vendor binaries.
 
 ## Agent Mandate
-If you are an AI agent, always check the current operating system from the session context. If it is `win32`, strictly adhere to PowerShell syntax to avoid execution errors.
+- If OS is `win32`, use PowerShell syntax strictly.

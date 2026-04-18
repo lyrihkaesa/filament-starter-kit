@@ -1,42 +1,32 @@
 # Roles & Permissions Guidelines
 
-This project uses **Spatie Laravel Permission** and **Filament Shield** for access control. To ensure scalability and ease of maintenance, you MUST follow these standards.
+## Use When
+- Creating Policies.
+- Naming permissions.
+- Designing role/permission matrices with Spatie Permission + Filament Shield.
 
-## Core Mandates
+## Rules
+- Policies must check permissions (`$user->can()`), not roles (`$user->hasRole()`).
+- Roles are permission containers only.
+- Global permission format: `{Action}:{Model}` (example: `Update:Post`).
+- Ownership permission format: `{Action}Own:{Model}` (example: `UpdateOwn:Post`).
 
-1.  **Permission-Only Policies:** Policies MUST NOT check for Roles (e.g., `$user->hasRole()`). They MUST only check for Permissions using `$user->can()`.
-2.  **Role Decoupling:** Roles are simply containers for Permissions. If an Admin and a Super Admin can both update a Post, they should both be granted the `Update:Post` permission.
-3.  **Explicit Naming:** Permissions MUST follow the Filament Shield convention: `{Action}:{Model}`.
-
-## Permission Naming Convention
-
-| Access Level | Format | Example |
-| :--- | :--- | :--- |
-| **Global** | `{Action}:{Model}` | `Update:CuratorMedia` |
-| **Ownership** | `{Action}Own:{Model}` | `UpdateOwn:CuratorMedia` |
-
-## Policy Implementation Standard
-
-Always prioritize **Global** permissions, then fallback to **Ownership** checks combined with an ownership permission.
+## Policy Pattern
+- Check global permission first.
+- Fallback to ownership + ownership permission when required.
 
 ```php
-public function update(User $user, CuratorMedia $media): bool
+public function update(User $user, Post $post): bool
 {
-    // 1. Check Global Permission (e.g. Admin/SuperAdmin)
-    if ($user->can('Update:CuratorMedia')) {
+    if ($user->can('Update:Post')) {
         return true;
     }
 
-    // 2. Check Ownership + Ownership Permission (e.g. Member)
-    return $user->id === $media->created_by && $user->can('UpdateOwn:CuratorMedia');
+    return $user->id === $post->created_by
+        && $user->can('UpdateOwn:Post');
 }
 ```
 
-## Why This Pattern?
-- **Flexibility:** You can create a "Moderator" role and give them `Update:Post` without changing a single line of code.
-- **Maintainability:** All authorization logic is centralized in the Policy, while access assignments are managed in the Database/UI.
-- **Consistency:** Follows the established patterns used by Filament Shield and the wider Laravel ecosystem.
-
-## Industrial Best Practice: Integrity Protection
-Authorization should not bypass physical integrity checks by default.  
-For media deletion, keep "in use" media blocked unless an explicit override permission exists (for example `DeleteUsed:CuratorMedia` or `ForceDeleteUsed:CuratorMedia`) and the check is implemented in Policy/Controller/Filament Action.
+## Integrity Guard
+- Authorization should not bypass integrity rules by default.
+- Example: block deleting media that is still in use, unless explicit override permission exists.
