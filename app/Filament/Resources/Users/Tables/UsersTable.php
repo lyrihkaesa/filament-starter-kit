@@ -116,7 +116,8 @@ final class UsersTable
                             'subject_type' => ['value' => ActivitySubjectType::USER],
                             'subject_id' => ['value' => $record->id],
                         ],
-                    ])),
+                    ]))
+                    ->visible(fn (): bool => ActivityResource::canViewAny()),
                 EditAction::make(),
                 DeleteAction::make()
                     ->using(fn (User $record, DeleteUserAccountAction $deleteAction) => $deleteAction->handle($record, Auth::user())),
