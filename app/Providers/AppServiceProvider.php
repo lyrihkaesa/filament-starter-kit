@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Intervention\Image\ImageManager;
 use Laravel\Sanctum\Sanctum;
 
 // use Illuminate\Validation\Rules\Password;
@@ -34,7 +35,11 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(ImageManager::class, function () {
+            $driverClass = config('image.driver');
+
+            return new ImageManager(new $driverClass);
+        });
     }
 
     /**
