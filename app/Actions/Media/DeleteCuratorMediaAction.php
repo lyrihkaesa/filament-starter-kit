@@ -7,7 +7,7 @@ namespace App\Actions\Media;
 use App\Models\CuratorMedia;
 use Illuminate\Support\Facades\DB;
 
-final class DeleteCuratorMediaAction
+final readonly class DeleteCuratorMediaAction
 {
     public function handle(CuratorMedia $media, ?string $deleterId = null, bool $allowDeleteWhenUsed = false): bool
     {

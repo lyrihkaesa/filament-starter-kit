@@ -8,7 +8,7 @@ use App\Models\CuratorMediaUsage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-final class SyncMediaUsageAction
+final readonly class SyncMediaUsageAction
 {
     /**
      * @param  Model  $model  The model using the media (e.g. Post, User)

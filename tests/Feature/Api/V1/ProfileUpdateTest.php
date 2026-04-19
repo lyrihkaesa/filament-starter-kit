@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Actions\Contracts\ResolvesMedia;
 use App\Models\CuratorMedia;
+use App\Models\TemporaryUpload;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
@@ -43,28 +43,40 @@ it('can update profile with basic data', function (): void {
 });
 
 it('can update profile with temporary avatar upload id', function (): void {
+    Storage::fake('uploads_tmp');
+    Storage::fake('public');
+
     $user = User::factory()->create();
     Sanctum::actingAs($user, ['profile:read']);
 
-    $uploadId = (string) Str::uuid();
+    // Create a real temporary upload record
+    $upload = TemporaryUpload::query()->create([
+        'user_id' => $user->id,
+        'session_id' => (string) str()->uuid(),
+        'disk' => 'uploads_tmp',
+        'path' => 'tmp/avatars/avatar.jpg',
+        'file_name' => 'avatar.jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+        'purpose' => 'user_avatar',
+        'status' => 'uploaded',
+        'final_visibility' => 'public',
+    ]);
 
-    // Mock ResolvesMedia
-    $media = CuratorMedia::factory()->create();
-    $mock = Mockery::mock(ResolvesMedia::class);
-    $mock->shouldReceive('handle')
-        ->once()
-        ->with($uploadId, null, 'user_avatar')
-        ->andReturn($media);
-    app()->instance(ResolvesMedia::class, $mock);
+    Storage::disk('uploads_tmp')->put($upload->path, 'fake content');
 
     $response = $this->patchJson('/api/v1/me', [
-        'avatar_upload_id' => $uploadId,
+        'avatar_upload_id' => $upload->id,
     ]);
 
     $response->assertSuccessful();
 
     $user->refresh();
-    expect($user->avatar_curator_id)->toBe($media->id);
+    expect($user->avatar_curator_id)->not->toBeNull();
+
+    $media = CuratorMedia::query()->find($user->avatar_curator_id);
+    expect($media)->not->toBeNull();
+    Storage::disk('public')->assertExists($media->path);
 });
 
 it('can update profile with existing media id', function (): void {

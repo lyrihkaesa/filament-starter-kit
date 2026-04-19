@@ -9,7 +9,7 @@ use App\Models\TemporaryUpload;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-final class ResolveMediaAction implements \App\Actions\Contracts\ResolvesMedia
+final readonly class ResolveMediaAction
 {
     public function handle(?string $uploadId, ?string $curatorId, string $purpose): ?CuratorMedia
     {

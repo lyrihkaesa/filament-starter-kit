@@ -7,6 +7,7 @@ use App\Models\PersonalAccessToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
@@ -110,7 +111,7 @@ it('does nothing when revoking a token not owned by the user', function (): void
 
 it('does nothing when revoking a token that does not exist', function (): void {
     $user = User::factory()->create();
-    resolve(RevokeDeviceAction::class)->handle($user, 'token:'.Illuminate\Support\Str::uuid()->toString());
+    resolve(RevokeDeviceAction::class)->handle($user, 'token:'.Str::uuid()->toString());
 
     expect(true)->toBeTrue();
 });

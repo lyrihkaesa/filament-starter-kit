@@ -9,7 +9,7 @@ use App\Models\CuratorMedia;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 
-final class CuratorMediaDeleteAction
+final readonly class CuratorMediaDeleteAction
 {
     public static function make(): DeleteAction
     {

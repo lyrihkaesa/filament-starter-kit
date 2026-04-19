@@ -8,7 +8,7 @@ use App\Models\CuratorMediaUsage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-final class DeleteAllMediaUsagesAction
+final readonly class DeleteAllMediaUsagesAction
 {
     /**
      * Delete all media usage records for a specific model (on delete)

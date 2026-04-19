@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 
-final class CuratorMediaDeleteBulkAction
+final readonly class CuratorMediaDeleteBulkAction
 {
     public static function make(): DeleteBulkAction
     {

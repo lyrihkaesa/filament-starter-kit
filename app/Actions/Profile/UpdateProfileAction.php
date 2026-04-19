@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Profile;
 
-use App\Actions\Contracts\ResolvesMedia;
 use App\Actions\Media\SyncMediaUsageAction;
+use App\Actions\ResolveMediaAction;
 use App\Models\CuratorMedia;
 use App\Models\User;
 use Illuminate\Support\Arr;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 final readonly class UpdateProfileAction
 {
     public function __construct(
-        private ResolvesMedia $resolveMediaAction,
+        private ResolveMediaAction $resolveMediaAction,
         private SyncMediaUsageAction $syncMediaUsageAction,
     ) {}
 

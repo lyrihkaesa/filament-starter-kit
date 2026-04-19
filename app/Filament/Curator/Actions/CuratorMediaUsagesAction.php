@@ -10,7 +10,7 @@ use Filament\Actions\Action;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\View;
 
-final class CuratorMediaUsagesAction
+final readonly class CuratorMediaUsagesAction
 {
     public static function make(): Action
     {

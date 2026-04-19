@@ -10,7 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Throwable;
 
-final class ListCuratorMediaUsagesAction
+final readonly class ListCuratorMediaUsagesAction
 {
     /**
      * @return Collection<int, array{
