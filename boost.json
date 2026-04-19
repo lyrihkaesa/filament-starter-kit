@@ -7,13 +7,18 @@
     "mcp": true,
     "nightwatch_mcp": false,
     "packages": [
-        "filament/filament"
+        "filament/filament",
+        "spatie/laravel-activitylog",
+        "spatie/laravel-backup",
+        "fruitcake/laravel-debugbar"
     ],
     "sail": false,
     "skills": [
         "laravel-best-practices",
         "livewire-development",
         "pest-testing",
-        "tailwindcss-development"
+        "tailwindcss-development",
+        "laravel-backup",
+        "debug-using-debugbar"
     ]
 }
