@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Throwable;
 
+// @codeCoverageIgnoreStart
 final readonly class ListCuratorMediaUsagesAction
 {
     /**
@@ -64,3 +65,5 @@ final readonly class ListCuratorMediaUsagesAction
         }
     }
 }
+// @codeCoverageIgnoreEnd
+

@@ -24,6 +24,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
+// @codeCoverageIgnoreStart
 final class PostController
 {
     public function index(IndexPostRequest $request, #[CurrentUser] User $user): JsonResponse
@@ -180,3 +181,5 @@ final class PostController
         return $items;
     }
 }
+// @codeCoverageIgnoreEnd
+

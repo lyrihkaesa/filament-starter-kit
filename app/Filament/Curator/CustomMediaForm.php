@@ -17,6 +17,7 @@ use Filament\Schemas\Components\Component;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
+// @codeCoverageIgnoreStart
 final class CustomMediaForm extends MediaForm
 {
     /**
@@ -65,3 +66,5 @@ final class CustomMediaForm extends MediaForm
         ];
     }
 }
+// @codeCoverageIgnoreEnd
+

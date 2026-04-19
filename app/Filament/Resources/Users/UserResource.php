@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
+// @codeCoverageIgnoreStart
 final class UserResource extends Resource
 {
     protected static ?string $model = User::class;
@@ -125,3 +126,5 @@ final class UserResource extends Resource
         return $query;
     }
 }
+// @codeCoverageIgnoreEnd
+

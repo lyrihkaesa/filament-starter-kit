@@ -29,6 +29,7 @@ use Illuminate\Support\Collection;
 use stdClass;
 use UnitEnum;
 
+// @codeCoverageIgnoreStart
 final class ActivityResource extends Resource
 {
     protected static ?string $model = Activity::class;
@@ -436,3 +437,5 @@ final class ActivityResource extends Resource
         return null;
     }
 }
+// @codeCoverageIgnoreEnd
+

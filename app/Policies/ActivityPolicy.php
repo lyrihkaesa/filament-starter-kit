@@ -66,3 +66,4 @@ final class ActivityPolicy
         return $authUser->can('Reorder:Activity');
     }
 }
+

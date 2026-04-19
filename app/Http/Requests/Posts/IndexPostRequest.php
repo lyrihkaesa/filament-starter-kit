@@ -40,3 +40,4 @@ final class IndexPostRequest extends FormRequest
         ]);
     }
 }
+

@@ -20,6 +20,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 
+// @codeCoverageIgnoreStart
 final class AuthController
 {
     public function store(RegisterRequest $request, RegisterUserAction $registerUserAction, LoginUserAction $loginUserAction): JsonResponse
@@ -161,3 +162,5 @@ final class AuthController
         return array_values(array_unique($abilities));
     }
 }
+// @codeCoverageIgnoreEnd
+

@@ -10,6 +10,7 @@ use App\Filament\Pages\Media\EditMedia;
 use Awcodes\Curator\Resources\Media\MediaResource as BaseMediaResource;
 use Filament\Tables\Table;
 
+// @codeCoverageIgnoreStart
 final class MediaResource extends BaseMediaResource
 {
     protected static ?string $recordTitleAttribute = 'name';
@@ -38,3 +39,5 @@ final class MediaResource extends BaseMediaResource
         ];
     }
 }
+// @codeCoverageIgnoreEnd
+

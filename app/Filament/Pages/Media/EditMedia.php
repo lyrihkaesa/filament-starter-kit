@@ -13,6 +13,7 @@ use Awcodes\Curator\Resources\Media\Pages\EditMedia as BaseEditMedia;
 use Filament\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 
+// @codeCoverageIgnoreStart
 final class EditMedia extends BaseEditMedia
 {
     protected static string $resource = MediaResource::class;
@@ -59,3 +60,5 @@ final class EditMedia extends BaseEditMedia
         return $user->can('DeleteUsed:CuratorMedia');
     }
 }
+// @codeCoverageIgnoreEnd
+

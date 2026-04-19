@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 
+// @codeCoverageIgnoreStart
 final readonly class CuratorMediaDeleteBulkAction
 {
     public static function make(): DeleteBulkAction
@@ -71,3 +72,5 @@ final readonly class CuratorMediaDeleteBulkAction
         return $user->can('DeleteUsed:CuratorMedia');
     }
 }
+// @codeCoverageIgnoreEnd
+

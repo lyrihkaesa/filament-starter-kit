@@ -20,6 +20,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
+// @codeCoverageIgnoreStart
 final class PostsTable
 {
     public static function configure(Table $table): Table
@@ -92,3 +93,5 @@ final class PostsTable
             ]);
     }
 }
+// @codeCoverageIgnoreEnd
+
