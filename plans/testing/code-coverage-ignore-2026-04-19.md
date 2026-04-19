@@ -2,8 +2,10 @@
 
 ## Ringkasan Update (Pengurangan Ignore)
 - Status awal log ini: 24 file memakai `@codeCoverageIgnoreStart/End`.
-- Pengurangan yang sudah dilakukan: 10 file ignore berhasil dilepas.
-- Status saat ini: 14 file masih di-ignore.
+- Batch 1: berhasil lepas 10 file.
+- Batch 2 (lanjutan terbaru): berhasil lepas 3 file tambahan.
+- Total berhasil dilepas: 13 file.
+- Status saat ini: 11 file masih di-ignore.
 - Verifikasi akhir: coverage tetap `100.0%` dengan `--exactly=100`.
 
 ## File Ignore yang Berhasil Dilepas
@@ -17,6 +19,9 @@
 - `app/Http/Requests/Users/IndexUserRequest.php`
 - `app/Http/Requests/Users/StoreUserRequest.php`
 - `app/Http/Requests/Users/UpdateUserRequest.php`
+- `app/Http/Controllers/Api/V1/PostController.php`
+- `app/Http/Resources/Api/V1/PostCollection.php`
+- `app/Models/Post.php`
 
 ## Test Yang Ditambahkan / Diperluas Untuk Mengganti Ignore
 - Ditambah: `tests/Feature/Policies/ActivityPolicyTest.php`
@@ -25,10 +30,13 @@
 - Ditambah: `tests/Unit/Support/FilamentNavigationTest.php`
 - Ditambah: `tests/Unit/Http/Requests/Posts/PostRequestAuthorizationTest.php`
 - Diperluas: `tests/Unit/Http/Requests/Users/UserRequestAuthorizationTest.php`
+- Diperluas: `tests/Feature/Api/V1/PostApiTest.php` (cursor pagination + show success + show forbidden)
+- Ditambah: `tests/Unit/Models/PostModelTest.php` (autofill author pada `creating` hook)
+- Ditambah: `tests/Unit/Http/Controllers/Api/V1/PostControllerTest.php` (fallback branch `collectionItems`)
 
-## Kenapa 14 File Sisanya Masih Di-ignore
-- Dominan adalah area Filament Resource/Page konfigurasi dan controller/resource API yang branch-nya lebih banyak serta sensitif terhadap setup panel/routing.
-- Untuk menurunkan ignore berikutnya, perlu set test tambahan yang lebih besar (integration-style) agar semua branch konfigurasi dan fallback route/path benar-benar kena.
+## Kenapa 11 File Sisanya Masih Di-ignore
+- Sisa file didominasi konfigurasi Filament Resource/Page/Action yang cukup besar dan memiliki banyak branch konfigurasi UI/behavior.
+- Pengurangannya masih bisa dilanjutkan, tetapi butuh penambahan integration test Filament yang lebih banyak agar branch callback/action/table/schema benar-benar terpicu semua.
 
 ## Daftar Lokasi `@codeCoverageIgnore` Tersisa
 - `app/Actions/Media/ListCuratorMediaUsagesAction.php:13-68`
@@ -42,9 +50,6 @@
 - `app/Filament/Resources/Posts/Tables/PostsTable.php:23-96`
 - `app/Filament/Resources/Users/UserResource.php:26-129`
 - `app/Http/Controllers/Api/V1/AuthController.php:23-165`
-- `app/Http/Controllers/Api/V1/PostController.php:27-184`
-- `app/Http/Resources/Api/V1/PostCollection.php:14-119`
-- `app/Models/Post.php:17-114`
 
 ## Validasi Yang Sudah Dijalankan
 - Targeted tests baru/diubah: PASS.

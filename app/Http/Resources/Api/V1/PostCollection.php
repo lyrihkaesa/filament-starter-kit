@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Collection;
 
-// @codeCoverageIgnoreStart
 final class PostCollection extends ResourceCollection
 {
     public $collects = PostResource::class;
@@ -116,5 +115,4 @@ final class PostCollection extends ResourceCollection
         ];
     }
 }
-// @codeCoverageIgnoreEnd
 

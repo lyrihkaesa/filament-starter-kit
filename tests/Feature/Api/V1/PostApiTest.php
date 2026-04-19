@@ -41,6 +41,23 @@ it('returns paginated posts with typed metadata and capabilities', function (): 
         ->and($response->json('data.0.can.delete'))->toBeFalse();
 });
 
+it('returns cursor paginated posts metadata', function (): void {
+    $admin = User::factory()->create();
+    grantPostApiPermissions($admin, ['ViewAny:Post', 'View:Post', 'Create:Post']);
+    Post::factory()->count(6)->create();
+
+    Sanctum::actingAs($admin, ['posts:read', 'posts:create']);
+
+    $response = $this->getJson('/api/v1/posts?pagination=cursor&per_page=2');
+
+    $response->assertSuccessful();
+
+    expect($response->json('meta.pagination_type'))->toBe('cursor')
+        ->and($response->json('meta.per_page'))->toBeInt()
+        ->and($response->json('meta.has_more_pages'))->toBeBool()
+        ->and($response->json('meta.can.create'))->toBeTrue();
+});
+
 it('creates post via api and syncs curator media usage through actions', function (): void {
     $admin = User::factory()->create();
     $author = User::factory()->create();
@@ -129,4 +146,33 @@ it('deletes post via api and removes media usage records', function (): void {
         'model_type' => $post->getMorphClass(),
         'field_name' => 'thumbnail_curator_id',
     ]);
+});
+
+it('shows a post via api with capabilities', function (): void {
+    $admin = User::factory()->create();
+    $post = Post::factory()->create();
+    grantPostApiPermissions($admin, ['View:Post']);
+
+    Sanctum::actingAs($admin, ['posts:read']);
+
+    $response = $this->getJson('/api/v1/posts/'.$post->id);
+
+    $response->assertSuccessful();
+
+    expect($response->json('message'))->toBe('Post retrieved successfully.')
+        ->and($response->json('data.id'))->toBe((string) $post->id)
+        ->and($response->json('data.can.view'))->toBeTrue()
+        ->and($response->json('data.can.update'))->toBeFalse()
+        ->and($response->json('data.can.delete'))->toBeFalse();
+});
+
+it('forbids showing a post when token misses read ability', function (): void {
+    $admin = User::factory()->create();
+    $post = Post::factory()->create();
+    grantPostApiPermissions($admin, ['View:Post']);
+
+    Sanctum::actingAs($admin, ['posts:create']);
+
+    $this->getJson('/api/v1/posts/'.$post->id)
+        ->assertForbidden();
 });
