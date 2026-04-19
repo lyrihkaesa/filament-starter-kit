@@ -8,6 +8,8 @@ use App\Models\Activity;
 use App\Models\PersonalAccessToken;
 use App\Policies\ActivityPolicy;
 use App\Support\Activity\ActivitySubjectType;
+use Awcodes\Curator\Config\GlideManager;
+use Awcodes\Curator\Glide\SymfonyResponseFactory;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Connection;
@@ -36,10 +38,15 @@ final class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ImageManager::class, function () {
-            $driverClass = config('image.driver');
+            $driver = config('image.driver');
 
-            return new ImageManager(new $driverClass);
+            // Jika di .env IMAGE_DRIVER=imagick, gunakan ImagickDriver
+            // Jika tidak, gunakan GdDriver
+            return new ImageManager(new $driver);
         });
+
+        // Alias untuk memastikan jika ada vendor yang memanggil via interface
+        $this->app->alias(ImageManager::class, 'image-manager');
     }
 
     /**
@@ -86,6 +93,22 @@ final class AppServiceProvider extends ServiceProvider
 
         // 📅 Tanggal: Gunakan CarbonImmutable secara global (Laravel 8.x+)
         Date::use(CarbonImmutable::class);
+
+        // 🖼️ Media: Paksa Glide (Curator) menggunakan driver yang sama dengan aplikasi
+        $this->app->resolving(GlideManager::class, function (GlideManager $manager) {
+            $driver = config('image.driver') === \Intervention\Image\Drivers\Imagick\Driver::class ? 'imagick' : 'gd';
+
+            $manager->serverConfig([
+                'driver' => $driver,
+                'response' => new SymfonyResponseFactory(app('request')),
+                'source' => storage_path('app'),
+                'source_path_prefix' => config('curator.default_directory') ?? 'public',
+                'cache' => storage_path('app'),
+                'cache_path_prefix' => '.cache',
+                'max_image_size' => 2000 * 2000,
+                'base_url' => $manager->getBasePath(),
+            ]);
+        });
 
         // 💎 Kualitas: Otomatis load relasi (Laravel 12.8+)
         Model::automaticallyEagerLoadRelationships();
