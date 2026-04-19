@@ -10,3 +10,8 @@ parameters:
     level: max
 
     treatPhpDocTypesAsCertain: false
+    
+    parallel:
+        processTimeout: 300.0
+        maximumNumberOfProcesses: 16
+        minimumNumberOfJobsPerProcess: 2

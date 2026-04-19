@@ -96,7 +96,7 @@
         "test:refactor": "rector --dry-run",
         "test-full": [
             "@php artisan config:clear --ansi",
-            "@php artisan test --compact",
+            "@php artisan test --parallel --compact",
             "@test:type-coverage",
             "@test:unit",
             "@test:lint",
@@ -105,7 +105,7 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@php artisan test --compact",
+            "@php artisan test --parallel --compact",
             "@test:unit",
             "@test:lint",
             "@test:types",

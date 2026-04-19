@@ -41,4 +41,5 @@ return RectorConfig::configure()
         earlyReturn: true,
         codingStyle: true,
     )
-    ->withPhpSets();
+    ->withPhpSets()
+    ->withParallel();
