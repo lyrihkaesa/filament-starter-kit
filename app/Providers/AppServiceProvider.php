@@ -95,8 +95,9 @@ final class AppServiceProvider extends ServiceProvider
         Date::use(CarbonImmutable::class);
 
         // 🖼️ Media: Paksa Glide (Curator) menggunakan driver yang sama dengan aplikasi
-        $this->app->resolving(GlideManager::class, function (GlideManager $manager) {
-            $driver = config('image.driver') === \Intervention\Image\Drivers\Imagick\Driver::class ? 'imagick' : 'gd';
+        $configureGlide = function (GlideManager $manager) {
+            $configDriver = config('image.driver');
+            $driver = ($configDriver === \Intervention\Image\Drivers\Imagick\Driver::class) ? 'imagick' : 'gd';
 
             $manager->serverConfig([
                 'driver' => $driver,
@@ -108,7 +109,14 @@ final class AppServiceProvider extends ServiceProvider
                 'max_image_size' => 2000 * 2000,
                 'base_url' => $manager->getBasePath(),
             ]);
-        });
+        };
+
+        $this->app->resolving(GlideManager::class, $configureGlide);
+
+        // Jika sudah terlanjur di-resolve, jalankan konfigurasinya sekarang
+        if ($this->app->resolved(GlideManager::class)) {
+            $configureGlide($this->app->make(GlideManager::class));
+        }
 
         // 💎 Kualitas: Otomatis load relasi (Laravel 12.8+)
         Model::automaticallyEagerLoadRelationships();

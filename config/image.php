@@ -18,8 +18,8 @@ return [
     |
     */
 
-    'driver' => env('IMAGE_DRIVER', 'gd') === 'imagick' 
-        ? ImagickDriver::class 
+    'driver' => (env('IMAGE_DRIVER', 'gd') === 'imagick' || (app()->isProduction() && extension_loaded('imagick')))
+        ? ImagickDriver::class
         : GdDriver::class,
 
 ];
