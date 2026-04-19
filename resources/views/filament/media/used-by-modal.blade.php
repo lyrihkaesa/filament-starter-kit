@@ -21,13 +21,25 @@
                             <td class="px-4 py-2 font-mono text-xs text-gray-700 dark:text-gray-200">{{ $usage['model_id'] }}</td>
                             <td class="px-4 py-2 font-mono text-xs text-gray-700 dark:text-gray-200">{{ $usage['field_name'] }}</td>
                             <td class="px-4 py-2 text-sm">
-                                @if (filled($usage['record_url']))
-                                    <a href="{{ $usage['record_url'] }}" class="text-primary-600 hover:underline dark:text-primary-400" target="_blank" rel="noopener noreferrer">
-                                        {{ __('Buka Record') }}
-                                    </a>
-                                @else
-                                    <span class="text-gray-500 dark:text-gray-400">{{ __('Tidak ada link') }}</span>
-                                @endif
+                                <div class="flex flex-col gap-1">
+                                    @forelse ($usage['actions'] as $action)
+                                        <a href="{{ $action['url'] }}" 
+                                           class="inline-flex items-center gap-1 text-primary-600 hover:underline dark:text-primary-400" 
+                                           target="_blank" 
+                                           rel="noopener noreferrer"
+                                        >
+                                            @if(filled($action['icon']))
+                                                <x-filament::icon
+                                                    :icon="$action['icon']"
+                                                    class="h-4 w-4"
+                                                />
+                                            @endif
+                                            {{ $action['label'] }}
+                                        </a>
+                                    @empty
+                                        <span class="text-gray-500 dark:text-gray-400 italic text-xs">{{ __('Tidak ada link aksi') }}</span>
+                                    @endforelse
+                                </div>
                             </td>
                         </tr>
                     @endforeach

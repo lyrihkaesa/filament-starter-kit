@@ -8,6 +8,7 @@ use App\Models\CuratorMedia;
 use App\Models\CuratorMediaUsage;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Throwable;
 
@@ -20,7 +21,7 @@ final readonly class ListCuratorMediaUsagesAction
      *     model_label: string,
      *     model_id: string,
      *     field_name: string,
-     *     record_url: string|null
+     *     actions: array<int, array{label: string, url: string, icon: string}>
      * }>
      */
     public function handle(CuratorMedia $media): Collection
@@ -33,37 +34,84 @@ final readonly class ListCuratorMediaUsagesAction
                 $modelType = (string) $usage->model_type;
                 $modelId = (string) $usage->model_id;
 
+                /** @var class-string<\Illuminate\Database\Eloquent\Model> $modelClass */
+                $modelClass = Relation::getMorphedModel($modelType) ?? $modelType;
+
                 return [
                     'model_type' => $modelType,
-                    'model_label' => $this->resolveModelLabel($modelType),
+                    'model_label' => $this->resolveModelLabel($modelClass),
                     'model_id' => $modelId,
                     'field_name' => (string) $usage->field_name,
-                    'record_url' => $this->resolveRecordUrl($modelType, $modelId),
+                    'actions' => $this->resolveActions($modelClass, $modelId),
                 ];
             })
             ->values();
     }
 
-    private function resolveModelLabel(string $modelType): string
+    /**
+     * @param  class-string  $modelClass
+     */
+    private function resolveModelLabel(string $modelClass): string
     {
-        return match ($modelType) {
+        return match ($modelClass) {
             User::class => 'User',
             Post::class => 'Post',
-            default => class_basename($modelType),
+            default => class_basename($modelClass),
         };
     }
 
-    private function resolveRecordUrl(string $modelType, string $modelId): ?string
+    /**
+     * @param  class-string  $modelClass
+     * @return array<int, array{label: string, url: string, icon: string}>
+     */
+    private function resolveActions(string $modelClass, string $modelId): array
     {
+        $actions = [];
+        $authUser = auth()->user();
+
         try {
-            return match ($modelType) {
-                User::class => route('filament.app.resources.users.edit', ['record' => $modelId]),
-                Post::class => route('filament.app.resources.posts.edit', ['record' => $modelId]),
-                default => null,
-            };
+            if ($modelClass === User::class) {
+                $userRecord = User::find($modelId);
+
+                // 1. Opsi Edit User (Jika punya role/permission via Policy)
+                if ($userRecord && $authUser?->can('update', $userRecord)) {
+                    $actions[] = [
+                        'label' => __('Edit User'),
+                        'url' => route('filament.app.resources.users.edit', ['record' => $modelId]),
+                        'icon' => 'heroicon-o-pencil-square',
+                    ];
+                }
+
+                // 2. Opsi Edit Profile (Jika itu record dirinya sendiri)
+                if ($authUser?->id === $modelId) {
+                    $actions[] = [
+                        'label' => __('Edit Profile'),
+                        'url' => route('filament.app.auth.profile'),
+                        'icon' => 'heroicon-o-user',
+                    ];
+                }
+
+                return $actions;
+            }
+
+            if ($modelClass === Post::class) {
+                $postRecord = Post::find($modelId);
+
+                if ($postRecord && $authUser?->can('update', $postRecord)) {
+                    $actions[] = [
+                        'label' => __('Edit Post'),
+                        'url' => route('filament.app.resources.posts.edit', ['record' => $modelId]),
+                        'icon' => 'heroicon-o-pencil-square',
+                    ];
+                }
+
+                return $actions;
+            }
         } catch (Throwable) {
-            return null;
+            // Skip action if route or permission check fails
         }
+
+        return $actions;
     }
 }
 
