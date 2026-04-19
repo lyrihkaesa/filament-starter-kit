@@ -6,6 +6,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Actions\Media\DeleteAllMediaUsagesAction;
+use App\Actions\Media\SyncMediaUsageAction;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -221,6 +222,26 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             }
 
             return true;
+        });
+
+        self::saved(function (self $user): void {
+            if ($user->isDirty('avatar_curator_id')) {
+                resolve(SyncMediaUsageAction::class)->handle(
+                    $user,
+                    'avatar_curator_id',
+                    (string) $user->avatar_curator_id,
+                );
+            }
+        });
+
+        self::restored(function (self $user): void {
+            if ($user->avatar_curator_id) {
+                resolve(SyncMediaUsageAction::class)->handle(
+                    $user,
+                    'avatar_curator_id',
+                    (string) $user->avatar_curator_id,
+                );
+            }
         });
 
         self::deleting(function (self $user): void {

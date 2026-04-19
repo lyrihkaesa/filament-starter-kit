@@ -90,3 +90,54 @@ it('cleans up usage records when a model is deleted', function (): void {
     // Usage should be gone (triggered by User model deleting hook)
     expect(CuratorMediaUsage::query()->count())->toBe($initialCount);
 });
+
+it('tracks user avatar usage automatically on save', function (): void {
+    $media = CuratorMedia::factory()->create();
+
+    $user = User::factory()->create([
+        'avatar_curator_id' => $media->id,
+    ]);
+
+    $usage = CuratorMediaUsage::query()
+        ->where('curator_media_id', $media->id)
+        ->where('model_id', $user->id)
+        ->where('field_name', 'avatar_curator_id')
+        ->first();
+
+    expect($usage)->not->toBeNull();
+});
+
+it('updates user avatar usage when changed', function (): void {
+    $media1 = CuratorMedia::factory()->create();
+    $media2 = CuratorMedia::factory()->create();
+
+    $user = User::factory()->create([
+        'avatar_curator_id' => $media1->id,
+    ]);
+
+    expect(CuratorMediaUsage::query()->where('curator_media_id', $media1->id)->exists())->toBeTrue();
+
+    $user->update([
+        'avatar_curator_id' => $media2->id,
+    ]);
+
+    expect(CuratorMediaUsage::query()->where('curator_media_id', $media1->id)->exists())->toBeFalse();
+    expect(CuratorMediaUsage::query()->where('curator_media_id', $media2->id)->exists())->toBeTrue();
+});
+
+it('restores media usage when user is restored', function (): void {
+    $media = CuratorMedia::factory()->create();
+    $user = User::factory()->create([
+        'avatar_curator_id' => $media->id,
+    ]);
+
+    expect(CuratorMediaUsage::query()->where('curator_media_id', $media->id)->exists())->toBeTrue();
+
+    $user->delete();
+
+    expect(CuratorMediaUsage::query()->where('curator_media_id', $media->id)->exists())->toBeFalse();
+
+    $user->restore();
+
+    expect(CuratorMediaUsage::query()->where('curator_media_id', $media->id)->exists())->toBeTrue();
+});
