@@ -73,9 +73,9 @@ final class AppPanelProvider extends PanelProvider
             ])
             ->plugins([
                 CuratorPlugin::make()
-                    ->label(__('Media'))
-                    ->pluralLabel(__('Media'))
-                    ->navigationGroup(__('Content Management'))
+                    ->label(fn () => __('Media'))
+                    ->pluralLabel(fn () => __('Media'))
+                    ->navigationGroup(fn () => __('Content Management'))
                     ->navigationSort(FilamentNavigation::sort(__('Media')) ?? 0)
                     ->registerNavigation(true)
                     ->curations(true)
@@ -96,7 +96,7 @@ final class AppPanelProvider extends PanelProvider
                         'default' => 1,
                         'sm' => 2,
                     ])
-                    ->navigationGroup(__('System Management'))
+                    ->navigationGroup(fn () => __('System Management'))
                     ->navigationSort(FilamentNavigation::sort(__('Role')) ?? 0),
             ])
             ->viteTheme('resources/css/filament/app/theme.css');

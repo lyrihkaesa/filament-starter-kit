@@ -16,6 +16,10 @@ final class FilamentNavigation
         }
 
         $navigationLabels = [
+            // Groups
+            __('Content Management'),
+            __('System Management'),
+
             // Content Management
             __('Post'),
             __('Media'),
