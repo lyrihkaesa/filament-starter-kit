@@ -180,4 +180,3 @@ final class PostController
         return $items;
     }
 }
-

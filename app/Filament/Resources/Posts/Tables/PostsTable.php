@@ -93,5 +93,5 @@ final class PostsTable
             ]);
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

@@ -39,5 +39,5 @@ final class MediaResource extends BaseMediaResource
         ];
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

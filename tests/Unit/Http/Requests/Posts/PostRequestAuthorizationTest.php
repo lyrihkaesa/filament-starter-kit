@@ -42,7 +42,6 @@ it('index post request returns rules and prepares default pagination', function 
     expect($rules)->toHaveKeys(['pagination', 'per_page', 'page', 'cursor']);
 
     $method = new ReflectionMethod(IndexPostRequest::class, 'prepareForValidation');
-    $method->setAccessible(true);
     $method->invoke($request);
 
     expect($request->input('pagination'))->toBe('page');
@@ -81,6 +80,7 @@ it('store post request returns validation rules', function (): void {
 it('update post request authorize handles token ability and policy checks', function (): void {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
+
     $post = Post::factory()->create();
 
     $request = UpdatePostRequest::create('/api/v1/posts/'.$post->id, 'PATCH');

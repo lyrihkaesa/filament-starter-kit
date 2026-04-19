@@ -110,4 +110,3 @@ final class Post extends Model implements HasRichContent
             ]);
     }
 }
-

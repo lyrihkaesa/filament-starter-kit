@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Media;
 
 use App\Models\CuratorMedia;
+use App\Models\CuratorMediaUsage;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -28,7 +29,7 @@ final readonly class ListCuratorMediaUsagesAction
             ->select(['model_type', 'model_id', 'field_name'])
             ->latest()
             ->get()
-            ->map(function ($usage): array {
+            ->map(function (CuratorMediaUsage $usage): array {
                 $modelType = (string) $usage->model_type;
                 $modelId = (string) $usage->model_id;
 
@@ -65,5 +66,5 @@ final readonly class ListCuratorMediaUsagesAction
         }
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

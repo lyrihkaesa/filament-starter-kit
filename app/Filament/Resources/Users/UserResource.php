@@ -126,5 +126,5 @@ final class UserResource extends Resource
         return $query;
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

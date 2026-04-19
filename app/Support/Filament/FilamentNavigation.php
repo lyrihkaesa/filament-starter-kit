@@ -41,4 +41,3 @@ final class FilamentNavigation
         return $key !== false ? (int) $key : null;
     }
 }
-

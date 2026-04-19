@@ -67,7 +67,6 @@ it('index user request returns rules and prepares default pagination', function 
     ]);
 
     $method = new ReflectionMethod(IndexUserRequest::class, 'prepareForValidation');
-    $method->setAccessible(true);
     $method->invoke($request);
 
     expect($request->input('pagination'))->toBe('page');

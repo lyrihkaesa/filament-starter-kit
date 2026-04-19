@@ -60,5 +60,5 @@ final class EditMedia extends BaseEditMedia
         return $user->can('DeleteUsed:CuratorMedia');
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

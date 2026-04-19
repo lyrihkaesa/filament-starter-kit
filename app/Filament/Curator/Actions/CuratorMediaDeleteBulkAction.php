@@ -72,5 +72,5 @@ final readonly class CuratorMediaDeleteBulkAction
         return $user->can('DeleteUsed:CuratorMedia');
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

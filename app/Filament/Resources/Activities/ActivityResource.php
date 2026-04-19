@@ -437,5 +437,5 @@ final class ActivityResource extends Resource
         return null;
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

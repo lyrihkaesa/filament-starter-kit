@@ -62,5 +62,5 @@ final readonly class CuratorMediaDeleteAction
         return $user->can('DeleteUsed:CuratorMedia');
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

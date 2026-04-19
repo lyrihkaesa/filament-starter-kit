@@ -76,4 +76,3 @@ final readonly class ActivitySubjectType
         return self::morphMap()[$alias] ?? null;
     }
 }
-

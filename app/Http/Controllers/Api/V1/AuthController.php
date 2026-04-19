@@ -162,5 +162,5 @@ final class AuthController
         return array_values(array_unique($abilities));
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

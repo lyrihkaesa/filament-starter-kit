@@ -66,5 +66,5 @@ final class CustomMediaForm extends MediaForm
         ];
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

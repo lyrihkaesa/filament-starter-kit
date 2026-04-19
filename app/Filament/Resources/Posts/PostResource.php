@@ -119,5 +119,5 @@ final class PostResource extends Resource
         ];
     }
 }
-// @codeCoverageIgnoreEnd
 
+// @codeCoverageIgnoreEnd

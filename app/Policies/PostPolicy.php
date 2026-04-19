@@ -87,4 +87,3 @@ final class PostPolicy
         return $authUser->can('Reorder:Post');
     }
 }
-
