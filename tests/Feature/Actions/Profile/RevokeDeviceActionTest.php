@@ -110,7 +110,7 @@ it('does nothing when revoking a token not owned by the user', function (): void
 
 it('does nothing when revoking a token that does not exist', function (): void {
     $user = User::factory()->create();
-    resolve(RevokeDeviceAction::class)->handle($user, 'token:99999');
+    resolve(RevokeDeviceAction::class)->handle($user, 'token:'.Illuminate\Support\Str::uuid()->toString());
 
     expect(true)->toBeTrue();
 });

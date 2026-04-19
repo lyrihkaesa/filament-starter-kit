@@ -39,6 +39,7 @@ it('can update profile information', function (): void {
     Livewire::test(EditProfile::class)
         ->set('data.name', 'New Name')
         ->set('data.email', 'new@example.com')
+        ->set('data.locale', 'en')
         ->call('save')
         ->assertHasNoErrors();
 
@@ -57,6 +58,7 @@ it('can upload avatar directly from the profile form', function (): void {
     $this->actingAs($user);
 
     Livewire::test(EditProfile::class)
+        ->set('data.locale', 'en')
         ->set('data.avatar_curator_id', UploadedFile::fake()->image('avatar.jpg', 500, 500))
         ->call('save')
         ->assertHasNoErrors();

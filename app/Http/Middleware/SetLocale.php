@@ -25,7 +25,7 @@ final class SetLocale
             /** @var string|null $locale */
             $locale = $user->locale ?? config('app.locale');
             if ($locale !== null) {
-                Log::info("User: {$user->id} setting locale to: {$locale}");
+                Log::info(sprintf('User: %s setting locale to: %s', $user->id, $locale));
                 App::setLocale($locale);
             }
         }

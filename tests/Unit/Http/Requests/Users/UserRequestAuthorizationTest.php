@@ -26,7 +26,7 @@ it('store user request denies when there is no authenticated user', function ():
     $request->setContainer($this->app);
     $request->setUserResolver(static fn (): ?User => null);
 
-    expect($request->authorize())->toBeFalse();
+    expect($request->authorize(User::factory()->make()))->toBeFalse();
 });
 
 it('store user request denies users without create permission', function (): void {
@@ -34,7 +34,7 @@ it('store user request denies users without create permission', function (): voi
     $request->setContainer($this->app);
     $request->setUserResolver(static fn (): User => User::factory()->create());
 
-    expect($request->authorize())->toBeFalse();
+    expect($request->authorize(User::factory()->make()))->toBeFalse();
 });
 
 it('update user request denies when the bound route parameter is not a user model', function (): void {
@@ -43,7 +43,7 @@ it('update user request denies when the bound route parameter is not a user mode
     $request->setUserResolver(static fn (): User => User::factory()->create());
     $request->setRouteResolver(static fn (): Route => makeBoundRoute($request, 'not-a-user'));
 
-    expect($request->authorize())->toBeFalse();
+    expect($request->authorize(User::factory()->make(), User::factory()->make()))->toBeFalse();
 });
 
 it('update user request denies when there is no authenticated user', function (): void {
@@ -53,7 +53,7 @@ it('update user request denies when there is no authenticated user', function ()
     $request->setUserResolver(static fn (): ?User => null);
     $request->setRouteResolver(static fn (): Route => makeBoundRoute($request, $target));
 
-    expect($request->authorize())->toBeFalse();
+    expect($request->authorize($target, User::factory()->make()))->toBeFalse();
 });
 
 it('update user request allows authorized users with update permission', function (): void {
@@ -67,5 +67,5 @@ it('update user request allows authorized users with update permission', functio
     $request->setUserResolver(static fn (): User => $authUser);
     $request->setRouteResolver(static fn (): Route => makeBoundRoute($request, $target));
 
-    expect($request->authorize())->toBeTrue();
+    expect($request->authorize($target, $authUser))->toBeTrue();
 });

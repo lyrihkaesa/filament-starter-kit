@@ -22,6 +22,7 @@ it('can update profile information and upload avatar to selected storage disk', 
         ->test(EditProfile::class)
         ->set('data.name', 'Feature Name Pest')
         ->set('data.email', 'feature-email@example.com')
+        ->set('data.locale', 'en')
         ->set('data.avatar_curator_id', $file)
         ->call('save')
         ->assertHasNoFormErrors()

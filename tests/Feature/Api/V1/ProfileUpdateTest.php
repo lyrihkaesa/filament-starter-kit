@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Actions\ResolveMediaAction;
+use App\Actions\Contracts\ResolvesMedia;
 use App\Models\CuratorMedia;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,14 +48,14 @@ it('can update profile with temporary avatar upload id', function (): void {
 
     $uploadId = (string) Str::uuid();
 
-    // Mock ResolveMediaAction
+    // Mock ResolvesMedia
     $media = CuratorMedia::factory()->create();
-    $mock = Mockery::mock(ResolveMediaAction::class);
+    $mock = Mockery::mock(ResolvesMedia::class);
     $mock->shouldReceive('handle')
         ->once()
         ->with($uploadId, null, 'user_avatar')
         ->andReturn($media);
-    app()->instance(ResolveMediaAction::class, $mock);
+    app()->instance(ResolvesMedia::class, $mock);
 
     $response = $this->patchJson('/api/v1/me', [
         'avatar_upload_id' => $uploadId,

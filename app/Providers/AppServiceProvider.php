@@ -34,7 +34,10 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            \App\Actions\Contracts\ResolvesMedia::class,
+            \App\Actions\ResolveMediaAction::class
+        );
     }
 
     /**

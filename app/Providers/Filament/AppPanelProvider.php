@@ -7,6 +7,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
+use App\Http\Middleware\SetLocale;
 use App\Support\Filament\FilamentNavigation;
 use Awcodes\Curator\CuratorPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -69,13 +70,13 @@ final class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                \App\Http\Middleware\SetLocale::class,
+                SetLocale::class,
             ])
             ->plugins([
                 CuratorPlugin::make()
-                    ->label(fn () => __('Media'))
-                    ->pluralLabel(fn () => __('Media'))
-                    ->navigationGroup(fn () => __('Content Management'))
+                    ->label(fn (): string|array => __('Media'))
+                    ->pluralLabel(fn (): string|array => __('Media'))
+                    ->navigationGroup(fn (): string|array => __('Content Management'))
                     ->navigationSort(FilamentNavigation::sort(__('Media')) ?? 0)
                     ->registerNavigation(true)
                     ->curations(true)
@@ -96,7 +97,7 @@ final class AppPanelProvider extends PanelProvider
                         'default' => 1,
                         'sm' => 2,
                     ])
-                    ->navigationGroup(fn () => __('System Management'))
+                    ->navigationGroup(fn (): string|array => __('System Management'))
                     ->navigationSort(FilamentNavigation::sort(__('Role')) ?? 0),
             ])
             ->viteTheme('resources/css/filament/app/theme.css');

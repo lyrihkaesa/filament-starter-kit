@@ -14,7 +14,7 @@ final class MediaResource extends BaseMediaResource
 {
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string
     {
         return __('Content Management');
     }
