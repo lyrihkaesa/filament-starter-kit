@@ -65,6 +65,35 @@ Dokumen ini merangkum dua hal:
   - Policy dasar
   - Test starter (Feature + Unit)
 
+### 7. GitHub Actions (CI/CD)
+**Kenapa penting:**
+- Menjamin setiap perubahan kode tidak merusak fitur yang sudah ada (*regression*).
+- Menjaga standar kualitas kode (linting/types) secara otomatis sebelum di-merge.
+
+**Ruang lingkup awal:**
+- Workflow untuk menjalankan `composer test`, `composer lint`, dan `phpstan`.
+
+### 8. Laravel Pulse Integration
+**Kenapa penting:**
+- Memberikan visibilitas instan terhadap beban server, query lambat, dan job yang gagal di production.
+
+**Ruang lingkup awal:**
+- Dashboard Pulse di Filament khusus untuk Super Admin.
+
+### 9. Social Auth (Socialite)
+**Kenapa penting:**
+- Mempermudah user onboarding dengan login via Google atau GitHub.
+
+**Ruang lingkup awal:**
+- Login via Google/GitHub di halaman login.
+
+### 10. API Documentation (Scribe)
+**Kenapa penting:**
+- API V1 sudah ada, tapi dokumentasi interaktif akan sangat membantu developer frontend atau partner integrasi.
+
+**Ruang lingkup awal:**
+- Menghasilkan dokumentasi HTML otomatis dari route API.
+
 ## 2) Fitur Yang Sudah Ada (Bawah)
 
 Berikut baseline fitur yang saat ini sudah tersedia di starter kit:
@@ -105,6 +134,7 @@ Berikut baseline fitur yang saat ini sudah tersedia di starter kit:
 
 10. **Operational Support**
 - Spatie Laravel Backup sudah terpasang.
+- Spatie Activitylog sudah terintegrasi (Resource `Activities` tersedia).
 - Debugbar tersedia untuk observasi query/performance saat development.
 
 11. **Starter Commands**
@@ -118,6 +148,7 @@ Berikut baseline fitur yang saat ini sudah tersedia di starter kit:
 ## Rekomendasi Prioritas Implementasi
 
 Jika ingin bertahap dan paling terasa dampaknya:
-1. **Audit Trail** (impact operasional cepat).
-2. **Generator Modul v2** (impact ke kecepatan development harian).
-3. **OpenAPI Contract** (impact ke stabilitas integrasi API).
+1. **GitHub Actions (CI)** (untuk menjamin kualitas secara otomatis).
+2. **Dynamic Settings UI** (fitur yang paling sering ditanyakan oleh klien/user).
+3. **Laravel Pulse** (untuk monitoring production).
+4. **Generator Modul v2** (untuk speed development).
