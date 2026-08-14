@@ -152,9 +152,8 @@ it('supports soft deletes and tracks who deleted it', function (): void {
 
     $media->refresh();
     expect($media->trashed())->toBeTrue()
-        ->and($media->deleted_by)->toBe($user->id);
-
-    expect($media->deletedBy)->toBeInstanceOf(User::class)
+        ->and($media->deleted_by)->toBe($user->id)
+        ->and($media->deletedBy)->toBeInstanceOf(User::class)
         ->and($media->deletedBy->id)->toBe($user->id);
 });
 

@@ -13,10 +13,7 @@ use App\Models\Post;
 use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     $user = User::factory()->create();

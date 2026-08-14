@@ -6,10 +6,7 @@ use App\Models\Permission;
 use App\Models\PersonalAccessToken;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function grantApiPermissions(User $user, array $permissions): void
 {
@@ -43,10 +40,9 @@ it('registers a user and returns a typed api token payload', function (): void {
         ->and($payload['data']['user']['id'])->toBeString()
         ->and($payload['data']['user']['name'])->toBe('Flutter User')
         ->and($payload['data']['user']['avatar_url'])->toBeNull()
-        ->and(array_key_exists('errors', $payload))->toBeFalse();
-
-    expect(User::query()->where('email', 'flutter@example.com')->firstOrFail()->hasRole('member'))->toBeTrue();
-    expect(PersonalAccessToken::query()->count())->toBe(1);
+        ->and($payload)->not->toHaveKey('errors')
+        ->and(User::query()->where('email', 'flutter@example.com')->firstOrFail()->hasRole('member'))->toBeTrue()
+        ->and(PersonalAccessToken::query()->count())->toBe(1);
 });
 
 it('validates register requests with json errors', function (): void {
@@ -58,7 +54,7 @@ it('validates register requests with json errors', function (): void {
         ->and($response->json('errors.name.0'))->toBeString()
         ->and($response->json('errors.email.0'))->toBeString()
         ->and($response->json('errors.password.0'))->toBeString()
-        ->and(array_key_exists('data', $response->json()))->toBeFalse();
+        ->and($response->json())->not->toHaveKey('data');
 });
 
 it('logs a user in and returns token abilities', function (): void {
@@ -93,7 +89,7 @@ it('logs a user in and returns token abilities', function (): void {
             'users:update',
             'users:delete',
         ])
-        ->and(array_key_exists('errors', $response->json()))->toBeFalse();
+        ->and($response->json())->not->toHaveKey('errors');
 });
 
 it('rejects login for an unknown email address', function (): void {
@@ -106,7 +102,7 @@ it('rejects login for an unknown email address', function (): void {
 
     expect($response->json('message'))->toBe('Invalid credentials.')
         ->and($response->json('errors.email.0'))->toBe('The provided credentials are incorrect.')
-        ->and(array_key_exists('data', $response->json()))->toBeFalse();
+        ->and($response->json())->not->toHaveKey('data');
 });
 
 it('rejects login for a wrong password', function (): void {
@@ -138,7 +134,7 @@ it('returns the authenticated user for tokens with profile access', function ():
     expect($response->json('message'))->toBe('Authenticated user retrieved successfully.')
         ->and($response->json('data.id'))->toBe((string) $user->getKey())
         ->and($response->json('data.email'))->toBe($user->email)
-        ->and(array_key_exists('errors', $response->json()))->toBeFalse();
+        ->and($response->json())->not->toHaveKey('errors');
 });
 
 it('returns json unauthenticated responses for protected auth endpoints', function (): void {
@@ -177,8 +173,7 @@ it('revokes only the current access token on logout', function (): void {
 
     expect($response->json())->toBe([
         'message' => 'Logout successful.',
-    ]);
-
-    expect(PersonalAccessToken::query()->whereKey($firstToken->accessToken->getKey())->exists())->toBeFalse()
+    ])
+        ->and(PersonalAccessToken::query()->whereKey($firstToken->accessToken->getKey())->exists())->toBeFalse()
         ->and(PersonalAccessToken::query()->whereKey($secondToken->accessToken->getKey())->exists())->toBeTrue();
 });

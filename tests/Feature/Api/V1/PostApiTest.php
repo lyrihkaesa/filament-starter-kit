@@ -6,10 +6,7 @@ use App\Models\CuratorMedia;
 use App\Models\Permission;
 use App\Models\Post;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function grantPostApiPermissions(User $user, array $permissions): void
 {

@@ -6,12 +6,12 @@ use App\Enums\Privacy;
 use Filament\Support\Icons\Heroicon;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('returns correct labels for Privacy enum', function (): void {
-    expect(Privacy::PRIVATE->getLabel())->toBe(__('Private'));
-    expect(Privacy::MEMBER->getLabel())->toBe(__('Member'));
-    expect(Privacy::PUBLIC->getLabel())->toBe(__('Public'));
+    expect(Privacy::PRIVATE->getLabel())->toBe(__('Private'))
+        ->and(Privacy::MEMBER->getLabel())->toBe(__('Member'))
+        ->and(Privacy::PUBLIC->getLabel())->toBe(__('Public'));
 });
 
 it('returns correct colors for Privacy enum', function (): void {

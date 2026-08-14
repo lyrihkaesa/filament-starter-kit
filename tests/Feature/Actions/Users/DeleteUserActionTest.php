@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 use App\Actions\Users\DeleteUserAction;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('can delete a user', function (): void {
     // Arrange

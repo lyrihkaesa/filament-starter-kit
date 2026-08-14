@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('uses a dedicated livewire temporary upload disk', function (): void {
     expect(Config::string('livewire.temporary_file_upload.disk'))->toBe('uploads_tmp');

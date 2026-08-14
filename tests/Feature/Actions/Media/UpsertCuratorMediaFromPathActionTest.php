@@ -70,8 +70,8 @@ it('uses original file name when provided', function (): void {
     $action = new UpsertCuratorMediaFromPathAction();
     $result = $action->handle(path: 'random-uuid.png', originalFileName: 'my-avatar.png', disk: 'public');
 
-    expect($result->title)->toBe('my-avatar');
-    expect($result->name)->toBe('random-uuid');
+    expect($result->title)->toBe('my-avatar')
+        ->and($result->name)->toBe('random-uuid');
 });
 
 it('handles non-image files correctly', function (): void {
@@ -81,9 +81,9 @@ it('handles non-image files correctly', function (): void {
     $action = new UpsertCuratorMediaFromPathAction();
     $result = $action->handle(path: 'document.pdf', disk: 'public');
 
-    expect($result->type)->toBe('application/pdf');
-    expect($result->width)->toBeNull();
-    expect($result->height)->toBeNull();
+    expect($result->type)->toBe('application/pdf')
+        ->and($result->width)->toBeNull()
+        ->and($result->height)->toBeNull();
 });
 
 it('respects private visibility and privacy setting', function (): void {
@@ -93,6 +93,6 @@ it('respects private visibility and privacy setting', function (): void {
     $action = new UpsertCuratorMediaFromPathAction();
     $result = $action->handle(path: 'private.png', disk: 'local', visibility: 'private');
 
-    expect($result->visibility)->toBe('private');
-    expect($result->privacy->value)->toBe('private');
+    expect($result->visibility)->toBe('private')
+        ->and($result->privacy->value)->toBe('private');
 });

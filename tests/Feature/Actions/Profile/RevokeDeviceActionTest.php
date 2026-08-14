@@ -5,11 +5,8 @@ declare(strict_types=1);
 use App\Actions\Profile\RevokeDeviceAction;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     config(['queue.default' => 'sync']);

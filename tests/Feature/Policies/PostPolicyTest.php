@@ -8,9 +8,6 @@ use App\Models\Post;
 use App\Models\User;
 use App\Policies\PostPolicy;
 use Database\Seeders\ShieldSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     $this->seed(ShieldSeeder::class);
@@ -151,7 +148,7 @@ it('can replicate post with permission', function (): void {
 
     $post = Post::factory()->create();
 
-    expect($this->policy->replicate($user, $post))->toBeTrue();
+    expect($this->policy->replicate($user))->toBeTrue();
 });
 
 it('can reorder post with permission', function (): void {

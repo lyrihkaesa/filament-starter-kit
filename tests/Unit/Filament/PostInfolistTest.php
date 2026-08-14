@@ -6,7 +6,7 @@ use App\Filament\Resources\Posts\Schemas\PostInfolist;
 use Filament\Schemas\Schema;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('configures PostInfolist schema', function (): void {
     $schema = mock(Schema::class);

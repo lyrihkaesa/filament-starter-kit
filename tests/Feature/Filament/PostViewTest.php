@@ -6,11 +6,8 @@ use App\Filament\Resources\Posts\Pages\ViewPost;
 use App\Models\Post;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Livewire\livewire;
-
-uses(RefreshDatabase::class);
 
 it('can view post page', function (): void {
     $user = User::factory()->create();

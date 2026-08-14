@@ -11,11 +11,8 @@ use App\Models\CuratorMediaUsage;
 use App\Models\Permission;
 use App\Models\Post;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\PermissionRegistrar;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     resolve(PermissionRegistrar::class)->forgetCachedPermissions();
@@ -121,8 +118,8 @@ it('updates user avatar usage when changed', function (): void {
         'avatar_curator_id' => $media2->id,
     ]);
 
-    expect(CuratorMediaUsage::query()->where('curator_media_id', $media1->id)->exists())->toBeFalse();
-    expect(CuratorMediaUsage::query()->where('curator_media_id', $media2->id)->exists())->toBeTrue();
+    expect(CuratorMediaUsage::query()->where('curator_media_id', $media1->id)->exists())->toBeFalse()
+        ->and(CuratorMediaUsage::query()->where('curator_media_id', $media2->id)->exists())->toBeTrue();
 });
 
 it('restores media usage when user is restored', function (): void {

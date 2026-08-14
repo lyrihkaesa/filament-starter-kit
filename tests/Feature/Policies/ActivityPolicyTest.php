@@ -7,9 +7,6 @@ namespace Tests\Feature\Policies;
 use App\Models\User;
 use App\Policies\ActivityPolicy;
 use Database\Seeders\ShieldSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     $this->seed(ShieldSeeder::class);

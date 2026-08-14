@@ -6,7 +6,7 @@ use App\Filament\Curator\CustomMediaForm;
 use Filament\Forms\Components\TextInput;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('returns custom media form schema array', function (): void {
     $schema = CustomMediaForm::getAdditionalInformationFormSchema();

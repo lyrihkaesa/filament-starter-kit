@@ -13,8 +13,8 @@ it('can restore a soft-deleted user', function (): void {
     $action = resolve(RestoreAccountAction::class);
     $result = $action->handle($user->id);
 
-    expect($result)->toBeTrue();
-    expect($user->fresh()->deleted_at)->toBeNull();
+    expect($result)->toBeTrue()
+        ->and($user->fresh()->deleted_at)->toBeNull();
 });
 
 it('returns false for non-deleted user', function (): void {

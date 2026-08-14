@@ -11,9 +11,6 @@ use App\Models\CuratorMedia;
 use App\Models\CuratorMediaUsage;
 use App\Models\Post;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('creates post and syncs thumbnail media usage via action', function (): void {
     $author = User::factory()->create();

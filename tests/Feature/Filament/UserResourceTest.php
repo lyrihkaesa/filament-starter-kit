@@ -11,12 +11,9 @@ use App\Models\CuratorMedia;
 use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     $user = User::factory()->create();

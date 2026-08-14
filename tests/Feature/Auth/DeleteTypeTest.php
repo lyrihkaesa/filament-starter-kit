@@ -7,11 +7,8 @@ namespace Tests\Feature\Auth;
 use App\Actions\Profile\DeleteUserAccountAction;
 use App\Filament\Pages\Auth\Login;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 it('shows restore hint when user deleted themselves', function (): void {
     $user = User::factory()->create([
@@ -65,8 +62,8 @@ it('anonymizes self-deleted users via command', function (): void {
 
     Artisan::call('app:anonymize-deleted-users');
 
-    expect($user->fresh()->isAnonymous())->toBeTrue();
-    expect($user2->fresh()->isAnonymous())->toBeTrue();
+    expect($user->fresh()->isAnonymous())->toBeTrue()
+        ->and($user2->fresh()->isAnonymous())->toBeTrue();
 });
 
 it('does not anonymize admin-deleted users via command', function (): void {
@@ -78,8 +75,8 @@ it('does not anonymize admin-deleted users via command', function (): void {
 
     Artisan::call('app:anonymize-deleted-users');
 
-    expect($user->fresh()->isAnonymous())->toBeFalse();
-    expect($user->fresh()->trashed())->toBeTrue();
+    expect($user->fresh()->isAnonymous())->toBeFalse()
+        ->and($user->fresh()->trashed())->toBeTrue();
 });
 
 it('anonymizes on forceDelete if self-deleted', function (): void {
@@ -90,9 +87,9 @@ it('anonymizes on forceDelete if self-deleted', function (): void {
 
     $user->forceDelete();
 
-    expect($user->fresh())->not->toBeNull();
-    expect($user->fresh()->isAnonymous())->toBeTrue();
-    expect($user->fresh()->trashed())->toBeTrue();
+    expect($user->fresh())->not->toBeNull()
+        ->and($user->fresh()->isAnonymous())->toBeTrue()
+        ->and($user->fresh()->trashed())->toBeTrue();
 });
 
 it('hard deletes on forceDelete if admin-deleted', function (): void {

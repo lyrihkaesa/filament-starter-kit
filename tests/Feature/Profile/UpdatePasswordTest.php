@@ -6,11 +6,8 @@ namespace Tests\Feature\Profile;
 
 use App\Filament\Pages\Auth\EditProfile;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 it('can update password via the consolidated profile page', function (): void {
     $user = User::factory()->create(['password' => bcrypt('old-password')]);

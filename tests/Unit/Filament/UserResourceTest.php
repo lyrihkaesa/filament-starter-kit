@@ -8,7 +8,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('configures UserResource form, infolist, table, relations, pages, and query', function (): void {
     // Mock Schema for form()

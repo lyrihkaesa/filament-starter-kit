@@ -15,8 +15,8 @@ it('can delete user account passing user as deleter', function (): void {
     $action = new DeleteUserAccountAction();
     $action->handle($user, $admin);
 
-    expect($user->refresh()->trashed())->toBeTrue();
-    expect($user->deleted_by)->toBe($admin->id);
+    expect($user->refresh()->trashed())->toBeTrue()
+        ->and($user->deleted_by)->toBe($admin->id);
 });
 
 it('can delete user account passing string as deleter', function (): void {
@@ -26,8 +26,8 @@ it('can delete user account passing string as deleter', function (): void {
     $action = new DeleteUserAccountAction();
     $action->handle($user, $adminId);
 
-    expect($user->refresh()->trashed())->toBeTrue();
-    expect((string) $user->deleted_by)->toBe($adminId);
+    expect($user->refresh()->trashed())->toBeTrue()
+        ->and((string) $user->deleted_by)->toBe($adminId);
 });
 
 it('defaults deleter to user id when not provided', function (): void {
@@ -36,6 +36,6 @@ it('defaults deleter to user id when not provided', function (): void {
     $action = new DeleteUserAccountAction();
     $action->handle($user);
 
-    expect($user->refresh()->trashed())->toBeTrue();
-    expect($user->deleted_by)->toBe($user->id);
+    expect($user->refresh()->trashed())->toBeTrue()
+        ->and($user->deleted_by)->toBe($user->id);
 });

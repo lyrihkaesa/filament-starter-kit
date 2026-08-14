@@ -20,7 +20,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
-uses(TestCase::class, RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 beforeEach(function (): void {
     resolve(PermissionRegistrar::class)->forgetCachedPermissions();
@@ -101,9 +101,8 @@ it('derives disabled state tooltip and modal description from usage state', func
 
     expect($usedAction->isDisabled())->toBeTrue()
         ->and($usedAction->getTooltip())->toBe($used->getDeletionBlockedMessage())
-        ->and($usedAction->getModalDescription())->toBe($used->getDeletionBlockedMessage());
-
-    expect($unusedAction->isDisabled())->toBeFalse()
+        ->and($usedAction->getModalDescription())->toBe($used->getDeletionBlockedMessage())
+        ->and($unusedAction->isDisabled())->toBeFalse()
         ->and($unusedAction->getTooltip())->toBeNull()
         ->and($unusedAction->getModalDescription())->toBe('Are you sure you want to delete this media?');
 });

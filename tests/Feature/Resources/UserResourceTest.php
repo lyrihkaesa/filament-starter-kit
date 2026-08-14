@@ -7,10 +7,7 @@ namespace Tests\Feature\Resources;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     Role::findOrCreate('super_admin');

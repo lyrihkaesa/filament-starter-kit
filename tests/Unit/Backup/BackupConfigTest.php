@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('stores backups on dedicated local and s3 disks by default', function (): void {
     expect(config('filesystems.disks.backups.root'))->toBe(storage_path('app/backups'))

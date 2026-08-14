@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 use App\Actions\Users\CreateUserAction;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-
-uses(RefreshDatabase::class);
 
 it('can create a user', function (): void {
     // Arrange: data untuk membuat user
@@ -33,6 +29,10 @@ it('can create a user', function (): void {
 });
 
 it('runs inside a transaction', function (): void {
+    User::saving(function (): void {
+        throw new Exception('DB error');
+    });
+
     $data = [
         'name' => 'Broken',
         'email' => 'broken@example.com',
@@ -41,14 +41,7 @@ it('runs inside a transaction', function (): void {
 
     $action = resolve(CreateUserAction::class);
 
-    // Simulasi error supaya transaction rollback
-    $this->expectException(Exception::class);
-
-    DB::shouldReceive('transaction')
-        ->once()
-        ->andThrow(new Exception('DB error'));
-
-    $action->handle($data);
+    expect(fn () => $action->handle($data))->toThrow(Exception::class);
 
     // Tidak ada user dengan email ini karena rollback
     $this->assertDatabaseMissing('users', [

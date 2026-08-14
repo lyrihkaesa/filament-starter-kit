@@ -8,13 +8,10 @@ use App\Filament\Pages\Auth\EditProfile;
 use App\Models\CuratorMedia;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 it('can see the consolidated profile page', function (): void {
     $user = User::factory()->create();

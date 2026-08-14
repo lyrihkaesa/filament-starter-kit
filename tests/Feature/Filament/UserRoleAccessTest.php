@@ -8,11 +8,8 @@ use App\Filament\Resources\Users\Pages\EditUser;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\PermissionRegistrar;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     app()->make(PermissionRegistrar::class)->forgetCachedPermissions();

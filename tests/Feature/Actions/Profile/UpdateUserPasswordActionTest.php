@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 use App\Actions\Profile\UpdateUserPasswordAction;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-
-uses(RefreshDatabase::class);
 
 it('can update user password', function (): void {
     // Arrange: Create a user with a known password

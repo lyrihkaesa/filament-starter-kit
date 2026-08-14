@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
-uses(TestCase::class, RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 it('sends notification via mail channel', function (): void {
     $notification = new RestoreAccountNotification();

@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Support\Activity\ActivitySubjectType;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('returns labels and morph map', function (): void {
     expect(ActivitySubjectType::labels())->toBe([
@@ -20,8 +20,8 @@ it('returns labels and morph map', function (): void {
 });
 
 it('returns expected database filter values', function (): void {
-    expect(ActivitySubjectType::databaseValuesForFilter(null))->toBe([])
-        ->and(ActivitySubjectType::databaseValuesForFilter(''))->toBe([])
+    expect(ActivitySubjectType::databaseValuesForFilter(null))->toBeEmpty()
+        ->and(ActivitySubjectType::databaseValuesForFilter(''))->toBeEmpty()
         ->and(ActivitySubjectType::databaseValuesForFilter(ActivitySubjectType::USER))->toBe([
             ActivitySubjectType::USER,
             User::class,

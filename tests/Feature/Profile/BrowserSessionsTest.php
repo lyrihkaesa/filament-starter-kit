@@ -6,11 +6,8 @@ namespace Tests\Feature\Profile;
 
 use App\Filament\Pages\Auth\EditProfile;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     config(['session.driver' => 'database']);

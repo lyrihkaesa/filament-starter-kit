@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Support\Filament\FilamentNavigation;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('returns null when label is null', function (): void {
     expect(FilamentNavigation::sort(null))->toBeNull();

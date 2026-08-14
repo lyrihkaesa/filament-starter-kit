@@ -8,10 +8,7 @@ use App\Actions\Auth\RegisterUserAction;
 use App\Models\PersonalAccessToken;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
-
-uses(RefreshDatabase::class);
 
 it('assigns the member role during registration when it exists', function (): void {
     Role::query()->firstOrCreate(['name' => 'member', 'guard_name' => 'web']);
@@ -35,7 +32,7 @@ it('registers a user without roles when the member role does not exist', functio
         'password' => 'password123',
     ]);
 
-    expect($user->roles)->toHaveCount(0);
+    expect($user->roles)->toBeEmpty();
 });
 
 it('creates a token with the abilities provided by the controller layer', function (): void {
@@ -45,9 +42,9 @@ it('creates a token with the abilities provided by the controller layer', functi
 
     $token = resolve(LoginUserAction::class)->handle($user, 'password123', 'flutter-phone', ['profile:read', 'users:read']);
 
-    expect($token)->toBeString();
-    expect(PersonalAccessToken::query()->count())->toBe(1);
-    expect(PersonalAccessToken::query()->firstOrFail()->abilities)->toBe(['profile:read', 'users:read']);
+    expect($token)->toBeString()
+        ->and(PersonalAccessToken::query()->count())->toBe(1)
+        ->and(PersonalAccessToken::query()->firstOrFail()->abilities)->toBe(['profile:read', 'users:read']);
 });
 
 it('returns null when login credentials are invalid', function (): void {

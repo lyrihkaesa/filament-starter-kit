@@ -258,9 +258,9 @@ it('can resolve a temporary upload into curator media', function (): void {
     $action = new ResolveMediaAction();
     $media = $action->handle($upload->id, null, 'user_avatar');
 
-    expect($media)->not->toBeNull();
-    expect($media->name)->toBe('test');
-    expect($media->ext)->toBe('jpg');
+    expect($media)->not->toBeNull()
+        ->and($media->name)->toBe('test')
+        ->and($media->ext)->toBe('jpg');
 
     Storage::disk('public')->assertExists($media->path);
     Storage::disk('uploads_tmp')->assertMissing($upload->path);

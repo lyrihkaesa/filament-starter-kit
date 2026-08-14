@@ -8,9 +8,6 @@ use App\Models\Role;
 use App\Models\User;
 use App\Policies\RolePolicy;
 use Database\Seeders\ShieldSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     $this->seed(ShieldSeeder::class);
@@ -30,7 +27,7 @@ it('can view role with permission', function (): void {
 
     $role = Role::query()->first();
 
-    expect($this->policy->view($user, $role))->toBeTrue();
+    expect($this->policy->view($user))->toBeTrue();
 });
 
 it('can create role with permission', function (): void {
@@ -46,7 +43,7 @@ it('can update role with permission', function (): void {
 
     $role = Role::query()->first();
 
-    expect($this->policy->update($user, $role))->toBeTrue();
+    expect($this->policy->update($user))->toBeTrue();
 });
 
 it('can delete role with permission', function (): void {
@@ -55,7 +52,7 @@ it('can delete role with permission', function (): void {
 
     $role = Role::query()->first();
 
-    expect($this->policy->delete($user, $role))->toBeTrue();
+    expect($this->policy->delete($user))->toBeTrue();
 });
 
 it('can restore role with permission', function (): void {
@@ -64,7 +61,7 @@ it('can restore role with permission', function (): void {
 
     $role = Role::query()->first();
 
-    expect($this->policy->restore($user, $role))->toBeTrue();
+    expect($this->policy->restore($user))->toBeTrue();
 });
 
 it('can force delete role with permission', function (): void {
@@ -73,7 +70,7 @@ it('can force delete role with permission', function (): void {
 
     $role = Role::query()->first();
 
-    expect($this->policy->forceDelete($user, $role))->toBeTrue();
+    expect($this->policy->forceDelete($user))->toBeTrue();
 });
 
 it('can force delete any role with permission', function (): void {
@@ -96,7 +93,7 @@ it('can replicate role with permission', function (): void {
 
     $role = Role::query()->first();
 
-    expect($this->policy->replicate($user, $role))->toBeTrue();
+    expect($this->policy->replicate($user))->toBeTrue();
 });
 
 it('can reorder role with permission', function (): void {

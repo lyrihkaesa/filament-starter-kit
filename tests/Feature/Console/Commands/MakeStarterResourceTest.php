@@ -23,12 +23,12 @@ it('can generate starter resource files', function (): void {
     $this->artisan('make:starter-resource '.$model)
         ->assertExitCode(0);
 
-    expect(File::exists($path.'/TestModelResource.php'))->toBeTrue();
-    expect(File::exists($path.'/Pages/CreateTestModel.php'))->toBeTrue();
-    expect(File::exists($path.'/Pages/EditTestModel.php'))->toBeTrue();
-    expect(File::exists($path.'/Pages/ListTestModels.php'))->toBeTrue();
-    expect(File::exists($path.'/Schemas/TestModelForm.php'))->toBeTrue();
-    expect(File::exists($path.'/Tables/TestModelsTable.php'))->toBeTrue();
+    expect(File::exists($path.'/TestModelResource.php'))->toBeTrue()
+        ->and(File::exists($path.'/Pages/CreateTestModel.php'))->toBeTrue()
+        ->and(File::exists($path.'/Pages/EditTestModel.php'))->toBeTrue()
+        ->and(File::exists($path.'/Pages/ListTestModels.php'))->toBeTrue()
+        ->and(File::exists($path.'/Schemas/TestModelForm.php'))->toBeTrue()
+        ->and(File::exists($path.'/Tables/TestModelsTable.php'))->toBeTrue();
 });
 
 it('fails if resource already exists and not forced', function (): void {

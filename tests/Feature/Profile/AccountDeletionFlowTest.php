@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 use App\Filament\Pages\Auth\EditProfile;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 it('can soft-delete account from profile page', function (): void {
     $user = User::factory()->create([
@@ -26,9 +23,9 @@ it('can soft-delete account from profile page', function (): void {
     // Let's check the database first.
     expect($user->refresh()->trashed())->toBeTrue();
 
-    expect(Auth::check())->toBeFalse();
-    expect($user->refresh()->trashed())->toBeTrue();
-    expect($user->anonymized_at)->toBeNull();
+    expect(Auth::check())->toBeFalse()
+        ->and($user->refresh()->trashed())->toBeTrue()
+        ->and($user->anonymized_at)->toBeNull();
 });
 
 it('can be restored by admin after soft-deletion', function (): void {
@@ -39,8 +36,8 @@ it('can be restored by admin after soft-deletion', function (): void {
 
     $user->restore();
 
-    expect($user->refresh()->trashed())->toBeFalse();
-    expect($user->isActive())->toBeTrue();
+    expect($user->refresh()->trashed())->toBeFalse()
+        ->and($user->isActive())->toBeTrue();
 });
 
 it('anonymizes users after 30 days of deletion', function (): void {
@@ -54,18 +51,18 @@ it('anonymizes users after 30 days of deletion', function (): void {
     $user->delete();
     $this->travelBack();
 
-    expect($user->refresh()->trashed())->toBeTrue();
-    expect($user->anonymized_at)->toBeNull();
+    expect($user->refresh()->trashed())->toBeTrue()
+        ->and($user->anonymized_at)->toBeNull();
 
     // Run command
     Artisan::call('app:anonymize-deleted-users');
 
     $user->refresh();
 
-    expect($user->anonymized_at)->not->toBeNull();
-    expect($user->name)->toBe('Anonymous User');
-    expect($user->email)->toContain('anonymous_');
-    expect($user->trashed())->toBeTrue(); // Stay trashed
+    expect($user->anonymized_at)->not->toBeNull()
+        ->and($user->name)->toBe('Anonymous User')
+        ->and($user->email)->toContain('anonymous_')
+        ->and($user->trashed())->toBeTrue(); // Stay trashed
 });
 
 it('does not anonymize users deleted less than 30 days ago', function (): void {

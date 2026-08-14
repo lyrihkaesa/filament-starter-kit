@@ -5,11 +5,8 @@ declare(strict_types=1);
 use App\Models\CuratorMedia;
 use App\Models\TemporaryUpload;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 it('can update profile with basic data', function (): void {
     $user = User::factory()->create([

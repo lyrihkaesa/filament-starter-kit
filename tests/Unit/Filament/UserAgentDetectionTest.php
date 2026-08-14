@@ -8,7 +8,7 @@ use App\Filament\Pages\Auth\EditProfile;
 use ReflectionClass;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('can detect various user agents using Matomo device-detector', function (
     string $userAgent,

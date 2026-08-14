@@ -21,7 +21,7 @@ final class PostgresUuidTest extends TestCase
         $this->assertDatabaseHas('posts', ['id' => $post->id]);
 
         $found = Post::query()->find($post->id);
-        $this->assertNotNull($found);
-        $this->assertEquals($post->id, $found->id);
+        expect($found)->not->toBeNull()
+            ->and($found->id)->toEqual($post->id);
     }
 }

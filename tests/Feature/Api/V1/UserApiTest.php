@@ -5,10 +5,7 @@ declare(strict_types=1);
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function grantUserApiPermissions(User $user, array $permissions): void
 {
@@ -66,9 +63,8 @@ it('returns cursor pagination when requested', function (): void {
         ->and($meta['has_more_pages'])->toBeBool()
         ->and($meta['next_cursor'])->toBeString()
         ->and($meta['prev_cursor'])->toBeNull()
-        ->and($meta['can']['create'])->toBeFalse();
-
-    expect(array_key_exists('current_page', $meta))->toBeFalse();
+        ->and($meta['can']['create'])->toBeFalse()
+        ->and($meta)->not->toHaveKey('current_page');
 });
 
 it('keeps the list item resource shape identical for page and cursor modes', function (): void {

@@ -6,7 +6,7 @@ use App\Filament\Resources\Posts\Tables\PostsTable;
 use Filament\Tables\Table;
 use Tests\TestCase;
 
-uses(TestCase::class);
+pest()->extend(TestCase::class);
 
 it('configures PostsTable', function (): void {
     $table = mock(Table::class);

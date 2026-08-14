@@ -6,12 +6,9 @@ use App\Filament\Resources\Activities\Pages\ManageActivities;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
 
 use function Pest\Livewire\livewire;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     app()->make(PermissionRegistrar::class)->forgetCachedPermissions();

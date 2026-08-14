@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
@@ -28,6 +29,17 @@ use Spatie\Activitylog\Models\Concerns\HasActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property string $id
+ * @property string $name
+ * @property string $email
+ * @property ?string $avatar_curator_id
+ * @property ?string $locale
+ * @property ?Carbon $deleted_at
+ * @property ?Carbon $email_verified_at
+ * @property ?Carbon $created_at
+ * @property ?Carbon $updated_at
+ */
 #[Guarded(['id'])]
 #[Hidden([
     'password',
