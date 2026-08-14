@@ -32,7 +32,7 @@ it('revokes other sessions and all api tokens, keeping the current session', fun
     expect(PersonalAccessToken::query()->where('tokenable_id', $user->id)->count())->toBe(2);
 
     // Simulate a current session by setting "current" session ID
-    session()->setId($currentSessionId);
+    $this->actingAs($user);
 
     resolve(RevokeOtherDevicesAction::class)->handle($user, 'password');
 
@@ -46,7 +46,7 @@ it('revokes other sessions and all api tokens, keeping the current session', fun
     // Notification was sent
     $data = json_decode((string) DB::table('notifications')->where('notifiable_id', $user->id)->value('data'), true);
     expect($data['title'])->toBe('Other Devices Logged Out');
-})->skip(fn (): bool => ! hash_equals(hash('sha256', 'password'), hash('sha256', User::factory()->make()->getAuthPassword() ?? '')), 'Skipped: password hashing mismatch in test environment');
+});
 
 it('only revokes api tokens when session driver is not database', function (): void {
     config(['session.driver' => 'file']);
