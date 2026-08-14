@@ -6,11 +6,11 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/lyrihkaesa/filament-starter-kit.svg?style=flat-square)](https://packagist.org/packages/lyrihkaesa/filament-starter-kit)
 [![Total Downloads](https://img.shields.io/packagist/dt/lyrihkaesa/filament-starter-kit.svg?style=flat-square)](https://packagist.org/packages/lyrihkaesa/filament-starter-kit)
-[![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue.svg?style=flat-square)](https://php.net)
-[![Laravel Version](https://img.shields.io/badge/laravel-12.x-red.svg?style=flat-square)](https://laravel.com)
+[![PHP Version](https://img.shields.io/badge/php-%5E8.3-blue.svg?style=flat-square)](https://php.net)
+[![Laravel Version](https://img.shields.io/badge/laravel-13.x-red.svg?style=flat-square)](https://laravel.com)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
 
-Starter kit untuk membangun admin panel dengan **Laravel 12**, **Filament 5**, dan **Livewire 4**.
+Starter kit untuk membangun admin panel dengan **Laravel 13**, **Filament 5**, **Livewire 4**, dan **Pest 5**.
 
 Fokus utamanya adalah struktur code yang rapi, maintainable, dan nyaman untuk development jangka panjang.
 
