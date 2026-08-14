@@ -17,15 +17,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
-// use Illuminate\Support\Facades\Http;
-// use Illuminate\Support\Sleep;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+// use Illuminate\Support\Facades\Http;
+// use Illuminate\Support\Sleep;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\DriverInterface;
 use Laravel\Sanctum\Sanctum;
 
 // use Illuminate\Validation\Rules\Password;
@@ -37,12 +39,13 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(ImageManager::class, function () {
-            $driver = config('image.driver');
+        $this->app->singleton(ImageManager::class, function (): ImageManager {
+            /** @var class-string<DriverInterface> $driver */
+            $driver = config('image.driver', Driver::class);
 
             // Jika di .env IMAGE_DRIVER=imagick, gunakan ImagickDriver
             // Jika tidak, gunakan GdDriver
-            return new ImageManager(new $driver);
+            return new ImageManager($driver);
         });
 
         // Alias untuk memastikan jika ada vendor yang memanggil via interface
@@ -95,15 +98,15 @@ final class AppServiceProvider extends ServiceProvider
         Date::use(CarbonImmutable::class);
 
         // 🖼️ Media: Paksa Glide (Curator) menggunakan driver yang sama dengan aplikasi
-        $configureGlide = function (GlideManager $manager) {
+        $configureGlide = function (GlideManager $manager): void {
             $configDriver = config('image.driver');
             $driver = ($configDriver === \Intervention\Image\Drivers\Imagick\Driver::class) ? 'imagick' : 'gd';
 
             $manager->serverConfig([
                 'driver' => $driver,
-                'response' => new SymfonyResponseFactory(app('request')),
+                'response' => new SymfonyResponseFactory(resolve('request')),
                 'source' => storage_path('app'),
-                'source_path_prefix' => config('curator.default_directory') ?? 'public',
+                'source_path_prefix' => config('curator.default_directory', 'public'),
                 'cache' => storage_path('app'),
                 'cache_path_prefix' => '.cache',
                 'max_image_size' => 2000 * 2000,

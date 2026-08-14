@@ -9,11 +9,15 @@ use Awcodes\Curator\Components\Forms\RichEditor\AttachCuratorMediaPlugin;
 use Database\Factories\PostFactory;
 use Filament\Forms\Components\RichEditor\Models\Concerns\InteractsWithRichContent;
 use Filament\Forms\Components\RichEditor\Models\Contracts\HasRichContent;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Guarded(['id'])]
+#[WithoutIncrementing]
 final class Post extends Model implements HasRichContent
 {
     /** @use HasFactory<PostFactory> */
@@ -23,25 +27,11 @@ final class Post extends Model implements HasRichContent
     use InteractsWithRichContent;
 
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
      * The primary key type.
      *
      * @var string
      */
     protected $keyType = 'string';
-
-    /**
-     * The attributes that are guarded from mass assignment.
-     *
-     * @var list<string>
-     */
-    protected $guarded = ['id'];
 
     /**
      * Get the author of the post.

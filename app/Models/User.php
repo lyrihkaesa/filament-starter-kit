@@ -12,6 +12,9 @@ use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +28,12 @@ use Spatie\Activitylog\Models\Concerns\HasActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 
+#[Guarded(['id'])]
+#[Hidden([
+    'password',
+    'remember_token',
+])]
+#[WithoutIncrementing]
 final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     use HasActivity;
@@ -40,35 +49,11 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
     use SoftDeletes;
 
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
      * The primary key type.
      *
      * @var string
      */
     protected $keyType = 'string';
-
-    /**
-     * The attributes that are guarded from mass assignment.
-     *
-     * @var list<string>
-     */
-    protected $guarded = ['id'];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
     public function getActivitylogOptions(): LogOptions
     {

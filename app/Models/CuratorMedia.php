@@ -8,6 +8,8 @@ use App\Enums\Privacy;
 use App\Query\CuratorMediaScope;
 use Awcodes\Curator\Models\Media;
 use Database\Factories\CuratorMediaFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,6 +24,30 @@ use Throwable;
  * @property Privacy $privacy
  * @property string $created_by
  */
+#[Fillable([
+    'disk',
+    'directory',
+    'visibility',
+    'name',
+    'path',
+    'width',
+    'height',
+    'size',
+    'type',
+    'ext',
+    'alt',
+    'title',
+    'description',
+    'caption',
+    'pretty_name',
+    'exif',
+    'curations',
+    'tenant_id',
+    'created_by',
+    'privacy',
+    'deleted_by',
+])]
+#[WithoutIncrementing]
 final class CuratorMedia extends Media
 {
     /** @use HasFactory<CuratorMediaFactory> */
@@ -30,33 +56,7 @@ final class CuratorMedia extends Media
     use HasUuids;
     use SoftDeletes;
 
-    public $incrementing = false;
-
     protected $keyType = 'string';
-
-    protected $fillable = [
-        'disk',
-        'directory',
-        'visibility',
-        'name',
-        'path',
-        'width',
-        'height',
-        'size',
-        'type',
-        'ext',
-        'alt',
-        'title',
-        'description',
-        'caption',
-        'pretty_name',
-        'exif',
-        'curations',
-        'tenant_id',
-        'created_by',
-        'privacy',
-        'deleted_by',
-    ];
 
     /**
      * @return Attribute<string, never>

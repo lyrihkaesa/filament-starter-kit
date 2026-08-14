@@ -6,25 +6,15 @@ namespace App\Console\Commands;
 
 use App\Actions\Profile\AnonymizeUserAction;
 use App\Models\User;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 
+#[Description('Anonymize users who have been soft-deleted for more than 30 days.')]
+#[Signature('app:anonymize-deleted-users')]
 final class AnonymizeDeletedUsersCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:anonymize-deleted-users';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Anonymize users who have been soft-deleted for more than 30 days.';
-
     /**
      * Execute the console command.
      */

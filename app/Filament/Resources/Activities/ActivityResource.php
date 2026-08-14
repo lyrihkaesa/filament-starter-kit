@@ -188,7 +188,7 @@ final class ActivityResource extends Resource
                             ->schema(function (Activity $record): array {
                                 [$oldValues, $newValues] = self::extractChangeBuckets($record);
 
-                                if (empty($oldValues) && empty($newValues)) {
+                                if ($oldValues === [] && $newValues === []) {
                                     return [
                                         TextEntry::make('properties')
                                             ->label(__('Metadata'))

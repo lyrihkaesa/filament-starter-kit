@@ -5,25 +5,15 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\TemporaryUpload;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
+#[Description('Cleanup expired temporary uploads')]
+#[Signature('uploads:cleanup')]
 final class CleanupTemporaryUploadsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'uploads:cleanup';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Cleanup expired temporary uploads';
-
     /**
      * Execute the console command.
      */

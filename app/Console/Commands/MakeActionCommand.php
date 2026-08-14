@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
+#[Description('Generate action class(es) for a model or a custom action')]
 final class MakeActionCommand extends GeneratorCommand
 {
     protected $name = 'make:action';
-
-    protected $description = 'Generate action class(es) for a model or a custom action';
 
     protected $type = 'Action';
 

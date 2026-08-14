@@ -14,7 +14,7 @@ final class UpdateProfileRequest extends FormRequest
     public function authorize(
         #[CurrentUser] User $user
     ): bool {
-        return ! ($user->currentAccessToken() && ! $user->tokenCan('profile:read'));
+        return ! $user->currentAccessToken() || $user->tokenCan('profile:read');
     }
 
     /**

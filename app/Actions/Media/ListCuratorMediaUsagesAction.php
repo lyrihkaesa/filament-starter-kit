@@ -8,6 +8,7 @@ use App\Models\CuratorMedia;
 use App\Models\CuratorMediaUsage;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Throwable;
@@ -34,7 +35,7 @@ final readonly class ListCuratorMediaUsagesAction
                 $modelType = (string) $usage->model_type;
                 $modelId = (string) $usage->model_id;
 
-                /** @var class-string<\Illuminate\Database\Eloquent\Model> $modelClass */
+                /** @var class-string<Model> $modelClass */
                 $modelClass = Relation::getMorphedModel($modelType) ?? $modelType;
 
                 return [
@@ -71,7 +72,7 @@ final readonly class ListCuratorMediaUsagesAction
 
         try {
             if ($modelClass === User::class) {
-                $userRecord = User::find($modelId);
+                $userRecord = User::query()->find($modelId);
 
                 // 1. Opsi Edit User (Jika punya role/permission via Policy)
                 if ($userRecord && $authUser?->can('update', $userRecord)) {
@@ -95,7 +96,7 @@ final readonly class ListCuratorMediaUsagesAction
             }
 
             if ($modelClass === Post::class) {
-                $postRecord = Post::find($modelId);
+                $postRecord = Post::query()->find($modelId);
 
                 if ($postRecord && $authUser?->can('update', $postRecord)) {
                     $actions[] = [

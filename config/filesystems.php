@@ -60,7 +60,6 @@ return [
         'uploads_tmp' => [
             'driver' => 'local',
             'root' => storage_path('app/tmp'),
-            'serve' => true,
             'visibility' => 'private',
             'throw' => false,
             'report' => false,

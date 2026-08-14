@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\CuratorMediaUsageFactory;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,16 +17,14 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @codeCoverageIgnore
  * Simple pivot model - relationships tested via integration tests
  */
+#[Guarded(['id'])]
+#[Table(name: 'curator_media_usages')]
 final class CuratorMediaUsage extends Model
 {
     /** @use HasFactory<CuratorMediaUsageFactory> */
     use HasFactory;
 
     use HasUuids;
-
-    protected $table = 'curator_media_usages';
-
-    protected $guarded = ['id'];
 
     /**
      * @return BelongsTo<CuratorMedia, $this>

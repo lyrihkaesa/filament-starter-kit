@@ -4,9 +4,9 @@ This document provides guidelines and commands for agents working in this Larave
 
 ## Project Overview
 
-- **Framework**: Laravel 12 + Filament 5 + Livewire 4
+- **Framework**: Laravel 13 + Filament 5 + Livewire 4
 - **Package Manager**: Composer (PHP), npm (JS)
-- **PHP Version**: ^8.2
+- **PHP Version**: ^8.3
 - **Database**: SQLite (development) or PostgreSQL
 - **Testing**: Pest PHP
 

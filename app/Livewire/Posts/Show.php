@@ -24,9 +24,6 @@ final class Show extends Component
 
     public function render(): View
     {
-        $view = view('livewire.posts.show');
-        assert($view instanceof View);
-
-        return $view;
+        return view('livewire.posts.show');
     }
 }

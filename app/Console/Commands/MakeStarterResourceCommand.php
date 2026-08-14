@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
+#[Description('Generate a custom Filament resource with action pattern')]
+#[Signature('make:starter-resource {model} {--view} {--soft-deletes} {--force}')]
 final class MakeStarterResourceCommand extends Command
 {
-    protected $signature = 'make:starter-resource {model} {--view} {--soft-deletes} {--force}';
-
-    protected $description = 'Generate a custom Filament resource with action pattern';
-
     public function handle(): int
     {
         $model = Str::studly($this->argument('model'));
