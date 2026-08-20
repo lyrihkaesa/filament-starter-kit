@@ -59,6 +59,16 @@ final class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Activity::class, ActivityPolicy::class);
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+
+        // 🛡️ Keamanan Dokumentasi API Scramble: Batasi akses dokumentasi API
+        Gate::define('viewApiDocs', function (?User $user): bool {
+            if (app()->isLocal()) {
+                return true;
+            }
+
+            return $user !== null && ($user->hasRole('super_admin') || $user->email === 'admin@example.com');
+        });
+
         // @codeCoverageIgnoreStart
 
         // 🚀 Optimasi Asset: Prefetching agresif (Laravel 11.7+)
