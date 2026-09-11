@@ -7,6 +7,10 @@ description: when creating, modifying, or refactoring HTTP or API controllers
 
 ## Principles
 - **Clean & Lean:** Controllers must be thin coordinators. Their only job is to coordinate: Authorize -> Validate -> Execute Action -> Return Response.
+- **Resourceful Methods Only ("Cruddy by Design"):** Controllers **MUST ONLY** define standard Laravel resourceful methods (`index`, `create`, `store`, `show`, `edit`, `update`, `destroy`) or single-action invokable controllers (`__invoke`).
+- **No Custom Action Methods:** NEVER add arbitrary action methods like `publish()`, `approve()`, `cancel()`, `ban()` to a controller. Instead, treat the action as a dedicated resource/sub-resource:
+  - Create a new focused controller (e.g., `PublishPostController` or `PostPublicationController`).
+  - Use standard methods such as `store` (to publish), `destroy` (to unpublish), or `__invoke`.
 - **Strict Typing:** Always use strict type accessors from the request.
 - **No Inheritance:** Controllers **MUST NOT** extend the base `App\Http\Controllers\Controller` class. They should be final, standalone classes.
 
@@ -35,6 +39,21 @@ description: when creating, modifying, or refactoring HTTP or API controllers
   ```
 - **Authorization in Controller:** Only allowed for simple `GET` requests that do not require a `FormRequest`.
 - **Injected Auth:** Use the `#[CurrentUser]` attribute to inject the authenticated user.
+- **Default Resource Methods Only:** Any public method declared on a controller MUST strictly adhere to Pest's `preset()->laravel()` allowed public methods:
+  - `__construct`
+  - `__invoke`
+  - `index`
+  - `show`
+  - `create`
+  - `store`
+  - `edit`
+  - `update`
+  - `destroy`
+  - `middleware` (when implementing `HasMiddleware`)
+  All helper methods must be `private`. This ensures automatic compliance with `arch()->preset()->laravel()`.
+- **Sub-Resource Controller for Custom Actions:** For state changes or domain operations (e.g. publishing, verifying, restoring):
+  - Model the action as a dedicated controller (e.g. `PublishPostController` or `PostPublicationController`).
+  - Use `store`/`update`/`destroy` or `__invoke` instead of inventing custom method names.
 - **Strict Request Access:** Use type-safe methods for data retrieval:
   - `$request->string('key')`
   - `$request->integer('key')`
@@ -42,6 +61,7 @@ description: when creating, modifying, or refactoring HTTP or API controllers
 - **PHPStan Happiness:** Use `assert()` to narrow down types when needed.
 
 ## Avoid
+- **Custom Public Action Methods:** DO NOT declare arbitrary public methods like `publish()`, `approve()`, `archive()`, `ban()` in a controller.
 - **Context Helpers:** DO NOT use `auth()`, `Auth::user()`, `request()`, or `session()`.
 - **User Retrieval:** DO NOT use `$request->user()`. Use `#[CurrentUser] User $user`.
 - **Generic Accessors:** DO NOT use `$request->input()`, `$request->all()`, or `$request->get()`.
