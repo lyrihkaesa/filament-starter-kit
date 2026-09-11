@@ -18,7 +18,7 @@ Fokus utamanya adalah struktur code yang rapi, maintainable, dan nyaman untuk de
 
 - Arsitektur jelas: mutation lewat `Action Pattern` (`handle()`), query lewat scope/custom builder.
 - API siap pakai dengan Sanctum dan struktur endpoint `api/v1`.
-- Dokumentasi API interaktif otomatis via Dedoc Scramble (`/docs/api`).
+- Dokumentasi API lengkap: interaktif via Dedoc Scramble (`/docs/api`) & living client via Bruno (`api-tests/bruno`).
 - SEO & Document Head management terintegrasi via `laravel/head` (title templates, OpenGraph, canonical URLs, robots).
 - Media management terpusat via Filament Curator dengan pelacakan penggunaan media (`CuratorMediaUsage`).
 - Role & permission sudah siap via Filament Shield berbasis Policy & Permissions standar.
@@ -138,6 +138,7 @@ Dokumentasi lengkap ada di folder [`docs`](./docs) dan versi online:
 - [30 - Media Usage Tracking & Deletion Protection System](./docs/30-media-usage-and-protection-system.md)
 - [31 - Filament Shield Seeding Process](./docs/31-shield-seeding-process.md)
 - [32 - Authorization & Policy Standards](./docs/32-authorization-policy-standard.md)
+- [33 - Laravel Head](./docs/33-laravel-head.md)
 
 ## License
 

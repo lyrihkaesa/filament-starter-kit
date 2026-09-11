@@ -1,0 +1,36 @@
+meta {
+  name: List Posts
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/posts
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~per_page: 15
+  ~page: 1
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response has posts list", function() {
+    const body = res.getBody();
+    const data = body.data;
+    expect(data).to.be.an('array');
+    if (data.length > 0) {
+      bru.setVar("last_post_id", data[0].id);
+    }
+  });
+
+  test("Response has pagination meta", function() {
+    const body = res.getBody();
+    expect(body.meta).to.be.an('object');
+  });
+}

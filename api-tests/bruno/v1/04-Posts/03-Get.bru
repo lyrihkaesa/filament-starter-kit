@@ -1,0 +1,23 @@
+meta {
+  name: Get Post
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/posts/{{created_post_id}}
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response has post data", function() {
+    const body = res.getBody();
+    const data = body.data;
+    expect(data.id).to.equal(bru.getVar("created_post_id"));
+  });
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Create Post
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/posts
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "Post from Bruno {{$randomInt}}",
+    "slug": "post-from-bruno-{{$randomInt}}",
+    "content": "This is sample article content created from Bruno API client.",
+    "author_id": "{{user_id}}",
+    "published_at": "2026-04-11T10:00:00Z"
+  }
+}
+
+tests {
+  test("Status code is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("Response has created post data", function() {
+    const body = res.getBody();
+    const data = body.data;
+    expect(data.id).to.be.a('string');
+    bru.setVar("created_post_id", data.id);
+  });
+}

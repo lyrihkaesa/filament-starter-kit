@@ -78,23 +78,24 @@ Bagian ini masih dikomentari, jadi belum aktif.
 
 Karena ini berguna saat project mulai membutuhkan standar password yang lebih ketat, terutama di production.
 
-## Strict Models (Opsional)
+## Prevent Lazy Loading (Anti N+1)
 
 ```php
-// Model::shouldBeStrict();
+Model::preventLazyLoading(! app()->isProduction());
 ```
 
 ### Tujuan
 
-Membantu mendeteksi:
+Mencegah terjadinya query N+1 selama fase development dan testing tanpa merusak kompatibilitas Filament.
 
-- lazy loading yang tidak sengaja
-- atribut yang tidak valid
-- beberapa perilaku model yang terlalu permisif
+### Kenapa bukan `Model::shouldBeStrict()`?
 
-### Status di project ini
+`Model::shouldBeStrict()` mengaktifkan tiga fitur sekaligus:
+1. `preventLazyLoading()`
+2. `preventSilentlyDiscardingAttributes()`
+3. `preventAccessingMissingAttributes()`
 
-Masih dikomentari. Cocok diaktifkan jika tim sudah siap dengan mode Eloquent yang lebih ketat.
+Pada Filament, query tabel sering kali hanya memilih sebagian kolom tertentu (misalnya `select('id', 'name')`) demi efisiensi. Fitur `preventAccessingMissingAttributes()` akan melempar exception saat Filament mengakses properti internal model yang sengaja tidak dimuat. Oleh karena itu, *best practice* di starter kit ini adalah mengaktifkan `preventLazyLoading(! app()->isProduction())` secara terarah.
 
 ## Unguard Mass Assignment di Local
 
@@ -240,6 +241,87 @@ Dengan `Sleep::fake()`, test tetap menjalankan alur logikanya tanpa benar-benar 
 ### Studi kasus
 
 Bayangkan Anda punya service yang mencoba ulang request 3 kali dan setiap percobaan memakai jeda 1 detik. Tanpa fake sleep, satu test bisa menunggu beberapa detik tanpa memberi nilai tambah. Dengan `Sleep::fake()`, test tetap memverifikasi flow retry tanpa membuang waktu nyata.
+
+## Keamanan Dokumentasi API (Scramble Gate)
+
+```php
+Gate::define('viewApiDocs', function (?User $user): bool {
+    if (app()->isLocal()) {
+        return true;
+    }
+
+    return $user !== null && ($user->hasRole('super_admin') || $user->email === 'admin@example.com');
+});
+```
+
+### Tujuan
+
+Mengontrol otorisasi akses halaman dokumentasi OpenAPI Swagger (`/docs/api`). Di environment lokal otomatis terbuka untuk mempercepat testing, sedangkan di staging/production diproteksi hanya untuk user dengan role `super_admin`.
+
+## Konfigurasi Default Document Head & SEO (`laravel/head`)
+
+```php
+Head::defaults(function (HeadBuilder $head): void {
+    $appName = config()->string('app.name', 'Laravel');
+
+    $head
+        ->title($appName, suffix: " - {$appName}")
+        ->description('Filament Starter Kit for Laravel with best practices')
+        ->canonical()
+        ->og(type: OgType::Website, siteName: $appName)
+        ->searchableByRobots();
+});
+```
+
+### Tujuan
+
+Menetapkan metadata document `<head>` default untuk seluruh aplikasi:
+- Template judul otomatis (`Page Title - AppName`).
+- Default meta description dan OpenGraph metadata.
+- Canonical URL otomatis berbasis URL request aktif.
+- Direktif robots (`all`) yang dapat di-override di level route atau komponen Livewire.
+
+## Enforce Morph Map
+
+```php
+Relation::enforceMorphMap(ActivitySubjectType::morphMap());
+```
+
+### Tujuan
+
+Mencegah penyimpanan Fully Qualified Class Name (FQCN) seperti `App\Models\Post` ke dalam kolom polymorphic database (`subject_type`). Sebagai gantinya, digunakan alias yang stabil seperti `post` atau `user`. Jika ada class baru yang belum terdaftar di map, Laravel akan melempar exception sehingga integritas database tetap terjaga saat refactoring namespace model.
+
+## Sinkronisasi Driver Gambar Glide (Curator)
+
+```php
+$this->app->resolving(GlideManager::class, function (GlideManager $manager): void {
+    $configDriver = config('image.driver');
+    $driver = ($configDriver === \Intervention\Image\Drivers\Imagick\Driver::class) ? 'imagick' : 'gd';
+    // set serverConfig ...
+});
+```
+
+### Tujuan
+
+Memastikan server pemrosesan thumbnail dan media pada Filament Curator menggunakan driver gambar yang selaras (`gd` atau `imagick`) dengan konfigurasi `IMAGE_DRIVER` di environment aplikasi.
+
+## Rate Limiter API
+
+```php
+RateLimiter::for('api', function (Request $request): Limit {
+    $key = $request->user()?->getAuthIdentifier() ?? $request->ip();
+
+    return Limit::perMinute(60)->by($key);
+});
+
+RateLimiter::for('api-auth', fn (Request $request): Limit => Limit::perMinute(5)->by($request->ip()));
+```
+
+### Tujuan
+
+Melindungi endpoint API dari serangan brute force dan denial of service:
+- `api`: Batas 60 request per menit per user (atau per IP jika guest).
+- `api-auth`: Batas ketat 5 request per menit per IP untuk endpoint autentikasi (`/api/v1/auth/login`).
 
 ## Studi Kasus Besar
 

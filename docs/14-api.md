@@ -518,26 +518,9 @@ Supaya struktur project tetap bersih:
 
 Jadi, action tidak bertugas mengecek ability token.
 
-## Automated API Testing (Bruno)
+## Post API v1 (Action-Based)
 
-Untuk memudahkan pengembangan dan integrasi, starter kit ini menyertakan koleksi **Bruno API Client** yang terletak di folder `api-tests/bruno`.
-
-### Fitur Utama:
-- **Git-Friendly**: Disimpan dalam format `.bru` yang mudah di-tracking.
-- **Automated Auth**: Script login otomatis menyimpan token Sanctum untuk dipakai request berikutnya (`me`, `logout`, dsb).
-- **Environment Support**: Mendukung environment `local` dengan variabel `{{base_url}}`.
-
-### Cara Menjalankan:
-1. Pakai ekstensi **Bruno** di VS Code.
-2. Buka folder `api-tests/bruno`.
-3. Pilih environment `local`.
-4. Jalankan alur `Login` -> `Get Profile`.
-
-Detail lebih lanjut ada di [api-tests/README.md](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/api-tests/README.md).
-
-## Update 11 April 2026: Post API v1 (Action-Based)
-
-Endpoint baru:
+Endpoint:
 
 - `GET /api/v1/posts`
 - `POST /api/v1/posts`
@@ -560,7 +543,85 @@ Token abilities:
 - `posts:update`
 - `posts:delete`
 
+## Dokumentasi API: Scramble vs Bruno
+
+Starter kit ini menyediakan **dua pendekatan dokumentasi API** yang saling melengkapi dan dirancang untuk kenyamanan tim backend, frontend (web), maupun mobile engineer (Flutter/React Native):
+
+| Aspek | Dedoc Scramble (`/docs/api`) | Bruno Collection (`api-tests/bruno`) |
+| :--- | :--- | :--- |
+| **Bentuk** | Web-based OpenAPI / Swagger UI interaktif | File teks `.bru` di dalam repository Git |
+| **Karakteristik** | Otomatis ter-generate dari route, FormRequest & API Resource | *Living & executable documentation* siap dijalankan |
+| **Kelebihan Utama** | Visual, mudah diakses lewat browser tanpa instalasi tool | Offline-first, tanpa cloud lock-in, mendukung auth chaining |
+| **Target Pengguna** | Developer yang butuh referensi cepat atau OpenAPI spec generator | Mobile/Frontend engineer yang langsung ingin hit endpoint & test |
+
+---
+
+### 1. Dedoc Scramble (Dokumentasi Browser / OpenAPI)
+
+Starter kit ini dilengkapi dengan **[Dedoc Scramble](https://scramble.dedoc.co/)** untuk menghasilkan dokumentasi OpenAPI / Swagger v3 interaktif secara otomatis tanpa perlu menulis anotasi PHPDoc yang melelahkan.
+
+#### Akses Dokumentasi
+
+Dokumentasi API dapat diakses di browser pada:
+
+```text
+/docs/api
+```
+
+Contoh jika menggunakan Laravel Herd: `http://filament-starter-kit.test/docs/api`.
+
+#### Keamanan Akses (Gate Authorization)
+
+Akses dokumentasi API diproteksi melalui Gate `viewApiDocs` di `AppServiceProvider`:
+
+```php
+Gate::define('viewApiDocs', function (?User $user): bool {
+    if (app()->isLocal()) {
+        return true;
+    }
+
+    return $user !== null && ($user->hasRole('super_admin') || $user->email === 'admin@example.com');
+});
+```
+
+- **Local environment (`isLocal()`):** Dokumentasi terbuka otomatis untuk mempermudah development.
+- **Staging / Production:** Akses dibatasi ketat hanya untuk user yang telah login dan memiliki role `super_admin` atau email admin terdaftar.
+
+---
+
+### 2. Bruno API Client (Dokumentasi Executable & Git-Friendly)
+
+Sebagai alternatif dan pendamping modern untuk Postman/Insomnia, starter kit ini menyertakan koleksi **[Bruno](https://www.usebruno.com/)** di folder `api-tests/bruno`.
+
+#### Kenapa Bruno Sangat Bagus untuk Dokumentasi API:
+
+1. **Git-Friendly & Text-Based (`.bru`)**: Seluruh request, headers, query params, body JSON, dan assertions disimpan dalam file teks biasa. Perubahan endpoint ikut terdokumentasi dan ter-review di Pull Request bersamaan dengan kode backend.
+2. **Bebas Cloud Lock-in**: Data API, token, dan environment Anda tersimpan 100% lokal di komputer Anda, tidak dikirim ke server pihak ketiga seperti pada Postman.
+3. **Automated Auth Chaining**: Request `01-Auth/02-Login.bru` memiliki post-response script yang otomatis mengekstrak token Sanctum dan menyimpannya ke variabel `{{access_token}}`. Seluruh request lain di koleksi otomatis mewarisi (*inherit*) token ini tanpa perlu copy-paste manual.
+4. **Struktur Koleksi Modular**:
+   - `01-Auth`: Register, Login, Me (Profile), Update Profile
+   - `02-Users`: CRUD User Management (List, Create, Get, Update, Delete)
+   - `03-Uploads`: Alur unggah berkas (Prepare, Upload Local, Mark Uploaded, Get Upload)
+   - `04-Posts`: CRUD Post Management
+   - `99-Cleanup`: Logout & token revocation
+5. **Dapat Dijalankan di CI/CD**: Selain via GUI (aplikasi desktop Bruno atau ekstensi VS Code), koleksi dapat dijalankan secara headless menggunakan `@usebruno/cli`:
+
+```bash
+bru run --env local --env-var email=superadmin@example.com --env-var password=password
+```
+
+#### Cara Menggunakan Bruno:
+1. Pasang aplikasi **Bruno** (atau pasang ekstensi **Bruno** di VS Code).
+2. Buka folder `api-tests/bruno` sebagai *Collection*.
+3. Pilih environment `local`.
+4. Buka folder `01-Auth` dan jalankan `02-Login` (token akan otomatis tersimpan).
+5. Anda siap mengeksplorasi dan mengeksekusi seluruh endpoint yang tersedia.
+
+Detail lebih lanjut ada di [api-tests/README.md](https://github.com/lyrihkaesa/filament-starter-kit/blob/main/api-tests/README.md).
+
 ## Referensi
 
-- Laravel Sanctum: [https://laravel.com/docs/12.x/sanctum](https://laravel.com/docs/12.x/sanctum)
-- Laravel API Resources: [https://laravel.com/docs/12.x/eloquent-resources](https://laravel.com/docs/12.x/eloquent-resources)
+- Laravel Sanctum: [https://laravel.com/docs/sanctum](https://laravel.com/docs/sanctum)
+- Laravel API Resources: [https://laravel.com/docs/eloquent-resources](https://laravel.com/docs/eloquent-resources)
+- Dedoc Scramble: [https://scramble.dedoc.co/](https://scramble.dedoc.co/)
+- Bruno API Client: [https://www.usebruno.com/](https://www.usebruno.com/)

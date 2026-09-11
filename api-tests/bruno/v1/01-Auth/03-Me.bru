@@ -19,5 +19,8 @@ tests {
     const body = res.getBody();
     const data = body.data || body;
     expect(data.email).to.be.a('string');
+    if (data.id) {
+      bru.setVar("user_id", data.id);
+    }
   });
 }

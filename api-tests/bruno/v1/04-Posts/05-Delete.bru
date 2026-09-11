@@ -1,0 +1,17 @@
+meta {
+  name: Delete Post
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/posts/{{created_post_id}}
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("Status code is 200 or 204", function() {
+    expect([200, 204]).to.include(res.getStatus());
+  });
+}

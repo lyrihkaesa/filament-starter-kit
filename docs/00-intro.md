@@ -63,12 +63,16 @@ Di fase production, menebak-nebak apakah *update* baru akan memecahkan sistem la
 
 Beberapa komponen utama yang dipakai:
 
-- Laravel 12
-- Filament
-- Livewire
-- Laravel Sanctum
-- Filament Shield
-- Pest
+- Laravel 13
+- Filament 5
+- Livewire 4
+- Laravel Sanctum (Mobile API Authentication)
+- Dedoc Scramble (Interactive OpenAPI Documentation)
+- Laravel Head (`laravel/head` - Document Head & SEO Manager)
+- Filament Shield (Role & Permission via Policies)
+- Filament Curator (Centralized Media Management)
+- Spatie Laravel Activitylog (Audit Trail & Activity Log)
+- Pest 5 (100% Type & Code Coverage)
 - Laravel Pint
 - Larastan
 - Rector
