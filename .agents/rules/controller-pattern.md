@@ -1,7 +1,7 @@
 # Controller Pattern
 
 ## Principles
-- **Clean & Lean:** Controllers must be thin. Their only job is to coordinate: Validate -> Authorize -> Execute Action -> Return Response.
+- **Clean & Lean:** Controllers must be thin coordinators. Their only job is to coordinate: Authorize -> Validate -> Execute Action -> Return Response.
 - **Strict Typing:** Always use strict type accessors from the request.
 - **No Inheritance:** Controllers **MUST NOT** extend the base `App\Http\Controllers\Controller` class. They should be final, standalone classes.
 
@@ -10,22 +10,22 @@
 - **Parameter Order:** 
   1. `FormRequest $request` (if applicable)
   2. `{Model} $model` (the bound model from the route)
-  3. `{Action} $action` (the logic handler)
+  3. `{Action} $action` (the logic handler for CUD mutations)
   4. `#[CurrentUser] User $user` (the authenticated user)
-- **Authorization in Request:** Authorization logic **MUST** be placed in the `authorize()` method of the `FormRequest` using Policies.
-- **Dual-Context Auth:** To support both Web (Session) and API (Sanctum), the `authorize()` method must check if a token is present before checking token abilities:
+- **Authorization in Request (Fail-Fast):** Authorization logic **MUST** be placed in the `authorize()` method of the `FormRequest` using Policies, running before validation rules.
+- **Dual-Context Auth:** To support both Web (Session) and API (Sanctum), inject attributes in `authorize()` and check token ability before checking policy:
   ```php
-  public function authorize(): bool
-  {
-      $user = $this->user();
-      if (!$user) return false;
-
-      // Only check token ability if the user is authenticated via Sanctum token
-      if ($user->currentAccessToken() && !$user->tokenCan('posts:update')) {
+  public function authorize(
+      #[RouteParameter('post')] Post $post,
+      #[CurrentUser] User $user,
+  ): bool {
+      // 1. Check Sanctum ability if authenticated via token
+      if ($user->currentAccessToken() && ! $user->tokenCan('posts:update')) {
           return false;
       }
 
-      return $user->can('update', $this->route('post'));
+      // 2. Check Policy / Gate
+      return $user->can('update', $post);
   }
   ```
 - **Authorization in Controller:** Only allowed for simple `GET` requests that do not require a `FormRequest`.
