@@ -18,9 +18,13 @@ Fokus utamanya adalah struktur code yang rapi, maintainable, dan nyaman untuk de
 
 - Arsitektur jelas: mutation lewat `Action Pattern` (`handle()`), query lewat scope/custom builder.
 - API siap pakai dengan Sanctum dan struktur endpoint `api/v1`.
-- Role & permission sudah siap via Filament Shield.
+- Dokumentasi API interaktif otomatis via Dedoc Scramble (`/docs/api`).
+- SEO & Document Head management terintegrasi via `laravel/head` (title templates, OpenGraph, canonical URLs, robots).
+- Media management terpusat via Filament Curator dengan pelacakan penggunaan media (`CuratorMediaUsage`).
+- Role & permission sudah siap via Filament Shield berbasis Policy & Permissions standar.
+- Audit Trail & Activity Log otomatis via Spatie Activitylog (UUID-first).
 - UUID-first untuk tabel baru.
-- Tooling kualitas code sudah terpasang: Pest, Pint, Larastan, Rector.
+- Tooling kualitas code sudah terpasang: Pest (100% type coverage), Pint, Larastan, Rector.
 - Cocok untuk workflow AI-assisted coding karena aturan project dan docs sudah terstruktur.
 
 ## Quick Start
@@ -34,14 +38,21 @@ cd my-app
 
 ### 2) Install dependency dan setup awal
 
+Jalankan perintah setup otomatis:
+
 ```bash
-composer install
-npm install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-npm run build
+composer run setup
 ```
+
+> Atau jika ingin menjalankan langkah manual:
+> ```bash
+> composer install
+> npm install
+> cp .env.example .env
+> php artisan key:generate
+> php artisan migrate --seed
+> npm run build
+> ```
 
 ### 3) Jalankan development server
 
@@ -121,6 +132,12 @@ Dokumentasi lengkap ada di folder [`docs`](./docs) dan versi online:
 - [24 - Laravel Boost AI Coding Guidelines](./docs/24-laravel-boost-ai-coding-guidelines.md)
 - [25 - Creating New Module](./docs/25-creating-new-module.md)
 - [26 - Production Deployment](./docs/26-production-deployment.md)
+- [27 - Audit Trail](./docs/27-audit-trail.md)
+- [28 - Curator Delete Guard & Authorization Boundary](./docs/28-curator-delete-authorization-boundary.md)
+- [29 - Media Action Orchestration](./docs/29-media-action-orchestration.md)
+- [30 - Media Usage Tracking & Deletion Protection System](./docs/30-media-usage-and-protection-system.md)
+- [31 - Filament Shield Seeding Process](./docs/31-shield-seeding-process.md)
+- [32 - Authorization & Policy Standards](./docs/32-authorization-policy-standard.md)
 
 ## License
 
