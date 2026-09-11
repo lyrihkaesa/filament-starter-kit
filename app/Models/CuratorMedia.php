@@ -122,32 +122,32 @@ final class CuratorMedia extends Media
     }
 
     /**
-     * @return Attribute<string, never>
+     * @return Attribute<string|null, never>
      */
     public function thumbnailUrl(): Attribute
     {
         return Attribute::make(
-            get: fn (): string => $this->url,
+            get: fn (): ?string => $this->url,
         );
     }
 
     /**
-     * @return Attribute<string, never>
+     * @return Attribute<string|null, never>
      */
     public function mediumUrl(): Attribute
     {
         return Attribute::make(
-            get: fn (): string => $this->url,
+            get: fn (): ?string => $this->url,
         );
     }
 
     /**
-     * @return Attribute<string, never>
+     * @return Attribute<string|null, never>
      */
     public function largeUrl(): Attribute
     {
         return Attribute::make(
-            get: fn (): string => $this->url,
+            get: fn (): ?string => $this->url,
         );
     }
 

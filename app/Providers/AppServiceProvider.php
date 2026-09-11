@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Models\Activity;
 use App\Models\PersonalAccessToken;
+use App\Models\User;
 use App\Policies\ActivityPolicy;
 use App\Support\Activity\ActivitySubjectType;
 use Awcodes\Curator\Config\GlideManager;
@@ -83,8 +84,8 @@ final class AppServiceProvider extends ServiceProvider
         //     : Password::min(8)
         // );
 
-        // 💎 Kualitas: Mode ketat Eloquent (Laravel 9.11+)
-        // Model::shouldBeStrict();
+        // 💎 Kualitas: Cegah N+1 Lazy Loading (Laravel Best Practices)
+        Model::preventLazyLoading(! app()->isProduction());
 
         // Paksa alias morph yang stabil agar tidak bergantung pada FQCN model.
         Relation::enforceMorphMap(ActivitySubjectType::morphMap());
