@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: when creating, updating, or reviewing policies, permissions, or Filament Shield authorization
+---
+
 # Roles & Permissions Guidelines
 
 ## Use When

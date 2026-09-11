@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: when creating, modifying, or refactoring HTTP or API controllers
+---
+
 # Controller Pattern
 
 ## Principles

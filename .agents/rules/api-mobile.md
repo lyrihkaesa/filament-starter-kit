@@ -1,5 +1,5 @@
 ---
-trigger: api_implementation
+trigger: model_decision
 description: when generating or modifying Laravel API resources, controllers, requests, and versioned endpoints
 ---
 
@@ -33,9 +33,9 @@ description: when generating or modifying Laravel API resources, controllers, re
 
 ## Controller Rules
 - Prefer final API controllers.
-- Keep controller flow thin: validate -> token ability -> authorize -> action -> response.
+- Keep controller flow thin: FormRequest (token ability -> authorize -> validate) -> Action -> Response.
 - Do not place Sanctum `tokenCan(...)` checks in Actions.
-- Avoid Sanctum ability checks in shared Form Requests.
+- Form Requests must handle token ability + policy check in `authorize()` to fail fast before validating body.
 
 ## Requests Namespace
 - Reusable requests: neutral namespace like `App\Http\Requests\Auth` or `App\Http\Requests\Users`.

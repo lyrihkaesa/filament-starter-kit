@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: when creating, modifying, or refactoring FormRequest validation and authorization classes
+---
+
 # Form Request Pattern
 
 ## Principles

@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: when creating, modifying, or refactoring business mutation logic (Create, Update, Delete) in app/Actions
+---
+
 # Action Pattern
 
 ## Use When
