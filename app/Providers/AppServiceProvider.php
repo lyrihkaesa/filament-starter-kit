@@ -29,6 +29,9 @@ use Illuminate\Support\ServiceProvider;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\DriverInterface;
+use Laravel\Head\Enums\OgType;
+use Laravel\Head\Facades\Head;
+use Laravel\Head\HeadBuilder;
 use Laravel\Sanctum\Sanctum;
 
 // use Illuminate\Validation\Rules\Password;
@@ -68,6 +71,18 @@ final class AppServiceProvider extends ServiceProvider
             }
 
             return $user !== null && ($user->hasRole('super_admin') || $user->email === 'admin@example.com');
+        });
+
+        // 🌐 Laravel Head: Konfigurasi default document head & SEO metadata
+        Head::defaults(function (HeadBuilder $head): void {
+            $appName = config()->string('app.name', 'Laravel');
+
+            $head
+                ->title($appName, suffix: " - {$appName}")
+                ->description('Filament Starter Kit for Laravel with best practices')
+                ->canonical()
+                ->og(type: OgType::Website, siteName: $appName)
+                ->searchableByRobots();
         });
 
         // @codeCoverageIgnoreStart
