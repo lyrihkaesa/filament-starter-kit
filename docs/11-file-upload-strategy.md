@@ -92,7 +92,7 @@ Bagus untuk:
 
 Ini biasanya pilihan paling sehat untuk production.
 
-### 3. Two-phase upload: temporary -> finalize
+### 3. Two-phase upload: temporary → finalize
 
 Ini adalah variasi direct upload yang saya paling sarankan untuk file yang nantinya dipakai model bisnis, misalnya:
 
@@ -1215,7 +1215,7 @@ Lebih cepat dibuat, tapi:
 - perlu job cleanup orphan
 - audit dan retry lebih sulit
 
-Menurut saya, untuk aplikasi yang ingin rapi sejak awal, **temporary -> finalize** tetap pilihan paling sehat.
+Menurut saya, untuk aplikasi yang ingin rapi sejak awal, **temporary → finalize** tetap pilihan paling sehat.
 
 ## Keputusan Akhir yang Saya Sarankan untuk Starter Kit Ini
 

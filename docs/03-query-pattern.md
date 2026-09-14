@@ -129,7 +129,7 @@ Model tetap bersih. Semua query logic terpusat di satu file Builder.
 
 ### Struktur Folder
 
-```
+```text
 app/Models/
 ├── Builders/
 │   └── UserBuilder.php
@@ -143,7 +143,7 @@ app/Models/
 | Kondisi | Pola yang Disarankan |
 | :--- | :--- |
 | Model baru / sederhana | `#[Scope]` di dalam model |
-| Model mulai memiliki > 5 scope | Pindahkan ke **Custom Builder** |
+| Model mulai memiliki `> 5` scope | Pindahkan ke **Custom Builder** |
 | Query melibatkan banyak Join/Subquery | Gunakan **Custom Builder** atau **Query Object** |
 
 ---

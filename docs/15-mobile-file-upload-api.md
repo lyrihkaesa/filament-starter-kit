@@ -1,4 +1,4 @@
-# Mobile File Upload API (Flutter <-> Laravel)
+# Mobile File Upload API (Flutter ↔ Laravel)
 
 Dokumen ini menjelaskan alur kerja (workflow) untuk mengunggah file dari aplikasi Mobile (Flutter) ke server Laravel menggunakan **Pre-Signed URL** serta cara menghubungkannya dengan model utama.
 

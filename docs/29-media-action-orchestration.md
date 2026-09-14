@@ -42,9 +42,9 @@ Filament page/resource tidak melakukan logika media langsung.
 
 Filament hanya memanggil Action domain:
 
-- `CreatePost` -> `CreatePostAction`
-- `EditPost` -> `UpdatePostAction`
-- `DeleteAction` Post -> `DeletePostAction`
+- `CreatePost` → `CreatePostAction`
+- `EditPost` → `UpdatePostAction`
+- `DeleteAction` Post → `DeletePostAction`
 
 Dengan pola ini, endpoint API nanti tinggal memanggil Action yang sama.
 

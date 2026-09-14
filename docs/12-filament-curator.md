@@ -103,8 +103,8 @@ Field domain yang saat ini sudah terhubung ke Curator:
 
 Relasi model yang dipakai:
 
-- user -> `avatarMedia`
-- post -> `thumbnailCurator`
+- user → `avatarMedia`
+- post → `thumbnailCurator`
 
 Dengan pola ini, model domain tidak menyimpan path file mentah sebagai source of truth utama. Yang disimpan adalah referensi ke record Curator.
 
@@ -240,7 +240,7 @@ Tahap berikut yang sudah direncanakan adalah upload API mobile dengan tabel `upl
 
 Pola yang akan dipakai:
 
-- mobile upload baru -> pegang `upload_id`
+- mobile upload baru → pegang `upload_id`
 - endpoint domain menerima `*_upload_id` atau `*_curator_id`
 - backend otomatis resolve hasil akhir ke record Curator
 - `prepare upload` akan membaca rule per `purpose`

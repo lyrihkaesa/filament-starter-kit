@@ -20,7 +20,7 @@ Berikut adalah tiga layer yang paling sering Anda temui saat membangun fitur bar
 
 Semua operasi yang **mengubah state** — buat, ubah, hapus — harus hidup di dalam kelas Action.
 
-```
+```text
 app/Actions/
 ├── Users/
 │   ├── CreateUserAction.php
@@ -101,7 +101,7 @@ User::query()->active()->search('kaesa')->paginate(15);
 
 Saat scope bertambah banyak, pindahkan semua logika query ke file Builder tersendiri.
 
-```
+```text
 app/Models/
 ├── Builders/
 │   └── UserBuilder.php
@@ -162,7 +162,7 @@ Bacaan lebih lanjut: [03-query-pattern.md](./03-query-pattern.md)
 
 Semua komunikasi dengan sistem di luar aplikasi — API pihak ketiga, SDK eksternal, layanan payment, SMS, notifikasi push — harus dibungkus dalam kelas Service.
 
-```
+```text
 app/Services/
 ├── GoogleClientService.php
 ├── MidtransPaymentService.php
@@ -216,7 +216,7 @@ final readonly class RegisterWithGoogleAction
 
 ## Ringkasan Struktur Folder
 
-```
+```text
 app/
 ├── Actions/          # Mutations: Create, Update, Delete, Custom Business Logic
 │   └── Users/
@@ -243,7 +243,7 @@ Berikut alur request yang ideal, dari user klik tombol hingga data tersimpan.
 
 ### Di Admin Panel (Filament)
 
-```
+```text
 User klik "Simpan" di Filament Page
   → Filament Action (UI trigger)
   → Form Request / Policy (authorization)
@@ -254,7 +254,7 @@ User klik "Simpan" di Filament Page
 
 ### Di API (Mobile/Frontend)
 
-```
+```text
 Client kirim PATCH /api/v1/users/{user}
   → Middleware (auth, throttle)
   → Form Request (validasi + authorization)
